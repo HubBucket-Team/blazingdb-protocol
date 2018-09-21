@@ -6,7 +6,7 @@ BlazingDB Protocol &amp; Messages
 
 Here are the steps to do so, including the necessary dependencies, just be sure to have:
 
-- a C++11 compiler (gcc 5+, clang 3.8+, VS2015+)
+- a C++11 compiler (gcc 5+, clang 3.8+)
 - CMake 3.3+
 
 ### Install dependencies
