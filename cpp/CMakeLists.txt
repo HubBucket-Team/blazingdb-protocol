@@ -24,7 +24,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 ###### OPTIONAL BUILDS
-option(SIMPLE_BUILD_TESTS "Build SIMPLE Tests" FALSE)
+option(BUILD_TESTS "Build SIMPLE Tests" FALSE)
+option(BUILD_EXAMPLES "Build SIMPLE Examples" FALSE)
 
 # Configure dependencies
 include(ConfigureFlatBuffers)
@@ -38,15 +39,24 @@ set(SRC_FILES
               ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/MessageBuilder.cpp
 )
 
-add_executable(blazingdb-protocol ${SRC_FILES})
-# TODO percy do not use libgdf.so here and use gdf (the static lib) instead
-#target_link_libraries(blazingdb-protocol ${CUDA_CUDA_LIBRARY} ${CUDA_NVRTC_LIBRARY})
+#add_executable(blazingdb-protocol ${SRC_FILES})
+
+# STATIC library
+add_library(blazingdb-protocol ${SRC_FILES})
+
 
 # NOTE Each time we build the target blazingdb-protocol we will compile the flatbuffer schemas
 add_dependencies(blazingdb-protocol FlatBuffersSchemas)
 
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
 # Tests.
-if (${SIMPLE_BUILD_TESTS})
+if (${BUILD_TESTS})
   include(CTest)
   if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_BUILD_TYPE MATCHES "Coverage") # Coverage flags for GCC
     add_compile_options(-g -O0 -fprofile-arcs -ftest-coverage)
@@ -55,6 +65,12 @@ if (${SIMPLE_BUILD_TESTS})
   enable_testing()
   add_subdirectory(tests)
 endif()
+
+# Examples.
+if (${BUILD_EXAMPLES})
+  add_subdirectory(examples)
+endif()
+
 
 # Print the project summary
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

@@ -6,7 +6,7 @@
 #pass the dependency libraries as optional arguments using ${ARGN}
 #NOTE the order of libraries matter, so try to link first with the most high level lib
 function(configure_test TEST_NAME Tests_SRCS)
-    message(STATUS "${TEST_NAME} will link against: gdf arrow")
+    message(STATUS "${TEST_NAME} will link against: ...")
 
     add_executable(${TEST_NAME} ${Tests_SRCS})
 
