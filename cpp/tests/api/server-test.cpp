@@ -7,8 +7,8 @@ int main() {
 
   blazingdb::protocol::Server server(conn);
 
-  server.handle([](const char *buffer, const std::size_t size) {
-    std::cout << buffer << std::endl;
+  server.handle([](const blazingdb::protocol::Buffer &buffer) {
+    std::cout << buffer.data() << std::endl;
   });
 
   return 0;

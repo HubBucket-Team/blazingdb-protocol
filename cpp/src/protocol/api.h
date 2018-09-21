@@ -27,6 +27,18 @@ private:
   std::size_t size_;
 };
 
+class ManagedBuffer : public Buffer {
+public:
+  static const std::size_t MAX_SIZE = 4096;
+
+  ManagedBuffer() : Buffer(actual_data_, MAX_SIZE), actual_data_{0} {}
+
+  std::uint8_t *data() { return actual_data_; }
+
+private:
+  std::uint8_t actual_data_[MAX_SIZE];
+};
+
 class File {
 public:
   virtual int fd() const = 0;
@@ -78,13 +90,12 @@ public:
 
     if (fd == -1) { throw std::runtime_error("accept error"); }
 
-    char buffer[100];
-    bzero(buffer, 100);
+    ManagedBuffer buffer;
 
-    int nread = read(fd, buffer, sizeof(buffer));
+    int nread = read(fd, buffer.data(), buffer.size());
 
     if (nread > 0) {
-      callback(buffer, nread);
+      callback(Buffer(buffer.data(), nread));
     } else if (nread == -1) {
       throw std::runtime_error("error read");
     } else if (nread == 0) {
