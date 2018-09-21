@@ -1,4 +1,4 @@
-#include <protocol/api.h>
+#include <blazingdb/protocol/api.h>
 
 int main() {
   blazingdb::protocol::UnixSocketConnection conn("/tmp/socket");
