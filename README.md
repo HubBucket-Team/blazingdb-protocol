@@ -13,12 +13,12 @@ Here are the steps to do so, including the necessary dependencies, just be sure 
 
 Install Flatbuffers
 
-``
+```
 git clone https://github.com/google/flatbuffers.git
 cd flatbuffers && mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/path/flatbuffers_install ..
 make -j8 install  /path/flatbuffers_install/
-``
+```
 
 ## Build Examples
 
