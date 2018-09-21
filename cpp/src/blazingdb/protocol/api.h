@@ -118,11 +118,11 @@ public:
     if (result == -1) { throw std::runtime_error("connect error"); }
   }
 
-  void send(const std::string &message) {
+  void send(const Buffer &buffer) {
     std::size_t written_bytes =
-        write(connection.fd(), message.c_str(), message.size());
+        write(connection.fd(), buffer.data(), buffer.size());
 
-    if (written_bytes != message.size()) {
+    if (written_bytes != buffer.size()) {
       throw std::runtime_error("write error");
     }
   }
@@ -137,6 +137,8 @@ public:
       : Connection(socket(AF_UNIX, SOCK_STREAM, 0), path) {
     if (fd_ == -1) { throw std::runtime_error("socket error"); }
   }
+
+  ~UnixSocketConnection() { close(fd_); }
 };
 
 }  // namespace protocol
