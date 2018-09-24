@@ -1,0 +1,11 @@
+
+namespace blazingdb.protocol;
+
+table BlazingMetadata {
+	status:string;
+  message:string;
+  time:double;
+  rows:int;
+}
+
+root_type BlazingMetadata;

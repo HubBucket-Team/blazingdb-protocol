@@ -1,0 +1,9 @@
+
+namespace blazingdb.protocol;
+
+table QueryMessage {
+	statement:string;
+  authorization:string;
+}
+
+root_type QueryMessage;

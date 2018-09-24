@@ -6,6 +6,7 @@ CTestTestfile.cmake
 Makefile
 cmake_install.cmake
 build/
+cmake-build-debug/
 *-build/
 Testing/
 
@@ -21,3 +22,4 @@ Testing/
 *.kdev4
 *.log
 *.swp
+\.vscode/ 

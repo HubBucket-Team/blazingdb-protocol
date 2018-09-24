@@ -2,7 +2,7 @@ include "gdf_dtype.fbs";
 include "gdf_dtype_extra_info.fbs";
 include "cudaIpcMemHandle_t.fbs";
 
-namespace BlazingDB.Protocol;
+namespace blazingdb.protocol;
 
 table gdf_column {
     data:cudaIpcMemHandle_t;
