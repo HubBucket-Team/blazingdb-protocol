@@ -1,0 +1,12 @@
+include "BlazingMetadata.fbs";
+include "gdf_column.fbs";
+
+namespace blazingdb.protocol;
+
+table QueryResult {
+	metadata:BlazingMetadata;
+  fieldNames:[string];
+  values:[gdf_column];
+}
+
+root_type QueryResult;

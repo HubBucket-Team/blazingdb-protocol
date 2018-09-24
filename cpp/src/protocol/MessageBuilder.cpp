@@ -17,10 +17,6 @@ BlazingProtocol::Payload::Payload(uint8_t* data, uint32_t size)
 
 const BlazingProtocol::Payload BlazingProtocol::buildServerMessage(const std::string &statement, const std::string &authorization, const QueryResult &queryResult) {
 
-
-
-
-
     // Build up a serialized buffer
     const int initial_buffer_size = 1024; // bytes
     flatbuffers::FlatBufferBuilder builder(initial_buffer_size);

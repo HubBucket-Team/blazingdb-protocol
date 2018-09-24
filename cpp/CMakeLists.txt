@@ -54,6 +54,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
+set(BUILD_EXAMPLES True)
 
 # Tests.
 if (${BUILD_TESTS})
