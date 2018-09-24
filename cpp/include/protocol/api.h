@@ -91,27 +91,6 @@ public:
     }
   }
 
-  // template <class Callable>
-  // void handle(Callable &&callback) const {
-  //   int fd = accept4(connection.fd(), nullptr, nullptr, SOCK_CLOEXEC);
-
-  //   if (fd == -1) { throw std::runtime_error("accept error"); }
-
-  //   ManagedBuffer buffer;
-
-  //   int nread = read(fd, buffer.data(), buffer.size());
-
-  //   if (nread > 0) {
-  //     callback(Buffer(buffer.data(), nread));
-  //   } else if (nread == -1) {
-  //     throw std::runtime_error("error read");
-  //   } else if (nread == 0) {
-  //     close(fd);
-  //   } else {
-  //     throw std::runtime_error("unreachable");
-  //   }
-  // }
-
   template <class Callable>
   void handle(Callable &&callback) const {
     int fd = accept4(connection.fd(), nullptr, nullptr, SOCK_CLOEXEC);
@@ -123,9 +102,7 @@ public:
     int nread = read(fd, buffer.data(), buffer.size());
 
     if (nread > 0) {
-      
-      callback( std::move(Buffer(buffer.data(), nread)) );
-
+      callback(Buffer(buffer.data(), nread));
     } else if (nread == -1) {
       throw std::runtime_error("error read");
     } else if (nread == 0) {
@@ -133,7 +110,7 @@ public:
     } else {
       throw std::runtime_error("unreachable");
     }
-  }
+  } 
 
 private:
   const Connection &connection;

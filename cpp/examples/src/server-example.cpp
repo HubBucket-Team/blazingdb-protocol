@@ -19,7 +19,7 @@ public:
    * @brief Construct a String message using a raw memory coming from network.
    */
 
-  BlazingQueryMessage(Buffer&& buffer) 
+  BlazingQueryMessage(const Buffer& buffer) 
     : statement_{ GetQueryMessage(buffer.data())->statement()->c_str() },
       authorization_{ GetQueryMessage(buffer.data())->authorization()->c_str() }
   {
@@ -64,8 +64,8 @@ int main() {
   UnixSocketConnection connection("/tmp/socket");
   Server server(connection);
 
-  server.handle([](Buffer &&buffer) {
-    BlazingQueryMessage message{std::move(buffer)};
+  server.handle([](const Buffer &buffer) {
+    BlazingQueryMessage message{buffer};
 
     std::cout << message.statement() << std::endl;
     std::cout << message.authorization() << std::endl;
