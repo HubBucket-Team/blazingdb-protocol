@@ -1,0 +1,8 @@
+namespace blazingdb.protocol.interpreter;
+
+table GetResultResponse {
+	names: [string];
+	values: [ubyte];
+}
+
+root_type DMLResponse;
