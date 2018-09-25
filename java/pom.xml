@@ -126,11 +126,10 @@
                     <arguments>
                         <argument>--java</argument>
                         <argument>--gen-mutable</argument>
+                        <argument>--gen-all</argument>
                         <argument>-o</argument>
                         <argument>${fbs.generated.sources}</argument>
-                        <argument>BlazingMetadata.fbs</argument>
-                        <argument>QueryMessage.fbs</argument>
-                        <argument>QueryResult.fbs</argument>
+                        <argument>protocol.fbs</argument>
                         <argument>gdf_column.fbs</argument>
                         <argument>gdf_dtype_extra_info.fbs</argument>
                         <argument>gdf_dtype.fbs</argument>

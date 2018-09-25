@@ -1,0 +1,17 @@
+include "blazingdb/protocol/calcite/DMLRequest.fbs";
+include "blazingdb/protocol/orchestrator/DMLRequest.fbs";
+include "blazingdb/protocol/interpreter/DMLRequest.fbs";
+include "blazingdb/protocol/interpreter/GetResultRequest.fbs";
+
+namespace blazingdb.protocol;
+
+struct Header {
+	kind: ushort;
+}
+
+table Request {
+	header: Header;
+	payload: [ubyte];
+}
+
+root_type Request;

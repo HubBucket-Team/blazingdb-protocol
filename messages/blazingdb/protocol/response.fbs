@@ -1,0 +1,19 @@
+include "blazingdb/protocol/calcite/DMLResponse.fbs";
+include "blazingdb/protocol/orchestrator/DMLResponse.fbs";
+include "blazingdb/protocol/interpreter/DMLResponse.fbs";
+include "blazingdb/protocol/interpreter/GetResultResponse.fbs";
+
+namespace blazingdb.protocol;
+
+enum Status : byte { Error = 0, Success }
+
+table Response {
+	status: Status;
+	payload: [ubyte];
+}
+
+table ResponseError {
+	errors: string;
+}
+
+root_type Response;

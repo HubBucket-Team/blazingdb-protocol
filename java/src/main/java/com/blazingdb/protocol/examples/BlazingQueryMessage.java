@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 
-import blazingdb.protocol.QueryMessage;
 
 public class BlazingQueryMessage {
 
@@ -28,9 +27,7 @@ public class BlazingQueryMessage {
 
      	System.out.println("##dataBuffer position:" + buffer.position());
 
- 		QueryMessage message = QueryMessage.getRootAsQueryMessage(buffer);
-		this.statement_ = message.statement();
-		this.authorization_ = message.authorization();
+
 		
 
      	System.out.println("##ByteBuffer statement_:" + statement_);
@@ -49,9 +46,6 @@ public class BlazingQueryMessage {
       	System.out.println("##ByteBuffer read:" + new String(buffer.array()) + "|sz:" + buffer.array().length);
      	System.out.println("##dataBuffer position:" + buffer.position());
 
- 		QueryMessage message = QueryMessage.getRootAsQueryMessage(buffer);
-		this.statement_ = message.statement();
-		this.authorization_ = message.authorization();
 
      	System.out.println("##ByteBuffer statement_:" + statement_);
 
@@ -64,8 +58,7 @@ public class BlazingQueryMessage {
 		FlatBufferBuilder builder = new FlatBufferBuilder(1024);
 		int statement_string_data = builder.createString(ByteBuffer.wrap(statement_.getBytes(StandardCharsets.US_ASCII)));
 		int authorization_string_data = builder.createString(ByteBuffer.wrap(authorization_.getBytes(StandardCharsets.US_ASCII)));
-		int root = QueryMessage.createQueryMessage(builder, statement_string_data, authorization_string_data);
-	    builder.finish(root);		
+
      	System.out.println("##dataBuffer position:" + builder.dataBuffer().position());
 
 		return builder.dataBuffer();
