@@ -9,3 +9,17 @@ compile_commands.json
 CTestTestfile.cmake
 
 \.vscode/
+
+java/\.idea/
+
+java/\.settings/
+
+java/target/
+
+java/\.project
+
+java/\.classpath
+
+java/dependency-reduced-pom\.xml
+
+java/blazingdb-protocol\.iml
