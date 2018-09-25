@@ -2,9 +2,7 @@ set(SRCS api.cpp)
 
 add_library(blazingdb-protocol ${SRCS})
 
-set_target_properties(blazingdb-protocol
-  PROPERTIES
-    PUBLIC_HEADER "api.h")
+install(FILES api.h DESTINATION include/blazingdb/protocol)
 
 install(TARGETS blazingdb-protocol
   ARCHIVE

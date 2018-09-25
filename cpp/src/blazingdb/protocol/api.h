@@ -117,11 +117,18 @@ public:
     if (fd == -1) { throw std::runtime_error("accept error"); }
 
     StackBuffer buffer;
-
     ssize_t nread = read(fd, buffer.data(), buffer.size());
 
     if (nread > 0) {
-      callback(Buffer(buffer.data(), static_cast<std::size_t>(nread)));
+      Buffer responseBuffer =
+          callback(Buffer(buffer.data(), static_cast<std::size_t>(nread)));
+
+      ssize_t written_bytes =
+          write(fd, responseBuffer.data(), responseBuffer.size());
+
+      if (static_cast<std::size_t>(written_bytes) != responseBuffer.size()) {
+        throw std::runtime_error("write error");
+      }
     } else if (nread == -1) {
       throw std::runtime_error("error read");
     } else if (nread == 0) {
@@ -191,13 +198,21 @@ public:
     if (result == -1) { throw std::runtime_error("connect error"); }
   }
 
-  void send(const Buffer &buffer) {
+  Buffer send(const Buffer &buffer) {
     ssize_t written_bytes =
         write(connection_.fd(), buffer.data(), buffer.size());
 
     if (static_cast<std::size_t>(written_bytes) != buffer.size()) {
       throw std::runtime_error("write error");
     }
+
+    StackBuffer responseBuffer;
+    ssize_t nread =
+        read(connection_.fd(), responseBuffer.data(), responseBuffer.size());
+
+    if (nread == -1) { throw std::runtime_error("error read"); }
+
+    return responseBuffer;
   }
 
 private:

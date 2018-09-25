@@ -48,17 +48,8 @@ include(ConfigureGoogleTest)
 # BEGIN MAIN #
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-set(SRC_FILES
-              ${CMAKE_CURRENT_SOURCE_DIR}/src/ipc/calcite_client.cpp
-              ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/MessageBuilder.cpp
-)
-
-add_executable(blazingdb-protocol ${SRC_FILES})
-# TODO percy do not use libgdf.so here and use gdf (the static lib) instead
-#target_link_libraries(blazingdb-protocol ${CUDA_CUDA_LIBRARY} ${CUDA_NVRTC_LIBRARY})
-
-# NOTE Each time we build the target blazingdb-protocol we will compile the flatbuffer schemas
-add_dependencies(blazingdb-protocol FlatBuffersSchemas)
+## NOTE Each time we build the target blazingdb-protocol we will compile the flatbuffer schemas
+#add_dependencies(blazingdb-protocol FlatBuffersSchemas)
 
 # Tests.
 if (${SIMPLE_BUILD_TESTS})
@@ -70,6 +61,8 @@ if (${SIMPLE_BUILD_TESTS})
   enable_testing()
   add_subdirectory(tests)
 endif()
+
+add_subdirectory(src)
 
 # Print the project summary
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

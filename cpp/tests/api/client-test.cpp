@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <blazingdb/protocol/api.h>
 
 int main() {
@@ -5,9 +7,11 @@ int main() {
   blazingdb::protocol::Client client(connection);
 
   blazingdb::protocol::Buffer buffer(
-      reinterpret_cast<const std::uint8_t*>("BlazingDB PROTOCOL"), 19);
+      reinterpret_cast<const std::uint8_t*>("BlazingDB Request"), 17);
 
-  client.send(buffer);
+  blazingdb::protocol::Buffer responseBuffer = client.send(buffer);
+
+  std::cout << responseBuffer.data() << std::endl;
 
   return 0;
 }
