@@ -1,0 +1,7 @@
+namespace blazingdb.protocol.calcite;
+
+table DMLRequest {
+	query: string;
+}
+
+root_type DMLRequest;
