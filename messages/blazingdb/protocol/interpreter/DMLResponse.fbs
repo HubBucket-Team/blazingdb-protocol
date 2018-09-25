@@ -1,0 +1,7 @@
+namespace blazingdb.protocol.interpreter;
+
+table DMLResponse {
+	token: string;
+}
+
+root_type DMLResponse;

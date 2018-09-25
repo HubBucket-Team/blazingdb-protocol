@@ -1,0 +1,7 @@
+namespace blazingdb.protocol.interpreter;
+
+table DMLRequest {
+	logicalPlan: string;
+}
+
+root_type DMLRequest;

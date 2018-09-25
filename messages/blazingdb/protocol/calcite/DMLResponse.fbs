@@ -1,0 +1,7 @@
+namespace blazingdb.protocol.calcite;
+
+table DMLResponse {
+	logicalPlan: string;
+}
+
+root_type DMLResponse;
