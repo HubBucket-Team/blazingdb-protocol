@@ -60,7 +60,6 @@ public:
   void operator=(const File &&) = delete;
 };
 
-
 class Connection : public File {
 public:
   Connection(const int fd, const std::string &path)
@@ -113,29 +112,31 @@ public:
 
   template <class Callable>
   void handle(Callable &&callback) const {
-    int fd = accept4(connection_.fd(), nullptr, nullptr, SOCK_CLOEXEC);
+    for (;;) {
+      int fd = accept4(connection_.fd(), nullptr, nullptr, SOCK_CLOEXEC);
 
-    if (fd == -1) { throw std::runtime_error("accept error"); }
+      if (fd == -1) { throw std::runtime_error("accept error"); }
 
-    StackBuffer buffer;
-    ssize_t nread = read(fd, buffer.data(), buffer.size());
+      StackBuffer buffer;
+      ssize_t nread = read(fd, buffer.data(), buffer.size());
 
-    if (nread > 0) {
-      Buffer responseBuffer =
-          callback(Buffer(buffer.data(), static_cast<std::size_t>(nread)));
+      if (nread > 0) {
+        Buffer responseBuffer =
+            callback(Buffer(buffer.data(), static_cast<std::size_t>(nread)));
 
-      ssize_t written_bytes =
-          write(fd, responseBuffer.data(), responseBuffer.size());
+        ssize_t written_bytes =
+            write(fd, responseBuffer.data(), responseBuffer.size());
 
-      if (static_cast<std::size_t>(written_bytes) != responseBuffer.size()) {
-        throw std::runtime_error("write error");
+        if (static_cast<std::size_t>(written_bytes) != responseBuffer.size()) {
+          throw std::runtime_error("write error");
+        }
+      } else if (nread == -1) {
+        throw std::runtime_error("error read");
+      } else if (nread == 0) {
+        close(fd);
+      } else {
+        throw std::runtime_error("unreachable");
       }
-    } else if (nread == -1) {
-      throw std::runtime_error("error read");
-    } else if (nread == 0) {
-      close(fd);
-    } else {
-      throw std::runtime_error("unreachable");
     }
   }
 

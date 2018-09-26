@@ -12,13 +12,13 @@ include(GoogleTest)
 include(ExternalProject)
 
 ExternalProject_Add(googletest_ep
-	CMAKE_ARGS
-		-DCMAKE_BUILD_TYPE=RELEASE
-		-DCMAKE_INSTALL_PREFIX=build
-    EXCLUDE_FROM_ALL TRUE
-	GIT_REPOSITORY git@github.com:google/googletest.git
-    GIT_TAG release-1.8.1
-	UPDATE_COMMAND "")
+  CMAKE_ARGS
+    -DCMAKE_BUILD_TYPE=RELEASE
+    -DCMAKE_INSTALL_PREFIX=build
+  EXCLUDE_FROM_ALL TRUE
+  GIT_REPOSITORY git@github.com:google/googletest.git
+  GIT_TAG release-1.8.1
+  UPDATE_COMMAND "")
 ExternalProject_Get_property(googletest_ep BINARY_DIR)
 set(GTEST_ROOT ${BINARY_DIR}/build)
 
