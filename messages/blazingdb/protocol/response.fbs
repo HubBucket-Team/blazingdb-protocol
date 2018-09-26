@@ -1,4 +1,5 @@
 include "blazingdb/protocol/calcite/DMLResponse.fbs";
+include "blazingdb/protocol/calcite/DDLResponse.fbs";
 include "blazingdb/protocol/orchestrator/DMLResponse.fbs";
 include "blazingdb/protocol/interpreter/DMLResponse.fbs";
 include "blazingdb/protocol/interpreter/GetResultResponse.fbs";
