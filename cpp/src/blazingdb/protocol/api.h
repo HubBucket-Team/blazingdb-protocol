@@ -11,8 +11,6 @@
 namespace blazingdb {
 namespace protocol {
 
-namespace {
-
 class Buffer {
 public:
   Buffer(const std::uint8_t *const data, const std::size_t size)
@@ -31,6 +29,8 @@ private:
   std::size_t size_;
 };
 
+namespace {
+
 class StackBuffer : public Buffer {
 public:
   static const std::size_t MAX_SIZE = 4096;
@@ -45,6 +45,8 @@ private:
   std::uint8_t actual_data_[MAX_SIZE];
 };
 
+}  // namespace
+
 class File {
 public:
   virtual ~File() = default;
@@ -58,7 +60,6 @@ public:
   void operator=(const File &&) = delete;
 };
 
-}  // namespace
 
 class Connection : public File {
 public:

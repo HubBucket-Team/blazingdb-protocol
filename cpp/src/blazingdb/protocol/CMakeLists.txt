@@ -1,4 +1,4 @@
-set(SRCS api.cpp)
+set(SRCS api.cc)
 
 add_library(blazingdb-protocol ${SRCS})
 
@@ -14,3 +14,11 @@ install(TARGETS blazingdb-protocol
   PUBLIC_HEADER
     DESTINATION include
     COMPONENT API)
+
+if (GTEST_FOUND)
+
+add_executable(server-test EXCLUDE_FROM_ALL server-test.cc)
+target_link_libraries(server-test GTest::GTest GTest::Main)
+gtest_add_tests(TARGET server-test)
+
+endif()
