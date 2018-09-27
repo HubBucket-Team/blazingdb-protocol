@@ -1,9 +1,9 @@
 #include <iostream>
+#include <exception>
 
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
-#include "messages.h"
-
+ 
 namespace blazingdb {
 namespace protocol { 
   
@@ -12,7 +12,7 @@ public:
   CalciteClient(blazingdb::protocol::Connection & connection) : client {connection}
   {}
 
-  std::string getLogicalPlan(std::string query) {
+  std::string getLogicalPlan(std::string query)  {
     DMLRequestMessage requestPayload{query};
     RequestMessage requestObject{calcite::MessageType_DML, requestPayload}; 
     
@@ -23,29 +23,35 @@ public:
 
     Buffer responseBuffer = client.send(buffer);
     ResponseMessage response{responseBuffer.data()};
+    if (response.getStatus() == Status_Error) {
+      ResponseErrorMessage errorMessage{response.getPayloadBuffer()};
+      throw std::runtime_error(errorMessage.getMessage());
+    }
     DMLResponseMessage responsePayload(response.getPayloadBuffer());
     return responsePayload.getLogicalPlan();
   }
 
-  void updateSchema(std::string query) {
-      DMLRequestMessage requestPayload{query};
-      RequestMessage requestObject{calcite::MessageType_DDL, requestPayload}; 
-      
-      auto bufferedData = requestObject.getBufferData();
+  Status updateSchema(std::string statement)    {
+    DDLRequestMessage requestPayload{statement};
+    RequestMessage requestObject{calcite::MessageType_DDL, requestPayload}; 
+    
+    auto bufferedData = requestObject.getBufferData();
 
-      Buffer buffer{bufferedData->data(), 
-                    bufferedData->size()};
+    Buffer buffer{bufferedData->data(), 
+                  bufferedData->size()};
 
-      Buffer responseBuffer = client.send(buffer);
-      // ResponseMessage response{responseBuffer.data()};
-      // DDLResponseMessage responsePayload(response.getPayloadBuffer());
-      
+    Buffer responseBuffer = client.send(buffer);
+    ResponseMessage response{responseBuffer.data()};
+    if (response.getStatus() == Status_Error) {
+      ResponseErrorMessage errorMessage{response.getPayloadBuffer()};
+      throw std::runtime_error(errorMessage.getMessage());
+    }
+    return response.getStatus();
   }
 
 private:
   blazingdb::protocol::Client client;
 };
-
 
 }
 }
@@ -57,22 +63,39 @@ int main() {
   CalciteClient client{connection};
   
   {
-     std::string query = "select * from orders";
+    std::string query = "select * from orders";
     try {
-        std::string logicalPlan = client.getLogicalPlan(query);
-        std::cout << logicalPlan << std::endl;
-    } catch (std::exception &error) {
-        std::cout << error.what() << std::endl;
+      std::string logicalPlan = client.getLogicalPlan(query);
+      std::cout << logicalPlan << std::endl;
+    } catch (std::runtime_error &error) {
+      std::cout << error.what() << std::endl;
+    }
+
+    query = "error_dml_query_example";
+    try {
+      std::string logicalPlan = client.getLogicalPlan(query);
+      std::cout << logicalPlan << std::endl;
+    } catch (std::runtime_error &error) {
+      std::cout << error.what() << std::endl;
     }
   }
-  // {
-  //   std::string query = "cas * from orders";
-  //   try {
-  //       client.updateSchema(query);
-        
-  //   } catch (std::exception &error) {
-  //       std::cout << error.what() << std::endl;
-  //   }
-  // }
+
+  {
+    std::string query = "create database alexdb";
+    try {
+      auto status = client.updateSchema(query);
+      std::cout << status << std::endl;
+    } catch (std::runtime_error &error) {
+      std::cout << error.what() << std::endl;
+    }
+
+    query = "error_ddl_query_example";
+    try {
+      auto status = client.updateSchema(query);
+      std::cout << status << std::endl;
+    } catch (std::runtime_error &error) {
+      std::cout << error.what() << std::endl;
+    }
+  }
   return 0;
 }

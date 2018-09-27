@@ -10,6 +10,7 @@
 #include "client/client.h"
 #include "connection/unix_socket_connection.h"
 #include "server/server.h"
+#include "messages.h"
 
 namespace blazingdb {
 namespace protocol {

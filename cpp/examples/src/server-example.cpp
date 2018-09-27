@@ -1,14 +1,14 @@
-#include <iostream>
+ion #include <iostream>
 
 #include <blazingdb/protocol/api.h>
-#include "messages.h"
- 
+  
 using namespace blazingdb::protocol;
 
 int main() {
   blazingdb::protocol::UnixSocketConnection connection({"/tmp/socket", std::allocator<char>()});
   blazingdb::protocol::Server server(connection);
   
+  // only DML 
   server.handle([](const blazingdb::protocol::Buffer &requestBuffer)
                     -> blazingdb::protocol::Buffer {
 
