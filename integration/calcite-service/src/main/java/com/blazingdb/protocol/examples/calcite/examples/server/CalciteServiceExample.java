@@ -1,6 +1,5 @@
 package com.blazingdb.protocol.examples.calcite.examples.server;
 
-import blazingdb.protocol.HeaderType;
 import blazingdb.protocol.Status;
 import com.blazingdb.protocol.IService;
 import com.blazingdb.protocol.UnixService;
@@ -11,6 +10,7 @@ import com.blazingdb.protocol.ipc.calcite.DMLResponseMessage;
 import com.blazingdb.protocol.ipc.RequestMessage;
 import com.blazingdb.protocol.ipc.ResponseErrorMessage;
 import com.blazingdb.protocol.ipc.ResponseMessage;
+import blazingdb.protocol.calcite.MessageType;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,9 +27,11 @@ public class CalciteServiceExample {
             public ByteBuffer process(ByteBuffer buffer) {
                 RequestMessage requestMessage = new RequestMessage(buffer);
 
-                if(requestMessage.getHeaderType() == HeaderType.DML) {
+                System.out.println("header: " + requestMessage.getHeaderType());
+                if(requestMessage.getHeaderType() == MessageType.DML) {
                     DMLRequestMessage requestPayload = new DMLRequestMessage(requestMessage.getPayloadBuffer());
                     ResponseMessage response = null;
+                    System.out.println("DML: " + requestPayload.getQuery());
                     if (requestPayload.getQuery().contains("select")) {
                         String logicalPlan = logicalPlan = "LogicalUnion(all=[false])\n" +
                                 "  LogicalUnion(all=[false])\n" +
@@ -45,9 +47,11 @@ public class CalciteServiceExample {
                     }
                     return response.getBufferData();
                 }
-                else if(requestMessage.getHeaderType() == HeaderType.DDL) {
+                else if(requestMessage.getHeaderType() == MessageType.DDL) {
                     DDLRequestMessage requestPayload = new DDLRequestMessage(requestMessage.getPayloadBuffer());
                     ResponseMessage response = null;
+                    System.out.println("DDL: " + requestPayload.getQuery());
+
                     if (requestPayload.getQuery().contains("create")){
                         DDLResponseMessage responsePayload = new DDLResponseMessage();
                         response = new ResponseMessage(Status.Success, responsePayload.getBufferData());
