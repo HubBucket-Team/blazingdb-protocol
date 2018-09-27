@@ -1,65 +1,78 @@
-#include <protocol/api.h>
-#include <protocol/config.h>
+#include <iostream>
 
+#include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
-#include "QueryMessage_generated.h"
+#include "messages.h"
 
 namespace blazingdb {
-namespace protocol {
+namespace protocol { 
+  
+class CalciteClient {
+public:
+  CalciteClient(blazingdb::protocol::Connection & connection) : client {connection}
+  {}
 
-class BlazingQueryMessage : public IMessage {
-public: 
-  BlazingQueryMessage() = default;
+  std::string getLogicalPlan(std::string query) {
+    DMLRequestMessage requestPayload{query};
+    RequestMessage requestObject{calcite::MessageType_DML, requestPayload}; 
+    
+    auto bufferedData = requestObject.getBufferData();
 
-  ~BlazingQueryMessage() = default;
+    Buffer buffer{bufferedData->data(), 
+                  bufferedData->size()};
 
-  BlazingQueryMessage(std::string statement, std::string authorization)
-    : IMessage{},
-      statement_{std::move(statement)},
-      authorization_{std::move(authorization)} {}
+    Buffer responseBuffer = client.send(buffer);
+    ResponseMessage response{responseBuffer.data()};
+    DMLResponseMessage responsePayload(response.getPayloadBuffer());
+    return responsePayload.getLogicalPlan();
+  }
 
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
-    std::lock_guard<std::mutex> lock{mutex_};
-    flatbuffers::FlatBufferBuilder builder{1024};
+  void updateSchema(std::string query) {
+      DMLRequestMessage requestPayload{query};
+      RequestMessage requestObject{calcite::MessageType_DDL, requestPayload}; 
+      
+      auto bufferedData = requestObject.getBufferData();
 
-    auto statement_string_data = builder.CreateString(statement_);
-    auto authorization_string_data = builder.CreateString(authorization_);
-    QueryMessageBuilder tmp_builder{builder};
-    tmp_builder.add_statement(statement_string_data);
-    tmp_builder.add_authorization(authorization_string_data);
+      Buffer buffer{bufferedData->data(), 
+                    bufferedData->size()};
 
-    FinishQueryMessageBuffer(builder, tmp_builder.Finish());
-
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+      Buffer responseBuffer = client.send(buffer);
+      // ResponseMessage response{responseBuffer.data()};
+      // DDLResponseMessage responsePayload(response.getPayloadBuffer());
+      
   }
 
 private:
-  std::string statement_{""};
-  std::string authorization_{""};
-
+  blazingdb::protocol::Client client;
 };
 
-}
-}
 
+}
+}
 using namespace blazingdb::protocol;
 
+
 int main() {
-  UnixSocketConnection connection("/tmp/socket");
-  Client client(connection);
-
-  const std::string statement = "select * from orders";
-  const std::string authorization = PERMISSIONS_DELIM;
-
-  BlazingQueryMessage query_message(statement, authorization);
-
-
-  // Buffer buffer(
-  //     reinterpret_cast<const std::uint8_t*>("BlazingDB PROTOCOL"), 19);
-
-  auto buffer = query_message.getBufferData();
-
-  client.send(buffer);
-
+  blazingdb::protocol::UnixSocketConnection connection("/tmp/socket");
+  CalciteClient client{connection};
+  
+  {
+     std::string query = "select * from orders";
+    try {
+        std::string logicalPlan = client.getLogicalPlan(query);
+        std::cout << logicalPlan << std::endl;
+    } catch (std::exception &error) {
+        std::cout << error.what() << std::endl;
+    }
+  }
+  // {
+  //   std::string query = "cas * from orders";
+  //   try {
+  //       client.updateSchema(query);
+        
+  //   } catch (std::exception &error) {
+  //       std::cout << error.what() << std::endl;
+  //   }
+  // }
   return 0;
 }

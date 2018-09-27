@@ -1,7 +1,0 @@
-namespace blazingdb.protocol.orchestator;
-
-table DMLResponse {
-	token: string;
-}
-
-root_type DMLResponse;

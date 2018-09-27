@@ -73,7 +73,7 @@ function(build_flatbuffers flatbuffers_schemas
 
   set(schema_glob "*.fbs")
   # Generate the include files parameters.
-  set(include_params "")
+  set(include_params "--gen-all")
   set(all_generated_files "")
   foreach (include_dir ${schema_include_dirs})
     set(include_params -I ${include_dir} ${include_params})

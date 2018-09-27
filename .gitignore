@@ -7,5 +7,26 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
+__pycache__
 
 \.vscode/
+
+java/\.idea/
+
+java/\.settings/
+
+java/target/
+
+java/dependency-reduced-pom\.xml
+
+java/blazingdb-protocol\.iml
+
+java/bin/
+
+integration/calcite-service/\.idea/
+
+integration/calcite-service/\.settings/
+
+integration/calcite-service/bin/
+
+integration/calcite-service/target/

@@ -1,7 +1,0 @@
-namespace blazingdb.protocol.orchestator;
-
-table DMLRequest {
-	query: string;
-}
-
-root_type DMLRequest;
