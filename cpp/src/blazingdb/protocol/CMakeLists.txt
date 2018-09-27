@@ -21,7 +21,6 @@ install(TARGETS blazingdb-protocol
     COMPONENT API)
 
 add_dependencies(blazingdb-protocol FlatBuffersSchemas)
-target_link_libraries(blazingdb-protocol FlatBuffersSchemas)
 
 if (GTEST_FOUND)
   add_executable(server-test EXCLUDE_FROM_ALL server-test.cc)
