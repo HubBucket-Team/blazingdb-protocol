@@ -26,6 +26,6 @@ We provide some examples on how to send/receive data using blazingdb-protocol.
 You can build the examples turning the corresponding CMake flag BUILD_EXAMPLES.
 
 ```
-cmake  -DFLATBUFFERS_HOME=/path/flatbuffers_install/   ..` 
+cmake  -DFLATBUFFERS_HOME=/path/flatbuffers_install/   ..
 make
 ```
