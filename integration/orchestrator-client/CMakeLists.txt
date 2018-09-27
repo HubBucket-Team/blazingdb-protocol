@@ -1,20 +1,6 @@
 cmake_minimum_required(VERSION 3.3)
 
-
 set(CMAKE_CXX_STANDARD 11)
-message(STATUS "Using C++ standard: c++${CMAKE_CXX_STANDARD}")
-
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
-message(STATUS "CMAKE_MODULE_PATH:" "${CMAKE_MODULE_PATH}")
-
-# Include CMake modules
-include(FeatureSummary)
-include(CheckIncludeFiles)
-include(CheckLibraryExists)
-include(CTest)
-
-# Configure dependencies
-include(ConfigureFlatBuffers)
 
 include(ExternalProject)
 
@@ -40,5 +26,4 @@ target_link_libraries(BlazingDB::Protocol
     INTERFACE ${BLAZINGDB_PROTOCOL_ROOT}/lib/libblazingdb-protocol.a)
 
 add_executable(blazingdb-orchestator src/blazingdb-orchestator.cc)
-
-target_link_libraries(blazingdb-orchestator BlazingDB::Protocol FlatBuffersSchemas)
+target_link_libraries(blazingdb-orchestator BlazingDB::Protocol)
