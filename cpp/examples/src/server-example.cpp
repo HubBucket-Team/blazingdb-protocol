@@ -1,14 +1,14 @@
-ion #include <iostream>
+#include <iostream>
 
 #include <blazingdb/protocol/api.h>
-  
+
 using namespace blazingdb::protocol;
 
 int main() {
   blazingdb::protocol::UnixSocketConnection connection({"/tmp/socket", std::allocator<char>()});
   blazingdb::protocol::Server server(connection);
-  
-  // only DML 
+
+  // only DML
   server.handle([](const blazingdb::protocol::Buffer &requestBuffer)
                     -> blazingdb::protocol::Buffer {
 
@@ -21,9 +21,9 @@ int main() {
     std::string logicalPlan = "LogicalUnion(all=[false])";
 
     DMLResponseMessage responsePayload{logicalPlan};
-    ResponseMessage responseObject{Status_Success, responsePayload}; 
+    ResponseMessage responseObject{Status_Success, responsePayload};
     auto bufferedData = responseObject.getBufferData();
-    Buffer buffer{bufferedData->data(), 
+    Buffer buffer{bufferedData->data(),
                 bufferedData->size()};
     return buffer;
   });
