@@ -4,7 +4,6 @@
 #include "flatbuffers/flatbuffers.h"
 #include "protocol_generated.h"
 
-
 namespace blazingdb {
 namespace protocol {
 
@@ -47,7 +46,9 @@ public:
     builder.Finish(root_offset);
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
-   
+  Status getStatus() {
+    return status_;
+  } 
   const uint8_t* getPayloadBuffer() {
     return payloadBuffer;
   }
@@ -87,6 +88,34 @@ private:
   std::string logicalPlan;
 };
 
+class ResponseErrorMessage : public IMessage {
+public:  
+
+  ResponseErrorMessage(const std::string& error) : IMessage(), error (error)
+  {
+  }
+  
+  ResponseErrorMessage (const uint8_t* buffer) : IMessage() {
+    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::ResponseError>(buffer);
+    
+    error = std::string{pointer->errors()->c_str()};
+  }
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override  {
+    flatbuffers::FlatBufferBuilder builder{1024};
+    auto string_offset = builder.CreateString(error);
+    auto root_offset = CreateResponseError(builder, string_offset);
+    builder.Finish(root_offset);
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+  }
+
+  std::string getMessage () {
+    return error;
+  }
+  
+private:
+  std::string error;
+};
 
 
 class RequestMessage : public IMessage {
@@ -122,12 +151,8 @@ public:
     return  payloadBufferSize;
   }
 
-  std::string header() { 
-    if (headerType == calcite::MessageType::MessageType_DDL) 
-      return "DDL";
-    if (headerType == calcite::MessageType::MessageType_DML) 
-      return "DML";
-    return "nothing";
+  int8_t header() { 
+    return headerType;
   }
    
 
@@ -147,6 +172,35 @@ public:
   }
   
   DMLRequestMessage (const uint8_t* buffer) : IMessage() {
+    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::calcite::DMLRequest>(buffer);
+    query = std::string{pointer->query()->c_str()};
+  }
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
+    flatbuffers::FlatBufferBuilder builder{1024};
+    auto string_offset = builder.CreateString(query);
+    auto root_offset = calcite::CreateDMLRequest(builder, string_offset);
+    builder.Finish(root_offset);
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+  }
+
+  std::string getQuery() const {
+    return query;
+  }
+
+private:
+  std::string query;
+};
+
+
+
+class DDLRequestMessage : public IMessage {
+public: 
+
+  DDLRequestMessage(const std::string& query) : IMessage(), query (query){
+  }
+  
+  DDLRequestMessage (const uint8_t* buffer) : IMessage() {
     auto pointer = flatbuffers::GetRoot<blazingdb::protocol::calcite::DMLRequest>(buffer);
     query = std::string{pointer->query()->c_str()};
   }
