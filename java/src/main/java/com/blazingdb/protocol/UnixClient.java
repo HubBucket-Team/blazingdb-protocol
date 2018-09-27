@@ -30,15 +30,21 @@ public class UnixClient {
         }
     }
 
-    public byte[] send(byte[] message) throws IOException {
-        OutputStream out = Channels.newOutputStream(channel);
-        out.write(message);
-        out.flush();
-
-        InputStream inputStream = Channels.newInputStream(channel);
+    public byte[] send(byte[] message) {
         byte[] result = new byte[MAX_BUFFER_SIZE];
-        DataInputStream inStream = new DataInputStream(new BufferedInputStream(inputStream));
-        inStream.read(result);
+        OutputStream out = Channels.newOutputStream(channel);
+        try {
+            out.write(message);
+            out.flush();
+            InputStream inputStream = Channels.newInputStream(channel);
+            DataInputStream inStream = new DataInputStream(new BufferedInputStream(inputStream));
+            inStream.read(result);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return result;
+    }
+    public ByteBuffer send(ByteBuffer message) {
+        return ByteBuffer.wrap(send(message.array()));
     }
 } 

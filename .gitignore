@@ -21,3 +21,11 @@ java/dependency-reduced-pom\.xml
 java/blazingdb-protocol\.iml
 
 java/bin/
+
+integration/calcite-service/\.idea/
+
+integration/calcite-service/\.settings/
+
+integration/calcite-service/bin/
+
+integration/calcite-service/target/

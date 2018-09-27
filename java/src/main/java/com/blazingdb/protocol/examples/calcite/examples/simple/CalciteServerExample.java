@@ -1,9 +1,9 @@
-package com.blazingdb.protocol.ipc.calcite.examples;
+package com.blazingdb.protocol.examples.calcite.examples.simple;
 
 import com.blazingdb.protocol.IService;
 import com.blazingdb.protocol.UnixService;
-import com.blazingdb.protocol.ipc.calcite.DMLRequestImpl;
-import com.blazingdb.protocol.ipc.calcite.DMLResponseImpl;
+import com.blazingdb.protocol.ipc.calcite.DMLRequestMessage;
+import com.blazingdb.protocol.ipc.calcite.DMLResponseMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class CalciteServerExample {
         IService calciteService  = new IService() {
             @Override
             public ByteBuffer process(ByteBuffer buffer) {
-                DMLRequestImpl request = new DMLRequestImpl(buffer);
+                DMLRequestMessage request = new DMLRequestMessage(buffer);
                 System.out.println("##ByteBuffer statement_:" + request.getQuery());
 
                 String logicalPlan = "LogicalUnion(all=[false])\n" +
@@ -27,7 +27,7 @@ public class CalciteServerExample {
                         "        LogicalProject(join_x=[$4], join_x0=[$7])\n" +
                         "          LogicalJoin(condition=[=($7, $0)], joinType=[inner])\n";
 
-                DMLResponseImpl response = new DMLResponseImpl(logicalPlan);
+                DMLResponseMessage response = new DMLResponseMessage(logicalPlan);
                 return response.getBufferData();
             }
         };

@@ -1,4 +1,4 @@
-package com.blazingdb.protocol.util;
+package com.blazingdb.protocol.ipc.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

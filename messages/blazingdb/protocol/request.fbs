@@ -6,12 +6,10 @@ include "blazingdb/protocol/interpreter/GetResultRequest.fbs";
 
 namespace blazingdb.protocol;
 
-struct Header {
-	kind: ushort;
-}
+enum HeaderType : ushort { DDL = 0, DML, GET_RESULT }
 
 table Request {
-	header: Header;
+	header:  HeaderType;
 	payload: [ubyte];
 }
 
