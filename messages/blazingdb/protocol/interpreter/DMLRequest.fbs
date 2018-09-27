@@ -1,5 +1,7 @@
 namespace blazingdb.protocol.interpreter;
 
+enum MessageType : byte { ExecutePlan = 0, GetResult }
+
 table DMLRequest {
 	logicalPlan: string;
 }

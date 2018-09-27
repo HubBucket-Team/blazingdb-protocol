@@ -9,10 +9,10 @@ import java.util.Arrays;
 
 public class RequestMessage implements IMessage {
 
-    short headerType;
+    byte headerType;
     ByteBuffer payloadBuffer;
 
-    public RequestMessage(short headerType, IMessage requestPayload) {
+    public RequestMessage(byte headerType, IMessage requestPayload) {
         this.headerType = headerType;
         this.payloadBuffer = requestPayload.getBufferData();
     }
@@ -27,7 +27,7 @@ public class RequestMessage implements IMessage {
 
     public RequestMessage(ByteBuffer buffer) {
         Request message = Request.getRootAsRequest(buffer);
-        this.headerType = (short)message.header();
+        this.headerType = message.header();
         this.payloadBuffer = message.payloadAsByteBuffer();
     }
 

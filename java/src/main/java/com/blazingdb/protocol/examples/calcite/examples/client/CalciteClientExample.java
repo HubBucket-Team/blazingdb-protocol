@@ -1,12 +1,12 @@
 package com.blazingdb.protocol.examples.calcite.examples.client;
 
-import blazingdb.protocol.HeaderType;
 import blazingdb.protocol.Status;
 import com.blazingdb.protocol.UnixClient;
 import com.blazingdb.protocol.ipc.calcite.DDLResponseMessage;
 import com.blazingdb.protocol.ipc.calcite.DMLRequestMessage;
 import com.blazingdb.protocol.ipc.calcite.DMLResponseMessage;
 import com.blazingdb.protocol.ipc.*;
+import blazingdb.protocol.calcite.MessageType;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class CalciteClientExample {
 
         public String getLogicalPlan(String query) throws IpcException {
             IMessage requestPayload = new DMLRequestMessage(query);
-            RequestMessage requestObj =  new RequestMessage(HeaderType.DML, requestPayload);
+            RequestMessage requestObj =  new RequestMessage(MessageType.DML, requestPayload);
             ByteBuffer result = client.send(requestObj.getBufferData());
             ResponseMessage response = new ResponseMessage(result);
             if (response.getStatus() == Status.Error) {
@@ -38,7 +38,7 @@ public class CalciteClientExample {
 
         public byte updateSchema(String query) throws IpcException {
             IMessage requestPayload = new DMLRequestMessage(query);
-            RequestMessage requestObj =  new RequestMessage(HeaderType.DDL, requestPayload);
+            RequestMessage requestObj =  new RequestMessage(MessageType.DDL, requestPayload);
             ByteBuffer result = client.send(requestObj.getBufferData());
             ResponseMessage response = new ResponseMessage(result);
             if (response.getStatus() == Status.Error) {
