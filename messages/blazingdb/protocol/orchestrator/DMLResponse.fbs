@@ -1,4 +1,4 @@
-namespace blazingdb.protocol.orchestator;
+namespace blazingdb.protocol.orchestrator;
 
 table DMLResponse {
 	token: string;

@@ -1,4 +1,4 @@
-namespace BlazingDB.Protocol;
+namespace blazingdb.protocol;
 
 enum gdf_time_unit : byte {
     TIME_UNIT_NONE=0, // default (undefined)

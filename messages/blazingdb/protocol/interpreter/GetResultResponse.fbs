@@ -2,7 +2,7 @@ namespace blazingdb.protocol.interpreter;
 
 table GetResultResponse {
 	names: [string];
-	values: [ubyte];
+	values: [ubyte]; //@todo update to [gdf_column]
 }
 
 root_type DMLResponse;
