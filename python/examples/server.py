@@ -12,8 +12,8 @@ def main():
     print(request.header)
     print(request.payload.query)
 
-    token = b'TOKEN 123'
-    responseBuffer = blazingdb.protocol.orchestrator.MakeDMLResponse(token)
+    responseBuffer = \
+      blazingdb.protocol.orchestrator.MakeDMLResponse('t-o-k-e-n')
 
     return responseBuffer
 

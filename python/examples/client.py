@@ -13,7 +13,7 @@ def main():
 
   response = blazingdb.protocol.orchestrator.DMLResponseFrom(responseBuffer)
 
-  print(response.status)
+  print(response.payload.token)
 
 
 if __name__ == '__main__':
