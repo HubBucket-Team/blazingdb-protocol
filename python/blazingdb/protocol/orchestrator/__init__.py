@@ -2,12 +2,14 @@ import flatbuffers
 
 import blazingdb.protocol.transport
 
-from blazingdb.messages.blazingdb.protocol import Request, Response, Status
+from blazingdb.messages.blazingdb.protocol.Status import Status
+
 from blazingdb.messages.blazingdb.protocol.orchestrator \
-  import (MessageType, DMLRequest, DMLResponse)
+    import DMLRequest, DMLResponse
 
 from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
   import MessageType as OrchestratorMessageType
+
 
 class DMLRequestDTO:
 
@@ -19,20 +21,6 @@ class DMLResponseDTO:
 
   def __init__(self, token):
     self.token = token
-
-
-class RequestDTO:
-
-  def __init__(self, header, payload):
-    self.header = header
-    self.payload = payload
-
-
-class ResponseDTO:
-
-  def __init__(self, status, payload):
-    self.status = status
-    self.payload = payload
 
 
 def MakeDMLRequest(query):
@@ -49,33 +37,23 @@ def MakeDMLRequest(query):
 def DMLRequestFrom(buffer_):
   request = blazingdb.protocol.transport.RequestFrom(buffer_)
   dmlRequest = DMLRequest.DMLRequest.GetRootAsDMLRequest(request.payload, 0)
-  return RequestDTO(request.header, DMLRequestDTO(dmlRequest.Query()))
+  return blazingdb.protocol.transport.RequestDTO(
+    request.header, DMLRequestDTO(dmlRequest.Query()))
 
 
 def MakeDMLResponse(token):
-  builder = flatbuffers.Builder(32)
+  builder = flatbuffers.Builder(512)
   token = builder.CreateString(token)
   DMLResponse.DMLResponseStart(builder)
   DMLResponse.DMLResponseAddToken(builder, token)
   builder.Finish(DMLResponse.DMLResponseEnd(builder))
-  buffer_ = builder.Output()
-
-  builder = flatbuffers.Builder(128)
-
-  Response.ResponseStartPayloadVector(builder, len(buffer_))
-  for b in reversed(buffer_):
-    builder.PrependByte(b)
-  payload = builder.EndVector(len(buffer_))
-
-  Response.ResponseStart(builder)
-  Response.ResponseAddStatus(builder, Status.Status.Success)
-  Response.ResponseAddPayload(builder, payload)
-  builder.Finish(Response.ResponseEnd(builder))
-  return builder.Output()
+  return blazingdb.protocol.transport.MakeResponse(
+    blazingdb.protocol.transport.ResponseDTO(Status.Success,
+                                             builder.Output()), 512)
 
 
 def DMLResponseFrom(buffer_):
-  response = Response.Response.GetRootAsResponse(buffer_, 0)
-  payload = DMLResponse.DMLResponse.GetRootAsDMLResponse(
-    bytes(response.Payload(i) for i in range(response.PayloadLength())), 0)
-  return ResponseDTO(response.Status(), DMLResponseDTO(payload.Token()))
+  response = blazingdb.protocol.transport.ResponseFrom(buffer_)
+  dmlResponse = DMLResponse.DMLResponse.GetRootAsDMLResponse(response.payload, 0)
+  return blazingdb.protocol.transport.ResponseDTO(
+      response.status, DMLResponseDTO(dmlResponse.Token()))
