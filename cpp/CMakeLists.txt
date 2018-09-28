@@ -5,7 +5,7 @@
 #     Copyright 2018 Cristhian Alberto Gonzales Castillo <cristhian@blazingdb.com>
 #=============================================================================
 
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.11)
 
 project(blazingdb-protocol)
 
