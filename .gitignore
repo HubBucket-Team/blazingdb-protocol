@@ -32,3 +32,9 @@ integration/calcite-service/bin/
 integration/calcite-service/target/
 
 integration/orchestrator-client/build/
+
+python/build/
+
+python/blazingdb_protocol\.egg-info/
+
+python/dist/
