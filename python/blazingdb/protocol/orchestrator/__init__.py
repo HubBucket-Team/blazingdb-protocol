@@ -1,9 +1,13 @@
 import flatbuffers
 
+import blazingdb.protocol.transport
+
 from blazingdb.messages.blazingdb.protocol import Request, Response, Status
 from blazingdb.messages.blazingdb.protocol.orchestrator \
   import (MessageType, DMLRequest, DMLResponse)
 
+from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
+  import MessageType as OrchestratorMessageType
 
 class DMLRequestDTO:
 
@@ -32,33 +36,20 @@ class ResponseDTO:
 
 
 def MakeDMLRequest(query):
-  builder = flatbuffers.Builder(1024)
+  builder = flatbuffers.Builder(512)
   query = builder.CreateString(query)
   DMLRequest.DMLRequestStart(builder)
   DMLRequest.DMLRequestAddQuery(builder, query)
   builder.Finish(DMLRequest.DMLRequestEnd(builder))
-  buffer_ = builder.Output()
-
-  builder = flatbuffers.Builder(32)
-
-  Request.RequestStartPayloadVector(builder, len(buffer_))
-  for b in reversed(buffer_):
-    builder.PrependByte(b)
-  payload = builder.EndVector(len(buffer_))
-
-  Request.RequestStart(builder)
-  Request.RequestAddHeader(builder, MessageType.MessageType.DML)
-  Request.RequestAddPayload(builder, payload)
-  builder.Finish(Request.RequestEnd(builder))
-
-  return builder.Output()
+  return blazingdb.protocol.transport.MakeRequest(
+    blazingdb.protocol.transport.RequestDTO(OrchestratorMessageType.DML,
+                                            builder.Output()), 512)
 
 
 def DMLRequestFrom(buffer_):
-  request = Request.Request.GetRootAsRequest(buffer_, 0)
-  payload = DMLRequest.DMLRequest.GetRootAsDMLRequest(
-    bytes(request.Payload(i) for i in range(request.PayloadLength())), 0)
-  return RequestDTO(request.Header(), DMLRequestDTO(payload.Query()))
+  request = blazingdb.protocol.transport.RequestFrom(buffer_)
+  dmlRequest = DMLRequest.DMLRequest.GetRootAsDMLRequest(request.payload, 0)
+  return RequestDTO(request.header, DMLRequestDTO(dmlRequest.Query()))
 
 
 def MakeDMLResponse(token):

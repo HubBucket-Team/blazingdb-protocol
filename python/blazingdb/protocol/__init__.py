@@ -31,7 +31,9 @@ class Server:
 
   def __init__(self, connection):
     self.connection_ = connection
-    os.unlink(connection.address())
+    address = connection.address()
+    if (os.path.exists(address)):
+      os.unlink(address)
     connection.socket_.bind(connection.address())
     connection.socket_.listen(4)
 
