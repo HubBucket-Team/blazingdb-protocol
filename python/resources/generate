@@ -1,0 +1,15 @@
+#!/bin/sh
+
+SRC=$(pwd)
+cd /tmp
+git clone https://github.com/google/flatbuffers.git flatbuffers
+cd flatbuffers
+git checkout v1.9.0
+mkdir build
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=prefix
+make -j4 flatc
+mkdir
+./flatc -p --gen-all --gen-object-api -o $SRC/blazingdb/messages $SRC/../messages/all.fbs
+touch $SRC/blazingdb/messages/__init__.py
+rm -fr /tmp/flatbuffers
