@@ -9,7 +9,7 @@ target_link_libraries(blazingdb-protocol Google::Flatbuffers)
 
 add_custom_command(TARGET blazingdb-protocol
   COMMAND ${GOOGLE_FLATBUFFERS_ROOT}/bin/flatc -c --gen-all
-    ../../../../../messages/all.fbs
+    ${PROJECT_SOURCE_DIR}/../messages/all.fbs
   COMMENT "Generate all messages")
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/all_generated.h
