@@ -12,6 +12,25 @@
 namespace blazingdb {
 namespace protocol {
 
+
+namespace {
+
+class StackBuffer : public Buffer {
+public:
+  static const std::size_t MAX_SIZE = 4096;
+
+  StackBuffer()
+      : Buffer(static_cast<const std::uint8_t *const>(actual_data_), MAX_SIZE),
+        actual_data_{0} {}
+
+  std::uint8_t *data() { return static_cast<std::uint8_t *>(actual_data_); }
+
+private:
+  std::uint8_t actual_data_[MAX_SIZE];
+};
+
+}  // namespace
+
 class Server {
 public:
   explicit Server(const Connection &connection);
@@ -28,6 +47,8 @@ private:
   using __HandlerBaseType = std::shared_ptr<_HandlerBase>;
 
   void _Start[[noreturn]](const __HandlerBaseType &) const;
+
+  ssize_t _GetRequest(int fd, StackBuffer &buffer) const;
 
   struct _HandlerBase {
     inline virtual ~_HandlerBase() = default;
