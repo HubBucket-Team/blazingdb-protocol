@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 
 setup(name='blazingdb-protocol',
@@ -8,4 +8,5 @@ setup(name='blazingdb-protocol',
       author_email='blazing@blazingdb',
       url='https://github.com/BlazingDB/blazingdb-protocol',
       packages=['blazingdb.protocol'],
+      install_requires=['flatbuffers'],
 )

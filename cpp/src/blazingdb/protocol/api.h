@@ -1,11 +1,6 @@
 #ifndef BLAZINGDB_PROTOCOL_API_H_
 #define BLAZINGDB_PROTOCOL_API_H_
 
-#include <cstring>
-#include <stdexcept>
-
-#include <unistd.h>
-
 #include "buffer/buffer.h"
 #include "client/client.h"
 #include "connection/unix_socket_connection.h"

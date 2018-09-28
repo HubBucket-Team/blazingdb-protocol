@@ -1,11 +1,14 @@
 import blazingdb.protocol
+import blazingdb.protocol.requests
 
 
 def main():
   connection = blazingdb.protocol.UnixSocketConnection('/tmp/socket')
   client = blazingdb.protocol.Client(connection)
 
-  responseBuffer = client.send(b'BlazingDB Request')
+  requestBuffer = blazingdb.protocol.requests.MakeDMLRequest('Select')
+
+  responseBuffer = client.send(requestBuffer)
 
   print(responseBuffer)
 
