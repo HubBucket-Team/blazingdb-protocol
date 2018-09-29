@@ -1,12 +1,16 @@
+#pragma once
 
 #include <string>
+#include <functional>
+#include <typeinfo>    
+
 #include <blazingdb/protocol/api.h>
+#include <iostream>
 #include "flatbuffers/flatbuffers.h"
 #include "generated/all_generated.h"
 
 namespace blazingdb {
 namespace protocol {
-
 
 class IMessage {
 public:
@@ -18,7 +22,6 @@ public:
 
 };
 
- 
 
 class ResponseMessage  : public IMessage {
 public:  
@@ -59,34 +62,6 @@ private:
     std::shared_ptr<flatbuffers::DetachedBuffer>  _copy_payload; 
 
  };
-
-
-class DMLResponseMessage : public IMessage {
-public:  
-
-  DMLResponseMessage(const std::string& logicalPlan) : IMessage(), logicalPlan (logicalPlan){
-  }
-  
-  DMLResponseMessage (const uint8_t* buffer) : IMessage() {
-    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::calcite::DMLResponse>(buffer);
-    logicalPlan = std::string{pointer->logicalPlan()->c_str()};
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override  {
-    flatbuffers::FlatBufferBuilder builder{1024};
-    auto string_offset = builder.CreateString(logicalPlan);
-    auto root_offset = calcite::CreateDMLResponse(builder, string_offset);
-    builder.Finish(root_offset);
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
-
-  std::string getLogicalPlan () {
-    return logicalPlan;
-  }
-  
-private:
-  std::string logicalPlan;
-};
 
 class ResponseErrorMessage : public IMessage {
 public:  
@@ -165,61 +140,66 @@ private:
 };
 
 
-class DMLRequestMessage : public IMessage {
+template<typename SchemaType>
+class StringTypeMessage : public IMessage {
 public: 
+  StringTypeMessage(const std::string& string) : IMessage(), string_value (string){
 
-  DMLRequestMessage(const std::string& query) : IMessage(), query (query){
   }
   
-  DMLRequestMessage (const uint8_t* buffer) : IMessage() {
-    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::calcite::DMLRequest>(buffer);
-    query = std::string{pointer->query()->c_str()};
+  using PointerToMethod = const flatbuffers::String* (SchemaType::*)() const;
+
+  StringTypeMessage (const uint8_t* buffer, PointerToMethod pmfn)
+    : IMessage()
+  {
+    auto pointer = flatbuffers::GetRoot<SchemaType>(buffer);
+    // auto string_buffer = std::invoke(pointer, pmfn);
+    auto string_buffer = (pointer->*pmfn)();
+    string_value = std::string {string_buffer->c_str()};
   }
 
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
+  template<class CreateFunctionPtr>
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferDataUsing(CreateFunctionPtr &&create_function) const  {
     flatbuffers::FlatBufferBuilder builder{1024};
-    auto string_offset = builder.CreateString(query);
-    auto root_offset = calcite::CreateDMLRequest(builder, string_offset);
+    auto root_offset = create_function(builder, string_value.c_str());
     builder.Finish(root_offset);
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
-
-  std::string getQuery() const {
-    return query;
-  }
-
-private:
-  std::string query;
-};
-
-
-
-class DDLRequestMessage : public IMessage {
-public: 
-
-  DDLRequestMessage(const std::string& query) : IMessage(), query (query){
-  }
   
-  DDLRequestMessage (const uint8_t* buffer) : IMessage() {
-    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::calcite::DMLRequest>(buffer);
-    query = std::string{pointer->query()->c_str()};
-  }
+protected:
+  std::string string_value;
+ };
 
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
-    flatbuffers::FlatBufferBuilder builder{1024};
-    auto string_offset = builder.CreateString(query);
-    auto root_offset = calcite::CreateDMLRequest(builder, string_offset);
-    builder.Finish(root_offset);
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
 
-  std::string getQuery() const {
-    return query;
-  }
+auto MakeRequest(int8_t message_header, IMessage&& payload) -> std::shared_ptr<flatbuffers::DetachedBuffer>{
+  RequestMessage request{message_header, payload}; 
+  auto bufferedData = request.getBufferData();
+  return bufferedData;
+}
 
-private:
-  std::string query;
-};
+template <typename ResponseType>
+ResponseType MakeResponse (Buffer responseBuffer) {
+  ResponseMessage response{responseBuffer.data()};
+  if (response.getStatus() == Status_Error) {
+    ResponseErrorMessage errorMessage{response.getPayloadBuffer()};
+    throw std::runtime_error(errorMessage.getMessage());
+  }
+  ResponseType responsePayload(response.getPayloadBuffer());
+  return responsePayload;
+}
+
+
+
+// template <typename ResponseType>
+// ResponseType MakeResponse (int8_t status, IMessage&& payload) {
+//   ResponseMessage response{responseBuffer.data()};
+//     if (response.getStatus() == Status_Error) {
+//       ResponseErrorMessage errorMessage{response.getPayloadBuffer()};
+//       throw std::runtime_error(errorMessage.getMessage());
+//     }
+//     ResponseType responsePayload(response.getPayloadBuffer());
+//     return responsePayload;
+// }
 
 }
 }

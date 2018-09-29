@@ -38,3 +38,15 @@ python/build/
 python/blazingdb_protocol\.egg-info/
 
 python/dist/
+
+cpp/\.idea/
+
+integration/services/orchestrator-service/build/
+
+integration/services/calcite-service/target/
+
+integration/services/calcite-service/bin/
+
+integration/services/calcite-service/\.settings/
+
+integration/services/calcite-service/\.idea/
