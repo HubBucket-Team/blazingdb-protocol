@@ -28,9 +28,10 @@ def main():
   query = 'select * from Table'
   dml_request_example(client, query)
 
+  # @todo check for exception : ex. not valid sql statement
+  # @todo error for consecutive requests (error in the python client) 
   query = '@typo * from Table'
   dml_request_example(client, query)
-
 
 if __name__ == '__main__':
   main()
