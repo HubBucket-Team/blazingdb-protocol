@@ -30,6 +30,8 @@ struct GetResultRequest;
 
 }  // namespace interpreter
 
+struct Header;
+
 struct Request;
 
 namespace calcite {
@@ -185,6 +187,38 @@ inline const char *EnumNameStatus(Status e) {
   const size_t index = static_cast<int>(e);
   return EnumNamesStatus()[index];
 }
+
+MANUALLY_ALIGNED_STRUCT(8) Header FLATBUFFERS_FINAL_CLASS {
+ private:
+  int8_t messageType_;
+  int8_t padding0__;  int16_t padding1__;  int32_t padding2__;
+  uint64_t payloadLength_;
+  uint64_t sessionToken_;
+
+ public:
+  Header() {
+    memset(this, 0, sizeof(Header));
+  }
+  Header(int8_t _messageType, uint64_t _payloadLength, uint64_t _sessionToken)
+      : messageType_(flatbuffers::EndianScalar(_messageType)),
+        padding0__(0),
+        padding1__(0),
+        padding2__(0),
+        payloadLength_(flatbuffers::EndianScalar(_payloadLength)),
+        sessionToken_(flatbuffers::EndianScalar(_sessionToken)) {
+    (void)padding0__;    (void)padding1__;    (void)padding2__;
+  }
+  int8_t messageType() const {
+    return flatbuffers::EndianScalar(messageType_);
+  }
+  uint64_t payloadLength() const {
+    return flatbuffers::EndianScalar(payloadLength_);
+  }
+  uint64_t sessionToken() const {
+    return flatbuffers::EndianScalar(sessionToken_);
+  }
+};
+STRUCT_END(Header, 24);
 
 namespace calcite {
 
@@ -448,15 +482,15 @@ struct Request FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HEADER = 4,
     VT_PAYLOAD = 6
   };
-  int8_t header() const {
-    return GetField<int8_t>(VT_HEADER, 0);
+  const Header *header() const {
+    return GetStruct<const Header *>(VT_HEADER);
   }
   const flatbuffers::Vector<uint8_t> *payload() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_PAYLOAD);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, VT_HEADER) &&
+           VerifyField<Header>(verifier, VT_HEADER) &&
            VerifyOffset(verifier, VT_PAYLOAD) &&
            verifier.Verify(payload()) &&
            verifier.EndTable();
@@ -466,8 +500,8 @@ struct Request FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct RequestBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_header(int8_t header) {
-    fbb_.AddElement<int8_t>(Request::VT_HEADER, header, 0);
+  void add_header(const Header *header) {
+    fbb_.AddStruct(Request::VT_HEADER, header);
   }
   void add_payload(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> payload) {
     fbb_.AddOffset(Request::VT_PAYLOAD, payload);
@@ -486,7 +520,7 @@ struct RequestBuilder {
 
 inline flatbuffers::Offset<Request> CreateRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
-    int8_t header = 0,
+    const Header *header = 0,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> payload = 0) {
   RequestBuilder builder_(_fbb);
   builder_.add_payload(payload);
@@ -496,7 +530,7 @@ inline flatbuffers::Offset<Request> CreateRequest(
 
 inline flatbuffers::Offset<Request> CreateRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    int8_t header = 0,
+    const Header *header = 0,
     const std::vector<uint8_t> *payload = nullptr) {
   return blazingdb::protocol::CreateRequest(
       _fbb,

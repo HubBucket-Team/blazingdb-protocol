@@ -1,10 +1,10 @@
 package com.blazingdb.protocol.ipc;
 
-public class IpcException extends Exception{
+public class SyntaxError extends Exception{
 
     private String message;
 
-    public IpcException(String msg){
+    public SyntaxError(String msg){
         super(msg);
         message = msg;
     }

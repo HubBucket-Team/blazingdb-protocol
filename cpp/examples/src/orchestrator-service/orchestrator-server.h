@@ -30,7 +30,7 @@ namespace orchestrator {
 //   RequestMessage request{requestBuffer.data()};
 //   DMLRequestMessage requestPayload(request.getPayloadBuffer());
 
-//   std::cout << "header: " << request.header() << std::endl;
+//   std::cout << "header: " << request.messageType() << std::endl;
 //   std::cout << "query: " << requestPayload.getLogicalPlan() << std::endl;
 
 //   std::string token = "JIFY*DSA%^F*(*(S)DIKFJLNDVOYD(";

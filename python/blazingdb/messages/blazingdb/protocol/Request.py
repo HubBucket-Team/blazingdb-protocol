@@ -22,8 +22,12 @@ class Request(object):
     def Header(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
-        return 0
+            x = o + self._tab.Pos
+            from .Header import Header
+            obj = Header()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
 
     # Request
     def Payload(self, j):
@@ -48,7 +52,7 @@ class Request(object):
         return 0
 
 def RequestStart(builder): builder.StartObject(2)
-def RequestAddHeader(builder, header): builder.PrependInt8Slot(0, header, 0)
+def RequestAddHeader(builder, header): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(header), 0)
 def RequestAddPayload(builder, payload): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(payload), 0)
 def RequestStartPayloadVector(builder, numElems): return builder.StartVector(1, numElems, 1)
 def RequestEnd(builder): return builder.EndObject()

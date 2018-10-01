@@ -1,5 +1,6 @@
 package com.blazingdb.protocol.examples.calcite.examples.client;
 
+import blazingdb.protocol.Header;
 import blazingdb.protocol.Status;
 import com.blazingdb.protocol.UnixClient;
 import com.blazingdb.protocol.ipc.calcite.DDLResponseMessage;
@@ -23,27 +24,32 @@ public class CalciteClientExample {
             client = new UnixClient(unixSocketFile);
         }
 
-        public String getLogicalPlan(String query) throws IpcException {
+        public String getLogicalPlan(String query) throws SyntaxError {
             IMessage requestPayload = new DMLRequestMessage(query);
-            RequestMessage requestObj =  new RequestMessage(MessageType.DML, requestPayload);
+
+            //@todo: byte messageType, long payloadLength, long sessionToken
+            HeaderMessage header = new HeaderMessage(MessageType.DML, 0L, 0L);
+            RequestMessage requestObj =  new RequestMessage(header , requestPayload);
             ByteBuffer result = client.send(requestObj.getBufferData());
             ResponseMessage response = new ResponseMessage(result);
             if (response.getStatus() == Status.Error) {
                 ResponseErrorMessage responsePayload = new ResponseErrorMessage(response.getPayload());
-                throw new IpcException(responsePayload.getError());
+                throw new SyntaxError(responsePayload.getError());
             }
             DMLResponseMessage responsePayload = new DMLResponseMessage(response.getPayload());
             return responsePayload.getLogicalPlan();
         }
 
-        public byte updateSchema(String query) throws IpcException {
+        public byte updateSchema(String query) throws SyntaxError {
             IMessage requestPayload = new DMLRequestMessage(query);
-            RequestMessage requestObj =  new RequestMessage(MessageType.DDL, requestPayload);
+            HeaderMessage header = new HeaderMessage(MessageType.DDL, 0L, 0L);
+
+            RequestMessage requestObj =  new RequestMessage(header, requestPayload);
             ByteBuffer result = client.send(requestObj.getBufferData());
             ResponseMessage response = new ResponseMessage(result);
             if (response.getStatus() == Status.Error) {
                 ResponseErrorMessage responsePayload = new ResponseErrorMessage(response.getPayload());
-                throw new IpcException(responsePayload.getError());
+                throw new SyntaxError(responsePayload.getError());
             }
             DDLResponseMessage responsePayload = new DDLResponseMessage(response.getPayload());
             return response.getStatus();
@@ -57,7 +63,7 @@ public class CalciteClientExample {
             try {
                 String logicalPlan = client.getLogicalPlan(statement);
                 System.out.println(logicalPlan);
-            } catch (IpcException error) {
+            } catch (SyntaxError error) {
                 System.out.println(error.getMessage());
             }
 
@@ -65,7 +71,7 @@ public class CalciteClientExample {
             try {
                 byte status = client.updateSchema(statementDDL);
                 System.out.println(status);
-            } catch (IpcException error) {
+            } catch (SyntaxError error) {
                 System.out.println(error.getMessage());
             }
         }
@@ -74,7 +80,7 @@ public class CalciteClientExample {
             try {
                 String logicalPlan = client.getLogicalPlan(statement);
                 System.out.println(logicalPlan);
-            } catch (IpcException error) {
+            } catch (SyntaxError error) {
                 System.out.println(error.getMessage());
             }
 
@@ -82,7 +88,7 @@ public class CalciteClientExample {
             try {
                 byte status = client.updateSchema(statementDDL);
                 System.out.println(status);
-            } catch (IpcException error) {
+            } catch (SyntaxError error) {
                 System.out.println(error.getMessage());
             }
         }

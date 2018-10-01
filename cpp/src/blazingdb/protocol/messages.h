@@ -92,20 +92,26 @@ private:
   std::string error;
 };
 
+static inline const Header * GetHeaderPtr (const uint8_t* buffer) {
+  return flatbuffers::GetRoot<blazingdb::protocol::Request>(buffer)->header();
+}
 
 class RequestMessage : public IMessage {
 public:  
-  RequestMessage (const uint8_t* buffer) : IMessage() {
+  RequestMessage (const uint8_t* buffer) 
+    : IMessage(), header{GetHeaderPtr(buffer)->messageType(),
+                         GetHeaderPtr(buffer)->payloadLength(), 
+                         GetHeaderPtr(buffer)->sessionToken() } 
+  {
       auto pointer = flatbuffers::GetRoot<blazingdb::protocol::Request>(buffer);
-      headerType = pointer->header();
       payloadBuffer = (uint8_t*)pointer->payload()->data();
       payloadBufferSize = pointer->payload()->size();
       
   }
-  RequestMessage(int8_t header, IMessage& payload) : IMessage() {
-      headerType = header;
+  RequestMessage(Header &&_header, IMessage& payload) 
+      : IMessage(), header{_header} 
+  {
       _copy_payload = payload.getBufferData(); 
-   
       payloadBuffer = _copy_payload->data();
       payloadBufferSize = _copy_payload->size();
   }
@@ -113,7 +119,7 @@ public:
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
     flatbuffers::FlatBufferBuilder builder{1024};
     auto payload_offset = builder.CreateVector(payloadBuffer, payloadBufferSize);
-    auto root_offset = CreateRequest(builder, headerType, payload_offset);
+    auto root_offset = CreateRequest(builder, &header, payload_offset);
     builder.Finish(root_offset);
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
@@ -126,16 +132,15 @@ public:
     return  payloadBufferSize;
   }
 
-  int8_t header() { 
-    return headerType;
+  int8_t  messageType() const { 
+    return header.messageType();
   }
    
 
 private:
-    int8_t            headerType;
+    Header            header;
     const uint8_t*    payloadBuffer;
     size_t            payloadBufferSize;
-
     std::shared_ptr<flatbuffers::DetachedBuffer>  _copy_payload; 
 };
 
@@ -171,8 +176,8 @@ protected:
  };
 
 
-auto MakeRequest(int8_t message_header, IMessage&& payload) -> std::shared_ptr<flatbuffers::DetachedBuffer>{
-  RequestMessage request{message_header, payload}; 
+auto MakeRequest(int8_t message_type, uint64_t payloadLength, uint64_t sessionToken, IMessage&& payload) -> std::shared_ptr<flatbuffers::DetachedBuffer>{
+  RequestMessage request{ Header{message_type, payloadLength, sessionToken}, payload}; 
   auto bufferedData = request.getBufferData();
   return bufferedData;
 }

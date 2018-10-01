@@ -46,7 +46,9 @@ public:
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
+    
     flatbuffers::FlatBufferBuilder builder{1024};
+    //1. query.length();
     auto string_offset = builder.CreateString(query);
     auto root_offset = calcite::CreateDMLRequest(builder, string_offset);
     builder.Finish(root_offset);

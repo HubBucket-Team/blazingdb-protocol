@@ -21,11 +21,11 @@ int main() {
     RequestMessage request{requestBuffer.data()};
     orchestrator::DMLRequestMessage requestPayload(request.getPayloadBuffer());
 
-    std::cout << "header: " << (int)request.header() << std::endl;
+    std::cout << "header: " << (int)request.messageType() << std::endl;
     std::cout << "query: " << requestPayload.getQuery() << std::endl;
     std::string token = "null_token";
 
-    if ( request.header() == orchestrator::MessageType_DML) {
+    if ( request.messageType() == orchestrator::MessageType_DML) {
       auto query = requestPayload.getQuery();
       try {
         blazingdb::protocol::UnixSocketConnection calcite_client_connection{"/tmp/calcite.socket"};

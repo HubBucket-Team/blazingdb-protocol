@@ -22,28 +22,32 @@ public:
   {}
 
   std::string executePlan(std::string logicalPlan)  {
-//     auto bufferedData = MakeRequest(interpreter::MessageType_ExecutePlan, DMLRequestMessage{logicalPlan});
-//     Buffer responseBuffer = client.send(bufferedData);
-//     auto response = MakeResponse<DMLResponseMessage>(responseBuffer);
-//     return response.getToken();
-
-    DMLRequestMessage requestPayload{logicalPlan};
-
-    RequestMessage requestObject{interpreter::MessageType_ExecutePlan, requestPayload};
-
-    auto bufferedData = requestObject.getBufferData();
-
-    std::cout << "\t1.1\n";
+    int64_t sessionToken = 0;
+    auto bufferedData = MakeRequest(interpreter::MessageType_ExecutePlan,
+                                     logicalPlan.length(),
+                                     sessionToken,
+                                     DMLRequestMessage{logicalPlan});
     Buffer responseBuffer = client.send(bufferedData);
-    std::cout << "\t1.2\n";
+    auto response = MakeResponse<DMLResponseMessage>(responseBuffer);
+    return response.getToken();
 
-    ResponseMessage response{responseBuffer.data()};
-    if (response.getStatus() == Status_Error) {
-      ResponseErrorMessage errorMessage{response.getPayloadBuffer()};
-      throw std::runtime_error(errorMessage.getMessage());
-    }
-    DMLResponseMessage responsePayload(response.getPayloadBuffer());
-    return responsePayload.getToken();
+    // DMLRequestMessage requestPayload{logicalPlan};
+
+    // RequestMessage requestObject{interpreter::MessageType_ExecutePlan, requestPayload};
+
+    // auto bufferedData = requestObject.getBufferData();
+
+    // std::cout << "\t1.1\n";
+    // Buffer responseBuffer = client.send(bufferedData);
+    // std::cout << "\t1.2\n";
+
+    // ResponseMessage response{responseBuffer.data()};
+    // if (response.getStatus() == Status_Error) {
+    //   ResponseErrorMessage errorMessage{response.getPayloadBuffer()};
+    //   throw std::runtime_error(errorMessage.getMessage());
+    // }
+    // DMLResponseMessage responsePayload(response.getPayloadBuffer());
+    // return responsePayload.getToken();
 
   }
 

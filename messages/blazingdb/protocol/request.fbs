@@ -6,8 +6,14 @@ include "blazingdb/protocol/interpreter/GetResultRequest.fbs";
 
 namespace blazingdb.protocol;
 
+struct Header {
+	messageType: byte;
+	payloadLength: ulong;
+	sessionToken: ulong;
+}
+
 table Request {
-	header:  byte;
+	header:  Header;
 	payload: [ubyte];
 }
 

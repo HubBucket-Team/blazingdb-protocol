@@ -49,6 +49,11 @@ void Server::_Start(const __HandlerBaseType &handler) const {
     if (fd == -1) { throw std::runtime_error("accept error"); }
     StackBuffer buffer;
     int nread = read(fd, buffer.data(), buffer.size());
+
+    // auto header_size = sizeof (Header); //>??
+    // auto buffer_header = read(fd, buffer.data(), header_size );
+    // auto payloadLength = flatbuffers::GetRoot<Header>(buffer_header)->payloadLength;
+    // int nread = read(fd, buffer.data() + header_size, payloadLength);
     
     //@todo: check this function for recovering byte per byte
     // ssize_t nread = _GetRequest(fd, buffer);
