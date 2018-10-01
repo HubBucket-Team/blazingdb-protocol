@@ -23,15 +23,20 @@ class DMLResponseDTO:
     self.token = token
 
 
-def MakeDMLRequest(query):
+def MakeDMLRequest(sessionToken, query):
   builder = flatbuffers.Builder(512)
   query = builder.CreateString(query)
   DMLRequest.DMLRequestStart(builder)
   DMLRequest.DMLRequestAddQuery(builder, query)
   builder.Finish(DMLRequest.DMLRequestEnd(builder))
+  output = builder.Output()
   return blazingdb.protocol.transport.MakeRequest(
-    blazingdb.protocol.transport.RequestDTO(OrchestratorMessageType.DML,
-                                            builder.Output()), 512)
+    blazingdb.protocol.transport.RequestDTO(
+      blazingdb.protocol.transport.HeaderDTO(
+        messageType=OrchestratorMessageType.DML,
+        payloadLength=len(output),
+        sessionToken=sessionToken),
+      output), 512)
 
 
 def DMLRequestFrom(buffer_):

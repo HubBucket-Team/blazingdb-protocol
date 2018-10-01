@@ -7,7 +7,7 @@ def main():
   client = blazingdb.protocol.Client(connection)
 
   requestBuffer = blazingdb.protocol.orchestrator.MakeDMLRequest(
-      'select * from Table')
+    123, 'select * from Table')
 
   responseBuffer = client.send(requestBuffer)
 

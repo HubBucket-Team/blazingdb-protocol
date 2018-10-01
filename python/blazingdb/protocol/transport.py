@@ -1,9 +1,23 @@
 import flatbuffers
 
-from blazingdb.messages.blazingdb.protocol import Request, Response
+from blazingdb.messages.blazingdb.protocol import Header, Request, Response
 
 
-__all__ = ('RequestDTO', 'ResponseDTO', 'MakeRequest', 'RequestFrom')
+__all__ = (
+  'HeaderDTO',
+  'RequestDTO',
+  'ResponseDTO',
+  'MakeRequest',
+  'RequestFrom',
+)
+
+
+class HeaderDTO:
+
+  def __init__(self, messageType, payloadLength, sessionToken):
+    self.messageType = messageType
+    self.payloadLength = payloadLength
+    self.sessionToken = sessionToken
 
 
 class RequestDTO:
@@ -22,9 +36,11 @@ class ResponseDTO:
 
 def MakeRequest(dto, builderInitialSize=0):
   builder = flatbuffers.Builder(builderInitialSize)
-  header = dto.header
   payload = _CreatePayload(builder, dto.payload)
   Request.RequestStart(builder)
+  headerDto = dto.header
+  header = Header.CreateHeader(builder,
+    headerDto.messageType, headerDto.payloadLength, headerDto.sessionToken)
   Request.RequestAddHeader(builder, header)
   Request.RequestAddPayload(builder, payload)
   builder.Finish(Request.RequestEnd(builder))
