@@ -26,7 +26,7 @@ public class ResponseMessage implements IMessage {
     public ByteBuffer getBufferData() {
         FlatBufferBuilder builder = new FlatBufferBuilder(1024);
         int payloadOffset = builder.createByteVector(payload.array());
-        int root = Request.createRequest(builder, status, payloadOffset);
+        int root = Response.createResponse(builder, status, payloadOffset);
         builder.finish(root);
         return ByteBufferUtils.addEOF(builder.dataBuffer());
     }
