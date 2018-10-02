@@ -1,0 +1,9 @@
+namespace blazingdb.protocol.authorization;
+
+enum MessageType : byte { Auth = 0 }
+
+table AuthRequest {
+	
+}
+
+root_type AuthRequest;

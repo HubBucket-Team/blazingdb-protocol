@@ -19,12 +19,12 @@ class DMLResponse(object):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DMLResponse
-    def Token(self):
+    def ResultToken(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
 def DMLResponseStart(builder): builder.StartObject(1)
-def DMLResponseAddToken(builder, token): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(token), 0)
+def DMLResponseAddResultToken(builder, resultToken): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(resultToken), 0)
 def DMLResponseEnd(builder): return builder.EndObject()
