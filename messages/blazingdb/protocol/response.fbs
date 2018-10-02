@@ -1,3 +1,4 @@
+include "blazingdb/protocol/authorization/AuthResponse.fbs";
 include "blazingdb/protocol/calcite/DMLResponse.fbs";
 include "blazingdb/protocol/calcite/DDLResponse.fbs";
 include "blazingdb/protocol/orchestrator/DMLResponse.fbs";

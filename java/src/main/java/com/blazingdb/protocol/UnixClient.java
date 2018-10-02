@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 
+import com.blazingdb.protocol.util.ByteBufferUtil;
 import jnr.unixsocket.UnixSocketAddress;
 import jnr.unixsocket.UnixSocketChannel;
 
@@ -45,6 +46,7 @@ public class UnixClient {
         return result;
     }
     public ByteBuffer send(ByteBuffer message) {
-        return ByteBuffer.wrap(send(message.array()));
+
+        return ByteBuffer.wrap(send(ByteBufferUtil.getByteArrayFromByteBuffer(message).array()));
     }
 } 

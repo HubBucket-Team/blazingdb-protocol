@@ -1,0 +1,7 @@
+namespace blazingdb.protocol.authorization;
+
+table AuthResponse {
+	accessToken: ulong;
+}
+
+root_type AuthResponse;

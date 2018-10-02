@@ -1,7 +1,7 @@
-namespace blazingdb.protocol.calcite;
+namespace blazingdb.protocol.flatbuf.calcite;
 
 table DDLRequest {
-	statement: string;
+	query: string;
 }
 
 root_type DDLRequest;

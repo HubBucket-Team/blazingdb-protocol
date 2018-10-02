@@ -1,3 +1,4 @@
+include "blazingdb/protocol/authorization/AuthRequest.fbs";
 include "blazingdb/protocol/calcite/DMLRequest.fbs";
 include "blazingdb/protocol/calcite/DDLRequest.fbs";
 include "blazingdb/protocol/orchestrator/DMLRequest.fbs";
@@ -9,7 +10,7 @@ namespace blazingdb.protocol;
 struct Header {
 	messageType: byte;
 	payloadLength: ulong;
-	sessionToken: ulong;
+	accessToken: ulong;
 }
 
 table Request {

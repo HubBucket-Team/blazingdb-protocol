@@ -4,12 +4,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.blazingdb.protocol.util.ByteBufferUtil;
 import jnr.enxio.channels.NativeSelectorProvider;
 import jnr.unixsocket.UnixServerSocket;
 import jnr.unixsocket.UnixServerSocketChannel;
@@ -51,12 +54,12 @@ public class UnixService implements Runnable {
         public final boolean rxready(IService handler) {
             try {
                 ByteBuffer buf = ByteBuffer.allocate(MAX_BUFFER_SIZE);
+                buf.order(ByteOrder.LITTLE_ENDIAN);
                 int n = channel.read(buf);
-                UnixSocketAddress remote = channel.getRemoteSocketAddress();
                 if (n > 0) {
                     buf.rewind();
                     ByteBuffer response = handler.process(buf);
-                    channel.write( response );
+                    channel.write(  ByteBufferUtil.getByteArrayFromByteBuffer(response) );
                     return true;
                 } else if (n < 0) {
                     return false;

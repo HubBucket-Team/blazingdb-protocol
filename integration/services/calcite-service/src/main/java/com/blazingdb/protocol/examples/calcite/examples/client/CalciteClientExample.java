@@ -3,10 +3,11 @@ package com.blazingdb.protocol.examples.calcite.examples.client;
 import blazingdb.protocol.Header;
 import blazingdb.protocol.Status;
 import com.blazingdb.protocol.UnixClient;
-import com.blazingdb.protocol.ipc.calcite.DDLResponseMessage;
-import com.blazingdb.protocol.ipc.calcite.DMLRequestMessage;
-import com.blazingdb.protocol.ipc.calcite.DMLResponseMessage;
-import com.blazingdb.protocol.ipc.*;
+import com.blazingdb.protocol.error.calcite.SyntaxError;
+import com.blazingdb.protocol.message.calcite.DDLResponseMessage;
+import com.blazingdb.protocol.message.calcite.DMLRequestMessage;
+import com.blazingdb.protocol.message.calcite.DMLResponseMessage;
+import com.blazingdb.protocol.message.*;
 import blazingdb.protocol.calcite.MessageType;
 
 import java.io.File;
