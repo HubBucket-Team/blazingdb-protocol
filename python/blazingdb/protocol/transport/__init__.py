@@ -105,18 +105,24 @@ class Schema(metaclass=MetaSchema):
   _segments = None
   _values = None
 
+  _nested = None
+  _inline = None
+
   def ToBuffer(self):
     builder = flatbuffers.Builder(0)
 
     pairs = []
-    for segment in self._segments.values():
-      name = segment._name
-      pairs.append((name, segment._bytes(builder, self._values[name])))
+    for segment in self._nested:
+      pairs.append((segment._name, segment._bytes(builder, self)))
 
     module = self._module
     name = module.__name__.split('.')[-1]
     getattr(module, name + 'Start')(builder)
-    for k, v in pairs:
+
+    for segment in self._inline:
+      pairs.append((segment._name, segment._bytes(builder, self)))
+
+    for k, v in reversed(pairs):
       getattr(module, '%sAdd%s' % (name, k.capitalize()))(builder, v)
     builder.Finish(getattr(module, name + 'End')(builder))
 
@@ -136,18 +142,28 @@ class Schema(metaclass=MetaSchema):
 
   @classmethod
   def _fix_up_segments(cls):
-    cls._segments = {}
     if __name__ == cls.__module__:
       return
+    cls._segments = {}
+    cls._nested = []
+    cls._inline = []
     for name in set(dir(cls)):
       attr = getattr(cls, name, None)
       if isinstance(attr, SchemaAttribute):
         attr._fix_up(cls, name)
         if isinstance(attr, Segment):
           cls._segments[name] = attr
+          if isinstance(attr, Nested):
+            cls._nested.append(attr)
+          elif isinstance(attr, Inline):
+            cls._inline.append(attr)
+          else:
+            raise TypeError('Bad `%s` order type' % name)
 
 
 class Segment(SchemaAttribute):
+
+  _name = None
 
   def _fix_up(self, cls, name):
     self._name = name
@@ -160,15 +176,46 @@ class Segment(SchemaAttribute):
     schema._values[self._name] = value
 
 
-class NumberSegment(Segment):
-
-  @staticmethod
-  def _bytes(builder, value):
-    return value
+class Nested(object):
+  pass
 
 
-class StringSegment(Segment):
+class Inline(object):
+  pass
 
-  @staticmethod
-  def _bytes(builder, value):
-    return builder.CreateString(value)
+
+class NumberSegment(Segment, Inline):
+
+  def _bytes(self, builder, schema):
+    return schema._values[self._name]
+
+
+class StringSegment(Segment, Nested):
+
+  def _bytes(self, builder, schema):
+    return builder.CreateString(schema._values[self._name])
+
+
+class BytesSegment(Segment, Nested):
+
+  def _bytes(self, builder, schema):
+    module = schema._module
+    name = module.__name__.split('.')[-1]
+    member = self._name.capitalize()
+    buffer_ = schema._values[self._name]
+    getattr(module, '%sStart%sVector' % (name, member))(builder, len(buffer_))
+    for b in reversed(buffer_):
+      builder.PrependByte(b)
+    return builder.EndVector(len(buffer_))
+
+
+class StructSegment(Segment, Inline):
+
+  def __init__(self, module):
+    self._module = module
+
+  def _bytes(self, builder, schema):
+    module = self._module
+    name = module.__name__.split('.')[-1]
+    value = schema._values[self._name]
+    return getattr(module, 'Create' + name)(builder, **value)
