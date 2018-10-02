@@ -36,11 +36,6 @@ public class ByteBufferUtil {
         }
         return ByteBuffer.wrap(outputStream.toByteArray());
     }
-    public static ByteBuffer concat(final ByteBuffer... buffers) {
-        final ByteBuffer combined = ByteBuffer.allocate(Arrays.stream(buffers).mapToInt(Buffer::remaining).sum());
-        Arrays.stream(buffers).forEach(b -> combined.put(b.duplicate()));
-        return combined;
-    }
 
     public static ByteBuffer deepCopyVisible( ByteBuffer orig )
     {
@@ -79,6 +74,12 @@ public class ByteBufferUtil {
         {
             orig.position(pos).limit(lim); // restore original
         }
+    }
+
+    public static ByteBuffer concat(final ByteBuffer... buffers) {
+        final ByteBuffer combined = ByteBuffer.allocate(Arrays.stream(buffers).mapToInt(Buffer::remaining).sum());
+        Arrays.stream(buffers).forEach(b -> combined.put(b.duplicate()));
+        return combined;
     }
 
     public static ByteBuffer addSizeToPrefix(ByteBuffer buffer) {

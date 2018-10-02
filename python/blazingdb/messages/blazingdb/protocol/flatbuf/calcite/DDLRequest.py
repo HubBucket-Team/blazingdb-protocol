@@ -19,12 +19,12 @@ class DDLRequest(object):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DDLRequest
-    def Statement(self):
+    def Query(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
         return None
 
 def DDLRequestStart(builder): builder.StartObject(1)
-def DDLRequestAddStatement(builder, statement): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(statement), 0)
+def DDLRequestAddQuery(builder, query): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(query), 0)
 def DDLRequestEnd(builder): return builder.EndObject()

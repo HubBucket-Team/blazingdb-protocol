@@ -16,11 +16,11 @@ class Header(object):
     # Header
     def PayloadLength(self): return self._tab.Get(flatbuffers.number_types.Uint64Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8))
     # Header
-    def SessionToken(self): return self._tab.Get(flatbuffers.number_types.Uint64Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(16))
+    def AccessToken(self): return self._tab.Get(flatbuffers.number_types.Uint64Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(16))
 
-def CreateHeader(builder, messageType, payloadLength, sessionToken):
+def CreateHeader(builder, messageType, payloadLength, accessToken):
     builder.Prep(8, 24)
-    builder.PrependUint64(sessionToken)
+    builder.PrependUint64(accessToken)
     builder.PrependUint64(payloadLength)
     builder.Pad(7)
     builder.PrependInt8(messageType)

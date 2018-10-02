@@ -50,7 +50,7 @@ def MakeDMLResponse(token):
   builder = flatbuffers.Builder(512)
   token = builder.CreateString(token)
   DMLResponse.DMLResponseStart(builder)
-  DMLResponse.DMLResponseAddToken(builder, token)
+  DMLResponse.DMLResponseAddResultToken(builder, token)
   builder.Finish(DMLResponse.DMLResponseEnd(builder))
   return blazingdb.protocol.transport.MakeResponse(
     blazingdb.protocol.transport.ResponseDTO(Status.Success,
@@ -61,4 +61,4 @@ def DMLResponseFrom(buffer_):
   response = blazingdb.protocol.transport.ResponseFrom(buffer_)
   dmlResponse = DMLResponse.DMLResponse.GetRootAsDMLResponse(response.payload, 0)
   return blazingdb.protocol.transport.ResponseDTO(
-      response.status, DMLResponseDTO(dmlResponse.Token()))
+      response.status, DMLResponseDTO(dmlResponse.ResultToken()))

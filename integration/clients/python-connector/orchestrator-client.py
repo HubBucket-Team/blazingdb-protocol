@@ -5,7 +5,7 @@ def dml_request_example (query):
   connection = blazingdb.protocol.UnixSocketConnection('/tmp/orchestrator.socket')
   client = blazingdb.protocol.Client(connection)
 
-  requestBuffer = blazingdb.protocol.orchestrator.MakeDMLRequest(query)
+  requestBuffer = blazingdb.protocol.orchestrator.MakeDMLRequest(123, query)
 
   responseBuffer = client.send(requestBuffer)
   try :
@@ -31,8 +31,8 @@ def main():
 
   # @todo check for exception : ex. not valid sql statement
   # @todo error for consecutive requests (error in the python client) 
-  query = '@typo * from Table'
-  dml_request_example(query)
+  # query = '@typo * from Table'
+  # dml_request_example(query)
 
 if __name__ == '__main__':
   main()

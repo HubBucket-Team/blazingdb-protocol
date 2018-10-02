@@ -52,3 +52,5 @@ integration/services/calcite-service/\.settings/
 integration/services/calcite-service/\.idea/
 
 integration/services/ral-service/build/
+
+python/resources/

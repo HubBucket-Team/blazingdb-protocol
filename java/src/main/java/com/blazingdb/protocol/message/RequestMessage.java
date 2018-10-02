@@ -45,24 +45,6 @@ public class RequestMessage implements IMessage {
         return builder.dataBuffer();
     }
 
-//    byte[] payload = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-//
-//    FlatBufferBuilder builder = new FlatBufferBuilder(0);
-//    int payloadOffset = builder.createByteVector(payload);
-//
-//        Request.startRequest(builder);
-//        Request.addHeader(builder, Header.createHeader(builder, (byte)1, 2, 3));
-//        Request.addPayload(builder, payloadOffset);
-//    int root = Request.endRequest(builder);
-//
-//        builder.finish(root);
-//    ByteBuffer buf = builder.dataBuffer();
-//
-//    Request request = Request.getRootAsRequest(buf);
-//        assert request.header().messageType() == (byte)1;
-//        assert request.header().payloadLength() == (long)2;
-//        assert request.header().accessToken() == (long)3;
-
     @Override
     public long getBufferSize() {
         return 0;
