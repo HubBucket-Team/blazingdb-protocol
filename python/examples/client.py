@@ -5,7 +5,7 @@ import blazingdb.protocol.transport.channel
 
 from blazingdb.protocol.interpreter import InterpreterMessage
 
-SESSION_TOKEN = 456
+ACCESS_TOKEN = 456
 
 
 def main():
@@ -15,7 +15,7 @@ def main():
   getResult = blazingdb.protocol.interpreter.GetResultSchema(
     token='RESULT_TOKEN')
   requestBuffer = blazingdb.protocol.transport.channel.MakeRequestBuffer(
-    InterpreterMessage.GetResult, SESSION_TOKEN, getResult)
+    InterpreterMessage.GetResult, ACCESS_TOKEN, getResult)
 
   responseBuffer = client.send(requestBuffer)
 
