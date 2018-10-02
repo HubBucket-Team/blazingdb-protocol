@@ -2,6 +2,8 @@ import flatbuffers
 
 import blazingdb.protocol.transport
 
+import blazingdb.protocol.transport as transport
+
 from blazingdb.messages.blazingdb.protocol.Status import Status
 
 from blazingdb.messages.blazingdb.protocol.orchestrator \
@@ -9,6 +11,10 @@ from blazingdb.messages.blazingdb.protocol.orchestrator \
 
 from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
   import MessageType as OrchestratorMessageType
+
+
+class DMLRequestSchema(transport.schema(DMLRequest)):
+  query = transport.StringSegment()
 
 
 class DMLRequestDTO:

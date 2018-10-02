@@ -19,9 +19,5 @@ def MakeRequestBuffer(messageType, accessToken, schema, builderInitialSize=0):
   }, payload=payload).ToBuffer()
 
 
-def _CreatePayload(builder, buffer_):
-  length = len(buffer_)
-  Request.RequestStartPayloadVector(builder, length)
-  for b in reversed(buffer_):
-    builder.PrependByte(b)
-  return builder.EndVector(length), length
+def RequestSchemaFrom(buffer_):
+  return RequestSchema.From(buffer_)
