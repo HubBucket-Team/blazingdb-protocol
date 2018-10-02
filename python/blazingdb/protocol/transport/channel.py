@@ -1,18 +1,22 @@
 import flatbuffers
 
+import blazingdb.protocol.transport as transport
+
 from blazingdb.messages.blazingdb.protocol import Header, Request, Response
 
 
-def MakeRequestBuffer(messageType, sessionToken, schema, builderInitialSize=0):
-  builder = flatbuffers.Builder(builderInitialSize)
-  payload, payloadLength = _CreatePayload(builder, schema.ToBuffer())
-  Request.RequestStart(builder)
-  header = Header.CreateHeader(builder,
-    messageType, payloadLength, sessionToken)
-  Request.RequestAddHeader(builder, header)
-  Request.RequestAddPayload(builder, payload)
-  builder.Finish(Request.RequestEnd(builder))
-  return builder.Output()
+class RequestSchema(transport.schema(Request)):
+  header = transport.StructSegment(Header)
+  payload = transport.BytesSegment()
+
+
+def MakeRequestBuffer(messageType, accessToken, schema, builderInitialSize=0):
+  payload = schema.ToBuffer()
+  return RequestSchema(header={
+    'messageType': messageType,
+    'payloadLength': len(payload),
+    'accessToken': accessToken,
+  }, payload=payload).ToBuffer()
 
 
 def _CreatePayload(builder, buffer_):
