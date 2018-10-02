@@ -8,13 +8,25 @@
 
 namespace blazingdb {
 namespace protocol {
+namespace authorization {
+
+struct AuthRequest;
+
+}  // namespace authorization
+
 namespace calcite {
 
 struct DMLRequest;
 
+}  // namespace calcite
+
+namespace flatbuf {
+namespace calcite {
+
 struct DDLRequest;
 
 }  // namespace calcite
+}  // namespace flatbuf
 
 namespace orchestrator {
 
@@ -33,6 +45,12 @@ struct GetResultRequest;
 struct Header;
 
 struct Request;
+
+namespace authorization {
+
+struct AuthResponse;
+
+}  // namespace authorization
 
 namespace calcite {
 
@@ -59,6 +77,36 @@ struct GetResultResponse;
 struct Response;
 
 struct ResponseError;
+
+namespace authorization {
+
+enum MessageType {
+  MessageType_Auth = 10,
+  MessageType_MIN = MessageType_Auth,
+  MessageType_MAX = MessageType_Auth
+};
+
+inline const MessageType (&EnumValuesMessageType())[1] {
+  static const MessageType values[] = {
+    MessageType_Auth
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesMessageType() {
+  static const char * const names[] = {
+    "Auth",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameMessageType(MessageType e) {
+  const size_t index = static_cast<int>(e) - static_cast<int>(MessageType_Auth);
+  return EnumNamesMessageType()[index];
+}
+
+}  // namespace authorization
 
 namespace calcite {
 
@@ -193,19 +241,19 @@ MANUALLY_ALIGNED_STRUCT(8) Header FLATBUFFERS_FINAL_CLASS {
   int8_t messageType_;
   int8_t padding0__;  int16_t padding1__;  int32_t padding2__;
   uint64_t payloadLength_;
-  uint64_t sessionToken_;
+  uint64_t accessToken_;
 
  public:
   Header() {
     memset(this, 0, sizeof(Header));
   }
-  Header(int8_t _messageType, uint64_t _payloadLength, uint64_t _sessionToken)
+  Header(int8_t _messageType, uint64_t _payloadLength, uint64_t _accessToken)
       : messageType_(flatbuffers::EndianScalar(_messageType)),
         padding0__(0),
         padding1__(0),
         padding2__(0),
         payloadLength_(flatbuffers::EndianScalar(_payloadLength)),
-        sessionToken_(flatbuffers::EndianScalar(_sessionToken)) {
+        accessToken_(flatbuffers::EndianScalar(_accessToken)) {
     (void)padding0__;    (void)padding1__;    (void)padding2__;
   }
   int8_t messageType() const {
@@ -214,11 +262,43 @@ MANUALLY_ALIGNED_STRUCT(8) Header FLATBUFFERS_FINAL_CLASS {
   uint64_t payloadLength() const {
     return flatbuffers::EndianScalar(payloadLength_);
   }
-  uint64_t sessionToken() const {
-    return flatbuffers::EndianScalar(sessionToken_);
+  uint64_t accessToken() const {
+    return flatbuffers::EndianScalar(accessToken_);
   }
 };
 STRUCT_END(Header, 24);
+
+namespace authorization {
+
+struct AuthRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct AuthRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit AuthRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  AuthRequestBuilder &operator=(const AuthRequestBuilder &);
+  flatbuffers::Offset<AuthRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<AuthRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<AuthRequest> CreateAuthRequest(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  AuthRequestBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+}  // namespace authorization
 
 namespace calcite {
 
@@ -271,17 +351,22 @@ inline flatbuffers::Offset<DMLRequest> CreateDMLRequestDirect(
       query ? _fbb.CreateString(query) : 0);
 }
 
+}  // namespace calcite
+
+namespace flatbuf {
+namespace calcite {
+
 struct DDLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_STATEMENT = 4
+    VT_QUERY = 4
   };
-  const flatbuffers::String *statement() const {
-    return GetPointer<const flatbuffers::String *>(VT_STATEMENT);
+  const flatbuffers::String *query() const {
+    return GetPointer<const flatbuffers::String *>(VT_QUERY);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_STATEMENT) &&
-           verifier.Verify(statement()) &&
+           VerifyOffset(verifier, VT_QUERY) &&
+           verifier.Verify(query()) &&
            verifier.EndTable();
   }
 };
@@ -289,8 +374,8 @@ struct DDLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct DDLRequestBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_statement(flatbuffers::Offset<flatbuffers::String> statement) {
-    fbb_.AddOffset(DDLRequest::VT_STATEMENT, statement);
+  void add_query(flatbuffers::Offset<flatbuffers::String> query) {
+    fbb_.AddOffset(DDLRequest::VT_QUERY, query);
   }
   explicit DDLRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -306,21 +391,22 @@ struct DDLRequestBuilder {
 
 inline flatbuffers::Offset<DDLRequest> CreateDDLRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> statement = 0) {
+    flatbuffers::Offset<flatbuffers::String> query = 0) {
   DDLRequestBuilder builder_(_fbb);
-  builder_.add_statement(statement);
+  builder_.add_query(query);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<DDLRequest> CreateDDLRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const char *statement = nullptr) {
-  return blazingdb::protocol::calcite::CreateDDLRequest(
+    const char *query = nullptr) {
+  return blazingdb::protocol::flatbuf::calcite::CreateDDLRequest(
       _fbb,
-      statement ? _fbb.CreateString(statement) : 0);
+      query ? _fbb.CreateString(query) : 0);
 }
 
 }  // namespace calcite
+}  // namespace flatbuf
 
 namespace orchestrator {
 
@@ -538,6 +624,50 @@ inline flatbuffers::Offset<Request> CreateRequestDirect(
       payload ? _fbb.CreateVector<uint8_t>(*payload) : 0);
 }
 
+namespace authorization {
+
+struct AuthResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_ACCESSTOKEN = 4
+  };
+  uint64_t accessToken() const {
+    return GetField<uint64_t>(VT_ACCESSTOKEN, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint64_t>(verifier, VT_ACCESSTOKEN) &&
+           verifier.EndTable();
+  }
+};
+
+struct AuthResponseBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_accessToken(uint64_t accessToken) {
+    fbb_.AddElement<uint64_t>(AuthResponse::VT_ACCESSTOKEN, accessToken, 0);
+  }
+  explicit AuthResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  AuthResponseBuilder &operator=(const AuthResponseBuilder &);
+  flatbuffers::Offset<AuthResponse> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<AuthResponse>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<AuthResponse> CreateAuthResponse(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint64_t accessToken = 0) {
+  AuthResponseBuilder builder_(_fbb);
+  builder_.add_accessToken(accessToken);
+  return builder_.Finish();
+}
+
+}  // namespace authorization
+
 namespace calcite {
 
 struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -623,15 +753,15 @@ namespace orchestrator {
 
 struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_TOKEN = 4
+    VT_RESULTTOKEN = 4
   };
-  const flatbuffers::String *token() const {
-    return GetPointer<const flatbuffers::String *>(VT_TOKEN);
+  const flatbuffers::String *resultToken() const {
+    return GetPointer<const flatbuffers::String *>(VT_RESULTTOKEN);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_TOKEN) &&
-           verifier.Verify(token()) &&
+           VerifyOffset(verifier, VT_RESULTTOKEN) &&
+           verifier.Verify(resultToken()) &&
            verifier.EndTable();
   }
 };
@@ -639,8 +769,8 @@ struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct DMLResponseBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_token(flatbuffers::Offset<flatbuffers::String> token) {
-    fbb_.AddOffset(DMLResponse::VT_TOKEN, token);
+  void add_resultToken(flatbuffers::Offset<flatbuffers::String> resultToken) {
+    fbb_.AddOffset(DMLResponse::VT_RESULTTOKEN, resultToken);
   }
   explicit DMLResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -656,18 +786,18 @@ struct DMLResponseBuilder {
 
 inline flatbuffers::Offset<DMLResponse> CreateDMLResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> token = 0) {
+    flatbuffers::Offset<flatbuffers::String> resultToken = 0) {
   DMLResponseBuilder builder_(_fbb);
-  builder_.add_token(token);
+  builder_.add_resultToken(resultToken);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<DMLResponse> CreateDMLResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const char *token = nullptr) {
+    const char *resultToken = nullptr) {
   return blazingdb::protocol::orchestrator::CreateDMLResponse(
       _fbb,
-      token ? _fbb.CreateString(token) : 0);
+      resultToken ? _fbb.CreateString(resultToken) : 0);
 }
 
 }  // namespace orchestrator
@@ -676,15 +806,15 @@ namespace interpreter {
 
 struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_TOKEN = 4
+    VT_RESULTTOKEN = 4
   };
-  const flatbuffers::String *token() const {
-    return GetPointer<const flatbuffers::String *>(VT_TOKEN);
+  const flatbuffers::String *resultToken() const {
+    return GetPointer<const flatbuffers::String *>(VT_RESULTTOKEN);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_TOKEN) &&
-           verifier.Verify(token()) &&
+           VerifyOffset(verifier, VT_RESULTTOKEN) &&
+           verifier.Verify(resultToken()) &&
            verifier.EndTable();
   }
 };
@@ -692,8 +822,8 @@ struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct DMLResponseBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_token(flatbuffers::Offset<flatbuffers::String> token) {
-    fbb_.AddOffset(DMLResponse::VT_TOKEN, token);
+  void add_resultToken(flatbuffers::Offset<flatbuffers::String> resultToken) {
+    fbb_.AddOffset(DMLResponse::VT_RESULTTOKEN, resultToken);
   }
   explicit DMLResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -709,18 +839,18 @@ struct DMLResponseBuilder {
 
 inline flatbuffers::Offset<DMLResponse> CreateDMLResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> token = 0) {
+    flatbuffers::Offset<flatbuffers::String> resultToken = 0) {
   DMLResponseBuilder builder_(_fbb);
-  builder_.add_token(token);
+  builder_.add_resultToken(resultToken);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<DMLResponse> CreateDMLResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const char *token = nullptr) {
+    const char *resultToken = nullptr) {
   return blazingdb::protocol::interpreter::CreateDMLResponse(
       _fbb,
-      token ? _fbb.CreateString(token) : 0);
+      resultToken ? _fbb.CreateString(resultToken) : 0);
 }
 
 struct GetResultResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -898,9 +1028,19 @@ inline flatbuffers::Offset<ResponseError> CreateResponseErrorDirect(
       errors ? _fbb.CreateString(errors) : 0);
 }
 
+namespace authorization {
+
+}  // namespace authorization
+
 namespace calcite {
 
 }  // namespace calcite
+
+namespace flatbuf {
+namespace calcite {
+
+}  // namespace calcite
+}  // namespace flatbuf
 
 namespace orchestrator {
 
@@ -909,6 +1049,10 @@ namespace orchestrator {
 namespace interpreter {
 
 }  // namespace interpreter
+
+namespace authorization {
+
+}  // namespace authorization
 
 namespace calcite {
 

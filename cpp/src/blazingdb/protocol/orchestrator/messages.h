@@ -41,7 +41,7 @@ public:
   }
   
   DMLResponseMessage (const uint8_t* buffer) 
-    :  StringTypeMessage<orchestrator::DMLResponse>(buffer, &orchestrator::DMLResponse::token)
+    :  StringTypeMessage<orchestrator::DMLResponse>(buffer, &orchestrator::DMLResponse::resultToken)
   {
   }
 
@@ -51,6 +51,42 @@ public:
 
   std::string getToken () {
     return string_value;
+  }
+};
+
+
+class DDLRequestMessage : public StringTypeMessage<orchestrator::DMLRequest> {
+public:
+  DDLRequestMessage(const std::string& string_value)
+      : StringTypeMessage<orchestrator::DMLRequest>(string_value)
+  {
+  }
+
+  DDLRequestMessage (const uint8_t* buffer)
+      :  StringTypeMessage<orchestrator::DMLRequest>(buffer, &orchestrator::DMLRequest::query)
+  {
+  }
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
+    return this->getBufferDataUsing(orchestrator::CreateDMLRequestDirect);
+  }
+
+  std::string getQuery () {
+    return string_value;
+  }
+};
+
+
+class DDLResponseMessage : public StringTypeMessage<orchestrator::DMLResponse> {
+public:
+
+  DDLResponseMessage(const std::string& string_value = "")
+      : StringTypeMessage<orchestrator::DMLResponse>(string_value)
+  {
+  }
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
+    return this->getBufferDataUsing(orchestrator::CreateDMLResponseDirect);
   }
 };
 

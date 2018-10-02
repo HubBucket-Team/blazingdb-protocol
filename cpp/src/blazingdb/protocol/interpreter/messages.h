@@ -42,7 +42,7 @@ public:
   }
 
   DMLResponseMessage (const uint8_t* buffer)
-      :  StringTypeMessage<interpreter::DMLResponse>(buffer, &interpreter::DMLResponse::token)
+      :  StringTypeMessage<interpreter::DMLResponse>(buffer, &interpreter::DMLResponse::resultToken)
   {
   }
 
