@@ -1,7 +1,5 @@
 import flatbuffers
 
-from blazingdb.protocol.internal import MakeBuffer
-
 import blazingdb.protocol.transport as transport
 
 from blazingdb.messages.blazingdb.protocol.Status import Status
