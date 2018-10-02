@@ -101,10 +101,9 @@ class SchemaAttribute(abc.ABC):
 
 class Schema(metaclass=MetaSchema):
 
-  _module = None
   _segments = None
+  _module = None
   _values = None
-
   _nested = None
   _inline = None
 
@@ -141,6 +140,17 @@ class Schema(metaclass=MetaSchema):
       segment._set_value(self, value)
 
   @classmethod
+  def From(cls, buffer_):
+    module = cls._module
+    name = module.__name__.split('.')[-1]
+    object_ = getattr(getattr(module, name), 'GetRootAs' + name)(buffer_, 0)
+    members = {name: segment._from(object_)
+      for name, segment in cls._segments.items()}
+    name = cls.__name__.split('.')[-1]
+    return type(name[0].lower() + name[1:], (), members)
+
+
+  @classmethod
   def _fix_up_segments(cls):
     if __name__ == cls.__module__:
       return
@@ -158,7 +168,7 @@ class Schema(metaclass=MetaSchema):
           elif isinstance(attr, Inline):
             cls._inline.append(attr)
           else:
-            raise TypeError('Bad `%s` order type' % name)
+            raise TypeError('Bad `%s` segment type' % name)
 
 
 class Segment(SchemaAttribute):
@@ -169,7 +179,11 @@ class Segment(SchemaAttribute):
     self._name = name
 
   @abc.abstractmethod
-  def _bytes(self, builder, value):
+  def _bytes(self, builder, schema):
+    return NotImplemented
+
+  @abc.abstractmethod
+  def _from(self, object_):
     return NotImplemented
 
   def _set_value(self, schema, value):
@@ -189,11 +203,17 @@ class NumberSegment(Segment, Inline):
   def _bytes(self, builder, schema):
     return schema._values[self._name]
 
+  def _from(self, object_):
+    return getattr(object_, self._name.capitalize())()
+
 
 class StringSegment(Segment, Nested):
 
   def _bytes(self, builder, schema):
     return builder.CreateString(schema._values[self._name])
+
+  def _from(self, object_):
+    return getattr(object_, self._name.capitalize())()
 
 
 class BytesSegment(Segment, Nested):
@@ -208,6 +228,11 @@ class BytesSegment(Segment, Nested):
       builder.PrependByte(b)
     return builder.EndVector(len(buffer_))
 
+  def _from(self, object_):
+    name = self._name.capitalize()
+    byte_ = getattr(object_, name)
+    return bytes(byte_(i) for i in range(getattr(object_, name + 'Length')()))
+
 
 class StructSegment(Segment, Inline):
 
@@ -219,3 +244,9 @@ class StructSegment(Segment, Inline):
     name = module.__name__.split('.')[-1]
     value = schema._values[self._name]
     return getattr(module, 'Create' + name)(builder, **value)
+
+  def _from(self, object_):
+    struct = getattr(object_, self._name.capitalize())()
+    members = {name[0].lower() + name[1:]: getattr(struct, name)()
+      for name in set(dir(struct)) - set(('Init', )) if name[0].isalpha()}
+    return type(self._name, (), members)
