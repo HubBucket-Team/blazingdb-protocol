@@ -1,5 +1,6 @@
 import blazingdb.protocol
 import blazingdb.protocol.orchestrator
+import blazingdb.protocol.transport.channel
 
 
 def main():
@@ -7,10 +8,14 @@ def main():
   server = blazingdb.protocol.Server(connection)
 
   def controller(requestBuffer):
-    request = blazingdb.protocol.orchestrator.DMLRequestFrom(requestBuffer)
+    request = blazingdb.protocol.transport.channel.RequestSchemaFrom(
+      requestBuffer)
 
     print(request.header)
-    print(request.payload.query)
+
+    dml = blazingdb.protocol.orchestrator.DMLRequestSchema.From(request.payload)
+
+    print(dml.query)
 
     responseBuffer = \
       blazingdb.protocol.orchestrator.MakeDMLResponse('t-o-k-e-n')
