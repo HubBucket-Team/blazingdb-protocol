@@ -17,6 +17,10 @@ class DMLRequestSchema(transport.schema(DMLRequest)):
   query = transport.StringSegment()
 
 
+class DMLResponseSchema(transport.schema(DMLResponse)):
+  resultToken = transport.StringSegment()
+
+
 class DMLRequestDTO:
 
   def __init__(self, query):

@@ -17,8 +17,14 @@ def main():
 
     print(dml.query)
 
+    dmlResponse = blazingdb.protocol.orchestrator.DMLResponseSchema(
+      resultToken='T-O-K-E-N')
+
     responseBuffer = \
-      blazingdb.protocol.orchestrator.MakeDMLResponse('t-o-k-e-n')
+      blazingdb.protocol.transport.channel.ResponseSchema(
+        status=blazingdb.protocol.transport.channel.Status.Success,
+        payload=dmlResponse.ToBuffer()
+      ).ToBuffer()
 
     return responseBuffer
 

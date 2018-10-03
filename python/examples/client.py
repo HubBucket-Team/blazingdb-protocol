@@ -19,10 +19,15 @@ def main():
 
   responseBuffer = client.send(requestBuffer)
 
-  response = blazingdb.protocol.orchestrator.DMLResponseFrom(responseBuffer)
+  response = blazingdb.protocol.transport.channel.ResponseSchema.From(
+    responseBuffer)
 
-  print(response.payload.token)
+  print(response.status)
 
+  dmlResponse = blazingdb.protocol.orchestrator.DMLResponseSchema.From(
+    response.payload)
+
+  print(dmlResponse.resultToken)
 
 if __name__ == '__main__':
   main()
