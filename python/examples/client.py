@@ -12,7 +12,7 @@ def main():
   connection = blazingdb.protocol.UnixSocketConnection('/tmp/socket')
   client = blazingdb.protocol.Client(connection)
 
-  getResult = blazingdb.protocol.interpreter.GetResultSchema(
+  getResult = blazingdb.protocol.interpreter.GetResultRequestSchema(
     token='RESULT_TOKEN')
   requestBuffer = blazingdb.protocol.transport.channel.MakeRequestBuffer(
     InterpreterMessage.GetResult, ACCESS_TOKEN, getResult)
