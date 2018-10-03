@@ -33,12 +33,21 @@ public:
       payloadBuffer = (uint8_t*)pointer->payload()->data();
       payloadBufferSize = pointer->payload()->size();
   }
-  ResponseMessage(Status status, IMessage& payload) : IMessage() {
+
+  ResponseMessage(Status status, std::shared_ptr<flatbuffers::DetachedBuffer>& buffer) : IMessage() {
       status_ = status;
-      _copy_payload = payload.getBufferData();
+      _copy_payload = buffer;
 
       payloadBuffer = _copy_payload->data();
       payloadBufferSize = _copy_payload->size();
+  }
+
+  ResponseMessage(Status status, IMessage& payload) : IMessage() {
+    status_ = status;
+    _copy_payload = payload.getBufferData();
+
+    payloadBuffer = _copy_payload->data();
+    payloadBufferSize = _copy_payload->size();
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override  {
@@ -101,7 +110,7 @@ public:
   RequestMessage (const uint8_t* buffer) 
     : IMessage(), header{GetHeaderPtr(buffer)->messageType(),
                          GetHeaderPtr(buffer)->payloadLength(), 
-                         GetHeaderPtr(buffer)->sessionToken() } 
+                         GetHeaderPtr(buffer)->accessToken() } 
   {
       auto pointer = flatbuffers::GetRoot<blazingdb::protocol::Request>(buffer);
       payloadBuffer = (uint8_t*)pointer->payload()->data();
@@ -183,7 +192,7 @@ auto MakeRequest(int8_t message_type, uint64_t payloadLength, uint64_t sessionTo
 }
 
 template <typename ResponseType>
-ResponseType MakeResponse (Buffer responseBuffer) {
+ResponseType MakeResponse (Buffer &responseBuffer) {
   ResponseMessage response{responseBuffer.data()};
   if (response.getStatus() == Status_Error) {
     ResponseErrorMessage errorMessage{response.getPayloadBuffer()};

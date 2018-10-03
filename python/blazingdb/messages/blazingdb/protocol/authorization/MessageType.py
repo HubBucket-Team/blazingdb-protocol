@@ -3,5 +3,5 @@
 # namespace: authorization
 
 class MessageType(object):
-    Auth = 0
+    Auth = 10
 

@@ -11,6 +11,8 @@ class RequestSchema(transport.schema(Request)):
   header = transport.StructSegment(Header)
   payload = transport.BytesSegment()
 
+def MakeAuthRequestBuffer(messageType, schema, builderInitialSize=0):
+  return MakeRequestBuffer(messageType, 0, schema, builderInitialSize)
 
 class ResponseSchema(transport.schema(Response)):
   status = transport.NumberSegment()  # todo(gcca): [Enum,Choice]Segment

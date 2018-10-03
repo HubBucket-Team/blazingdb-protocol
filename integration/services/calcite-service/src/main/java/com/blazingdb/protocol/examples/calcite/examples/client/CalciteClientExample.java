@@ -52,7 +52,6 @@ public class CalciteClientExample {
                 ResponseErrorMessage responsePayload = new ResponseErrorMessage(response.getPayload());
                 throw new SyntaxError(responsePayload.getError());
             }
-            DDLResponseMessage responsePayload = new DDLResponseMessage(response.getPayload());
             return response.getStatus();
         }
     }

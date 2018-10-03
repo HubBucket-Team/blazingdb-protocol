@@ -2,6 +2,7 @@ include "blazingdb/protocol/authorization/AuthRequest.fbs";
 include "blazingdb/protocol/calcite/DMLRequest.fbs";
 include "blazingdb/protocol/calcite/DDLRequest.fbs";
 include "blazingdb/protocol/orchestrator/DMLRequest.fbs";
+include "blazingdb/protocol/orchestrator/DDLRequest.fbs";
 include "blazingdb/protocol/interpreter/DMLRequest.fbs";
 include "blazingdb/protocol/interpreter/GetResultRequest.fbs";
 

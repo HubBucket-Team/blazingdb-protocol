@@ -1,6 +1,7 @@
 import flatbuffers
 
 import blazingdb.protocol.transport as transport
+import blazingdb.protocol.transport
 
 from blazingdb.messages.blazingdb.protocol.interpreter \
   import DMLRequest, DMLResponse, GetResultRequest, GetResultResponse

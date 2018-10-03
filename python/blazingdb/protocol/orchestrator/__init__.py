@@ -3,7 +3,7 @@ import flatbuffers
 import blazingdb.protocol.transport as transport
 
 from blazingdb.messages.blazingdb.protocol.orchestrator \
-    import DMLRequest, DMLResponse
+    import DMLRequest, DMLResponse, DDLRequest, DDLResponse
 
 from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
   import MessageType as OrchestratorMessageType
