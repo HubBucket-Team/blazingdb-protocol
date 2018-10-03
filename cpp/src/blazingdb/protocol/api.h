@@ -15,7 +15,6 @@ template <class Frame>
 class Protocol {
 public:
   //// TODO(gcca): reading input stream
-
   const Frame &frameFrom(const Buffer &buffer) const {
     const auto *frame = reinterpret_cast<const Frame *>(buffer.data());
     return *frame;

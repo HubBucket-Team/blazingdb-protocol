@@ -10,11 +10,13 @@ from blazingdb.protocol.authorization import AuthorizationMessage
 
 
 class PyConnector:
-  def __init__ (self, path):
+  def __init__ (self, path, interpreter_path):
     self.unixPath = path
-    self.client = self._open_client(self.unixPath)
-    self.accessToken = 0
-    self._connect()
+    self._interpreter_path = interpreter_path
+
+    # self.client = self._open_client(self.unixPath)
+    # self.accessToken = 0
+    # self._connect()
 
   def _connect(self):
 
@@ -58,27 +60,42 @@ class PyConnector:
       print(err)
     return ''
 
-  def _get_result(self, result_token):
-    self.client = self._open_client(self.unixPath)
+  def get_result(self, result_token):
+    self.accessToken = 123
+    self.client = self._open_client(self._interpreter_path)
 
-    getResult = blazingdb.protocol.interpreter.GetResultSchema(
+    getResultRequest = blazingdb.protocol.interpreter.GetResultRequestSchema(
       token=result_token)
 
     requestBuffer = blazingdb.protocol.transport.channel.MakeRequestBuffer(
-      InterpreterMessage.GetResult, self.accessToken, getResult)
+      InterpreterMessage.GetResult, self.accessToken, getResultRequest)
 
     responseBuffer = self.client.send(requestBuffer)
 
-    return blazingdb.protocol.orchestrator.DMLResponseFrom(responseBuffer)
+    response = blazingdb.protocol.transport.channel.ResponseSchema.From(
+      responseBuffer)
+
+    if response.status == blazingdb.protocol.transport.channel.Status.Error:
+      raise ValueError('Error status')
+
+    getResultResponse = blazingdb.protocol.orchestrator.DMLResponseSchema.From(
+      response.payload)
+
+    grr = blazingdb.protocol.interpreter.GetResultResponse
+    grr = grr.GetResultResponse.GetRootAsGetResultResponse(response.payload, 0)
+
+    print(grr.Names(0))
+    print(grr.Names(1))
 
 
 def main():
-  connector = PyConnector('/tmp/orchestrator.socket')
-  connector.run_dml_query('select * from Table')
-  connector.run_dml_query('@typo * from Table')
+  connector = PyConnector('/tmp/orchestrator.socket', '/tmp/ral.socket')
+  # connector.run_dml_query('select * from Table')
+  # connector.run_dml_query('@typo * from Table')
 
-  connector.run_ddl_query('create database alexdb')
-  connector.run_ddl_query('@typo database alexdb')
+  # connector.run_ddl_query('create database alexdb')
+  # connector.run_ddl_query('@typo database alexdb')
+  connector.get_result('RESULT_TOKEN')
 
 if __name__ == '__main__':
   main()

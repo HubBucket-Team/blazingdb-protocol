@@ -32,7 +32,7 @@ ssize_t Server::_GetRequest(int fd, StackBuffer &buffer) const {
     int n = recv(fd, &next_byte, 1, 0);
     if (n <= 0) {
       break;
-    } 
+    }
     request.append(&next_byte, 1);
     if (next_byte == (uint8_t)'\n') {
       break;
@@ -54,7 +54,7 @@ void Server::_Start(const __HandlerBaseType &handler) const {
     // auto buffer_header = read(fd, buffer.data(), header_size );
     // auto payloadLength = flatbuffers::GetRoot<Header>(buffer_header)->payloadLength;
     // int nread = read(fd, buffer.data() + header_size, payloadLength);
-    
+
     //@todo: check this function for recovering byte per byte
     // ssize_t nread = _GetRequest(fd, buffer);
     if (nread > 0) {

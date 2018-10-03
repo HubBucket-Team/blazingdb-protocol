@@ -1,40 +1,58 @@
-
 #include <iostream>
 
 #include <blazingdb/protocol/api.h>
 
 #include <blazingdb/protocol/interpreter/messages.h>
 
-namespace blazingdb {
-  namespace protocol {
+namespace blazingdb
+{
+namespace protocol
+{
+namespace interpreter
+{
 
-    namespace interpreter {
+auto InterpreterService(const blazingdb::protocol::Buffer &requestBuffer)
+    -> blazingdb::protocol::Buffer
+{
+  RequestMessage request{requestBuffer.data()};
+  std::cout << "header: " << static_cast<int>(request.messageType())
+            << std::endl;
 
-      auto InterpreterService(const blazingdb::protocol::Buffer &requestBuffer) -> blazingdb::protocol::Buffer {
-        RequestMessage request{requestBuffer.data()};
-        DMLRequestMessage requestPayload(request.getPayloadBuffer());
+  if (request.messageType() == interpreter::MessageType_ExecutePlan)
+    {
+      std::string token = "JIFY*DSA%^F*(*(S)DIKFJLNDVOYD(";
 
-        std::cout << "header: " << request.messageType() << std::endl;
-        std::cout << "query: " << requestPayload.getLogicalPlan() << std::endl;
-
-        std::string token = "JIFY*DSA%^F*(*(S)DIKFJLNDVOYD(";
-
-        DMLResponseMessage responsePayload{token};
-        ResponseMessage responseObject{Status_Success, responsePayload};
-        auto bufferedData = responseObject.getBufferData();
-        Buffer buffer{bufferedData->data(),
-                      bufferedData->size()};
-        return buffer;
-      }
-
+      DMLResponseMessage responsePayload{token};
+      ResponseMessage responseObject{Status_Success, responsePayload};
+      auto bufferedData = responseObject.getBufferData();
+      Buffer buffer{bufferedData->data(), bufferedData->size()};
+      return buffer;
     }
-  }
+  else if (request.messageType() == interpreter::MessageType_GetResult)
+    {
+      flatbuffers::FlatBufferBuilder builder;
+      std::vector<std::string> names{"iron", "man"};
+      auto vectorOfNames = builder.CreateVectorOfStrings(names);
+      builder.Finish(CreateGetResultResponse(builder, vectorOfNames));
+      std::shared_ptr<flatbuffers::DetachedBuffer> payload =
+        std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+      ResponseMessage responseMessage(Status::Status_Success, payload);
+      std::shared_ptr<flatbuffers::DetachedBuffer> response =
+        responseMessage.getBufferData();
+      return Buffer{response->data(), response->size()};
+    }
 }
+
+}  // namespace interpreter
+}  // namespace protocol
+}  // namespace blazingdb
 
 using namespace blazingdb::protocol::interpreter;
 
-int main() {
-  blazingdb::protocol::UnixSocketConnection connection({"/tmp/ral.socket", std::allocator<char>()});
+int main()
+{
+  blazingdb::protocol::UnixSocketConnection connection(
+      {"/tmp/ral.socket", std::allocator<char>()});
   blazingdb::protocol::Server server(connection);
 
 
