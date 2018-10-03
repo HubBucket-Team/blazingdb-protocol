@@ -17,7 +17,7 @@ namespace blazingdb {
         std::cout << "header: " << request.messageType() << std::endl;
         std::cout << "query: " << requestPayload.getLogicalPlan() << std::endl;
 
-        std::string token = "JIFY*DSA%^F*(*(S)DIKFJLNDVOYD(";
+        uint64_t token = 543210L;
 
         DMLResponseMessage responsePayload{token};
         ResponseMessage responseObject{Status_Success, responsePayload};
