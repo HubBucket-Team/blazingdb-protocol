@@ -82,10 +82,25 @@ def _PayloadFrom(flatbuffer):
 
 
 def schema(module):
+  """Shortcut to create concrete schema classes.
+
+  Args:
+    module: A Flatbuffers module for message
+
+  Useful to have a simple way to define schemas.
+
+  class ConcreteSchema(schema(FlatBuffersModule)):
+    field_str = StringSegment()
+    field_int = NumberSegment()
+  """
   return type(module.__name__ + 'SchemaBase', (Schema,), dict(_module=module))
 
 
 class MetaSchema(type):
+  """Metaclass for Schema.
+
+  To fix up segment members of the concrete schema.
+  """
 
   def __init__(cls, name, bases, classdict):
     super(MetaSchema, cls).__init__(name, bases, classdict)
@@ -93,6 +108,7 @@ class MetaSchema(type):
 
 
 class SchemaAttribute(abc.ABC):
+  """A base class to identify schema members."""
 
   @abc.abstractmethod
   def _fix_up(self, cls, code_name):
@@ -100,6 +116,21 @@ class SchemaAttribute(abc.ABC):
 
 
 class Schema(metaclass=MetaSchema):
+  """A class describing Flatbuffers schema.
+
+  All classes inheriting from Schema have MetaSchema, so that segments
+  are fixed up after class definition.
+
+  class ConcreteSchema(Schema):
+    _module = flatbuffer.user.message.module
+
+    field_str = StringSegment()
+    field_int = NumberSegment()
+
+  The related flatbuffers module is `None` by default. You must override
+  in parent scope in order to have working `ToBuffer` and `From` methods. See
+  `schema` function as a tool to create concrete schema classes.
+  """
 
   _segments = None
   _module = None
