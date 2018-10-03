@@ -2,6 +2,9 @@ import blazingdb.protocol.transport as transport
 import blazingdb.protocol.transport
 from blazingdb.messages.blazingdb.protocol.authorization \
   import AuthRequest, AuthResponse
+from blazingdb.messages.blazingdb.protocol.Status import Status
+from blazingdb.messages.blazingdb.protocol.ResponseError import ResponseError
+from blazingdb.protocol.errors import Error
 
 from blazingdb.messages.blazingdb.protocol.authorization.MessageType \
   import MessageType as AuthorizationMessage
@@ -34,6 +37,9 @@ def AuthRequestFrom(buffer_):
 
 def AuthResponseFrom(buffer_):
   response = blazingdb.protocol.transport.ResponseFrom(buffer_)
+  if response.status == Status.Error:
+    errorResponse = ResponseError.GetRootAsResponseError(response.payload, 0)
+    raise Error(errorResponse.Errors())
   authResponse = AuthResponse.AuthResponse.GetRootAsAuthResponse(response.payload, 0)
   return blazingdb.protocol.transport.ResponseDTO(
     response.status, AuthResponseDTO(authResponse.AccessToken()))

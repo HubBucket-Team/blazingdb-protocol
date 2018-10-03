@@ -1,38 +1,84 @@
 import blazingdb.protocol
+import blazingdb.protocol.interpreter
+import blazingdb.protocol.authorization
 import blazingdb.protocol.orchestrator
+import blazingdb.protocol.transport.channel
+from blazingdb.protocol.errors import Error
 
-def dml_request_example (query):
-  connection = blazingdb.protocol.UnixSocketConnection('/tmp/orchestrator.socket')
-  client = blazingdb.protocol.Client(connection)
+from blazingdb.protocol.interpreter import InterpreterMessage
+from blazingdb.protocol.authorization import AuthorizationMessage
 
-  requestBuffer = blazingdb.protocol.orchestrator.MakeDMLRequest(123, query)
 
-  responseBuffer = client.send(requestBuffer)
-  try :
-    response = blazingdb.protocol.orchestrator.DMLResponseFrom(responseBuffer)
-    print(response.payload.token)
-  except ValueError as err:   
-    print(err)
+class PyConnector:
+  def __init__ (self, path):
+    self.unixPath = path
+    self.client = self._open_client(self.unixPath)
+    self.accessToken = 0
+    self._connect()
 
-# def ddl_request_example (client, query):
-#   requestBuffer = blazingdb.protocol.orchestrator.MakeDDLRequest(query)
+  def _connect(self):
 
-#   responseBuffer = client.send(requestBuffer)
-#   try :
-#     response = blazingdb.protocol.orchestrator.DDLResponseFrom(responseBuffer)
-#     print(response.payload.token)
-#   except ValueError as err:   
-#     print(err)
-    
+    authSchema = blazingdb.protocol.authorization.AuthRequestSchema()
+
+    requestBuffer = blazingdb.protocol.transport.channel.MakeAuthRequestBuffer(
+      AuthorizationMessage.Auth, authSchema)
+
+    try:
+      responseBuffer = self.client.send(requestBuffer)
+      response = blazingdb.protocol.authorization.AuthResponseFrom(responseBuffer)
+      print(response.payload.accessToken)
+      self.accessToken = response.payload.accessToken
+    except Error as err:
+      print(err)
+
+  def _open_client(self, unixPath) :
+    connection = blazingdb.protocol.UnixSocketConnection(unixPath)
+    return blazingdb.protocol.Client(connection)
+
+  def run_dml_query(self, query):
+    self.client = self._open_client(self.unixPath)
+    requestBuffer = blazingdb.protocol.orchestrator.MakeDMLRequest(self.accessToken, query)
+    responseBuffer = self.client.send(requestBuffer)
+    try:
+      response = blazingdb.protocol.orchestrator.DMLResponseFrom(responseBuffer)
+      print(response.payload.token)
+      return response.payload.token
+    except Error as err:
+      print(err)
+
+  def run_ddl_query(self, query):
+    self.client = self._open_client(self.unixPath)
+    requestBuffer = blazingdb.protocol.orchestrator.MakeDDLRequest(self.accessToken, query)
+    responseBuffer = self.client.send(requestBuffer)
+    try:
+      response = blazingdb.protocol.orchestrator.DDLResponseFrom(responseBuffer)
+      print(response.status)
+      return response.status
+    except Error as err:
+      print(err)
+    return ''
+
+  def _get_result(self, result_token):
+    self.client = self._open_client(self.unixPath)
+
+    getResult = blazingdb.protocol.interpreter.GetResultSchema(
+      token=result_token)
+
+    requestBuffer = blazingdb.protocol.transport.channel.MakeRequestBuffer(
+      InterpreterMessage.GetResult, self.accessToken, getResult)
+
+    responseBuffer = self.client.send(requestBuffer)
+
+    return blazingdb.protocol.orchestrator.DMLResponseFrom(responseBuffer)
+
+
 def main():
+  connector = PyConnector('/tmp/orchestrator.socket')
+  connector.run_dml_query('select * from Table')
+  connector.run_dml_query('@typo * from Table')
 
-  query = 'select * from Table'
-  dml_request_example(query)
-
-  # @todo check for exception : ex. not valid sql statement
-  # @todo error for consecutive requests (error in the python client) 
-  # query = '@typo * from Table'
-  # dml_request_example(query)
+  connector.run_ddl_query('create database alexdb')
+  connector.run_ddl_query('@typo database alexdb')
 
 if __name__ == '__main__':
   main()

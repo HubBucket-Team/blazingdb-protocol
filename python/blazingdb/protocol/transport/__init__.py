@@ -36,6 +36,11 @@ class ResponseDTO:
     self.payload = payload
 
 
+class ErrorResponseDTO:
+  def __init__(self, errors):
+    self.errors = errors
+
+
 def MakeRequest(dto, builderInitialSize=0):
   builder = flatbuffers.Builder(builderInitialSize)
   payload = _CreatePayload(builder, dto.payload)

@@ -1,0 +1,7 @@
+namespace blazingdb.protocol.orchestrator;
+
+table DDLRequest {
+	query: string;
+}
+
+root_type DDLRequest;

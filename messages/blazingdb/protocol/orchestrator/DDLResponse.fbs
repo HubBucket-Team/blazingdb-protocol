@@ -1,0 +1,7 @@
+namespace blazingdb.protocol.orchestrator;
+
+table DDLResponse {
+
+}
+
+root_type DDLResponse;

@@ -192,7 +192,7 @@ auto MakeRequest(int8_t message_type, uint64_t payloadLength, uint64_t sessionTo
 }
 
 template <typename ResponseType>
-ResponseType MakeResponse (Buffer responseBuffer) {
+ResponseType MakeResponse (Buffer &responseBuffer) {
   ResponseMessage response{responseBuffer.data()};
   if (response.getStatus() == Status_Error) {
     ResponseErrorMessage errorMessage{response.getPayloadBuffer()};
