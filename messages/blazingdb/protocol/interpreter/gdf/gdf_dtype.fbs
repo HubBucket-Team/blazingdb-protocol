@@ -1,4 +1,4 @@
-namespace blazingdb.protocol;
+namespace blazingdb.protocol.interpreter.gdf;
 
 enum gdf_dtype : byte {
     GDF_invalid=0,

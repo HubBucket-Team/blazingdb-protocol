@@ -1,4 +1,4 @@
-namespace blazingdb.protocol.authorization;
+namespace blazingdb.protocol.orchestrator;
 
 table AuthResponse {
 	accessToken: ulong;

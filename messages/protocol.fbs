@@ -1,4 +1,0 @@
-include "blazingdb/protocol/request.fbs";
-include "blazingdb/protocol/response.fbs";
-
-namespace blazingdb.protocol;

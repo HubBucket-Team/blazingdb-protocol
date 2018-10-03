@@ -1,8 +1,18 @@
+include "blazingdb/protocol/interpreter/gdf/gdf_column.fbs";
+
 namespace blazingdb.protocol.interpreter;
 
-table GetResultResponse {
-	names: [string];
-	values: [ubyte]; //@todo update to [gdf_column]
+table BlazingMetadata {
+  status:string;
+  message:string;
+  time:double;
+  rows:int;
 }
 
-root_type DMLResponse;
+table GetResultResponse {
+  metadata:BlazingMetadata;
+  fieldNames:[string];
+  values:[gdf.gdf_column];
+}
+
+root_type GetResultResponse; 

@@ -5,4 +5,6 @@
 class MessageType(object):
     DDL = 0
     DML = 1
+    AuthOpen = 2
+    AuthClose = 3
 

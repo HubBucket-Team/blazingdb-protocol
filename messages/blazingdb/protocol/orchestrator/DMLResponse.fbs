@@ -1,7 +1,7 @@
 namespace blazingdb.protocol.orchestrator;
 
 table DMLResponse {
-	resultToken: string;
+	resultToken: ulong;
 }
 
 root_type DMLResponse;

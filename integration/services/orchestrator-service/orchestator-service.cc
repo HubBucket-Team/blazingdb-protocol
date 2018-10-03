@@ -82,7 +82,7 @@ int main() {
   std::map<int8_t, FunctionType> services;
   services.insert(std::make_pair(orchestrator::MessageType_DML, &dmlService));
   services.insert(std::make_pair(orchestrator::MessageType_DDL, &ddlService));
-  services.insert(std::make_pair(authorization::MessageType_Auth, &authorizationService));
+  services.insert(std::make_pair(authorization::MessageType_AuthOpen, &authorizationService));
 
   auto orchestratorService = [&services](const blazingdb::protocol::Buffer &requestBuffer) -> blazingdb::protocol::Buffer {
     RequestMessage request{requestBuffer.data()};

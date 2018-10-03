@@ -6,7 +6,7 @@ import blazingdb.protocol.transport.channel
 from blazingdb.protocol.errors import Error
 
 from blazingdb.protocol.interpreter import InterpreterMessage
-from blazingdb.protocol.authorization import AuthorizationMessage
+from blazingdb.protocol.orchestrator import OrchestratorMessageType
 
 
 class PyConnector:
@@ -18,14 +18,14 @@ class PyConnector:
 
   def _connect(self):
 
-    authSchema = blazingdb.protocol.authorization.AuthRequestSchema()
+    authSchema = blazingdb.protocol.orchestrator.AuthRequestSchema()
 
     requestBuffer = blazingdb.protocol.transport.channel.MakeAuthRequestBuffer(
-      AuthorizationMessage.Auth, authSchema)
+      OrchestratorMessageType.AuthOpen, authSchema)
 
     try:
       responseBuffer = self.client.send(requestBuffer)
-      response = blazingdb.protocol.authorization.AuthResponseFrom(responseBuffer)
+      response = blazingdb.protocol.orchestrator.AuthResponseFrom(responseBuffer)
       print(response.payload.accessToken)
       self.accessToken = response.payload.accessToken
     except Error as err:
@@ -79,6 +79,7 @@ def main():
 
   connector.run_ddl_query('create database alexdb')
   connector.run_ddl_query('@typo database alexdb')
+
 
 if __name__ == '__main__':
   main()

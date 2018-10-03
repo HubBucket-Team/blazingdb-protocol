@@ -8,12 +8,6 @@
 
 namespace blazingdb {
 namespace protocol {
-namespace authorization {
-
-struct AuthRequest;
-
-}  // namespace authorization
-
 namespace calcite {
 
 struct DMLRequest;
@@ -30,7 +24,11 @@ struct DDLRequest;
 
 namespace orchestrator {
 
+struct AuthRequest;
+
 struct DMLRequest;
+
+struct DDLRequest;
 
 }  // namespace orchestrator
 
@@ -46,12 +44,6 @@ struct Header;
 
 struct Request;
 
-namespace authorization {
-
-struct AuthResponse;
-
-}  // namespace authorization
-
 namespace calcite {
 
 struct DMLResponse;
@@ -62,13 +54,29 @@ struct DDLResponse;
 
 namespace orchestrator {
 
+struct AuthResponse;
+
 struct DMLResponse;
+
+struct DDLResponse;
 
 }  // namespace orchestrator
 
 namespace interpreter {
 
 struct DMLResponse;
+
+namespace gdf {
+
+struct gdf_dtype_extra_info;
+
+struct cudaIpcMemHandle_t;
+
+struct gdf_column;
+
+}  // namespace gdf
+
+struct BlazingMetadata;
 
 struct GetResultResponse;
 
@@ -77,36 +85,6 @@ struct GetResultResponse;
 struct Response;
 
 struct ResponseError;
-
-namespace authorization {
-
-enum MessageType {
-  MessageType_Auth = 10,
-  MessageType_MIN = MessageType_Auth,
-  MessageType_MAX = MessageType_Auth
-};
-
-inline const MessageType (&EnumValuesMessageType())[1] {
-  static const MessageType values[] = {
-    MessageType_Auth
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesMessageType() {
-  static const char * const names[] = {
-    "Auth",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameMessageType(MessageType e) {
-  const size_t index = static_cast<int>(e) - static_cast<int>(MessageType_Auth);
-  return EnumNamesMessageType()[index];
-}
-
-}  // namespace authorization
 
 namespace calcite {
 
@@ -146,14 +124,18 @@ namespace orchestrator {
 enum MessageType {
   MessageType_DDL = 0,
   MessageType_DML = 1,
+  MessageType_AuthOpen = 2,
+  MessageType_AuthClose = 3,
   MessageType_MIN = MessageType_DDL,
-  MessageType_MAX = MessageType_DML
+  MessageType_MAX = MessageType_AuthClose
 };
 
-inline const MessageType (&EnumValuesMessageType())[2] {
+inline const MessageType (&EnumValuesMessageType())[4] {
   static const MessageType values[] = {
     MessageType_DDL,
-    MessageType_DML
+    MessageType_DML,
+    MessageType_AuthOpen,
+    MessageType_AuthClose
   };
   return values;
 }
@@ -162,6 +144,8 @@ inline const char * const *EnumNamesMessageType() {
   static const char * const names[] = {
     "DDL",
     "DML",
+    "AuthOpen",
+    "AuthClose",
     nullptr
   };
   return names;
@@ -205,6 +189,115 @@ inline const char *EnumNameMessageType(MessageType e) {
   return EnumNamesMessageType()[index];
 }
 
+namespace gdf {
+
+enum gdf_dtype {
+  gdf_dtype_GDF_invalid = 0,
+  gdf_dtype_GDF_INT8 = 1,
+  gdf_dtype_GDF_INT16 = 2,
+  gdf_dtype_GDF_INT32 = 3,
+  gdf_dtype_GDF_INT64 = 4,
+  gdf_dtype_GDF_UINT8 = 5,
+  gdf_dtype_GDF_UINT16 = 6,
+  gdf_dtype_GDF_UINT32 = 7,
+  gdf_dtype_GDF_UINT64 = 8,
+  gdf_dtype_GDF_FLOAT32 = 9,
+  gdf_dtype_GDF_FLOAT64 = 10,
+  gdf_dtype_GDF_DATE32 = 11,
+  gdf_dtype_GDF_DATE64 = 12,
+  gdf_dtype_GDF_TIMESTAMP = 13,
+  gdf_dtype_N_GDF_TYPES = 14,
+  gdf_dtype_MIN = gdf_dtype_GDF_invalid,
+  gdf_dtype_MAX = gdf_dtype_N_GDF_TYPES
+};
+
+inline const gdf_dtype (&EnumValuesgdf_dtype())[15] {
+  static const gdf_dtype values[] = {
+    gdf_dtype_GDF_invalid,
+    gdf_dtype_GDF_INT8,
+    gdf_dtype_GDF_INT16,
+    gdf_dtype_GDF_INT32,
+    gdf_dtype_GDF_INT64,
+    gdf_dtype_GDF_UINT8,
+    gdf_dtype_GDF_UINT16,
+    gdf_dtype_GDF_UINT32,
+    gdf_dtype_GDF_UINT64,
+    gdf_dtype_GDF_FLOAT32,
+    gdf_dtype_GDF_FLOAT64,
+    gdf_dtype_GDF_DATE32,
+    gdf_dtype_GDF_DATE64,
+    gdf_dtype_GDF_TIMESTAMP,
+    gdf_dtype_N_GDF_TYPES
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesgdf_dtype() {
+  static const char * const names[] = {
+    "GDF_invalid",
+    "GDF_INT8",
+    "GDF_INT16",
+    "GDF_INT32",
+    "GDF_INT64",
+    "GDF_UINT8",
+    "GDF_UINT16",
+    "GDF_UINT32",
+    "GDF_UINT64",
+    "GDF_FLOAT32",
+    "GDF_FLOAT64",
+    "GDF_DATE32",
+    "GDF_DATE64",
+    "GDF_TIMESTAMP",
+    "N_GDF_TYPES",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamegdf_dtype(gdf_dtype e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesgdf_dtype()[index];
+}
+
+enum gdf_time_unit {
+  gdf_time_unit_TIME_UNIT_NONE = 0,
+  gdf_time_unit_TIME_UNIT_s = 1,
+  gdf_time_unit_TIME_UNIT_ms = 2,
+  gdf_time_unit_TIME_UNIT_us = 3,
+  gdf_time_unit_TIME_UNIT_ns = 4,
+  gdf_time_unit_MIN = gdf_time_unit_TIME_UNIT_NONE,
+  gdf_time_unit_MAX = gdf_time_unit_TIME_UNIT_ns
+};
+
+inline const gdf_time_unit (&EnumValuesgdf_time_unit())[5] {
+  static const gdf_time_unit values[] = {
+    gdf_time_unit_TIME_UNIT_NONE,
+    gdf_time_unit_TIME_UNIT_s,
+    gdf_time_unit_TIME_UNIT_ms,
+    gdf_time_unit_TIME_UNIT_us,
+    gdf_time_unit_TIME_UNIT_ns
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesgdf_time_unit() {
+  static const char * const names[] = {
+    "TIME_UNIT_NONE",
+    "TIME_UNIT_s",
+    "TIME_UNIT_ms",
+    "TIME_UNIT_us",
+    "TIME_UNIT_ns",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamegdf_time_unit(gdf_time_unit e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesgdf_time_unit()[index];
+}
+
+}  // namespace gdf
 }  // namespace interpreter
 
 enum Status {
@@ -267,38 +360,6 @@ MANUALLY_ALIGNED_STRUCT(8) Header FLATBUFFERS_FINAL_CLASS {
   }
 };
 STRUCT_END(Header, 24);
-
-namespace authorization {
-
-struct AuthRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           verifier.EndTable();
-  }
-};
-
-struct AuthRequestBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  explicit AuthRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  AuthRequestBuilder &operator=(const AuthRequestBuilder &);
-  flatbuffers::Offset<AuthRequest> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<AuthRequest>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<AuthRequest> CreateAuthRequest(
-    flatbuffers::FlatBufferBuilder &_fbb) {
-  AuthRequestBuilder builder_(_fbb);
-  return builder_.Finish();
-}
-
-}  // namespace authorization
 
 namespace calcite {
 
@@ -410,6 +471,34 @@ inline flatbuffers::Offset<DDLRequest> CreateDDLRequestDirect(
 
 namespace orchestrator {
 
+struct AuthRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct AuthRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit AuthRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  AuthRequestBuilder &operator=(const AuthRequestBuilder &);
+  flatbuffers::Offset<AuthRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<AuthRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<AuthRequest> CreateAuthRequest(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  AuthRequestBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
 struct DMLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_QUERY = 4
@@ -455,6 +544,55 @@ inline flatbuffers::Offset<DMLRequest> CreateDMLRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *query = nullptr) {
   return blazingdb::protocol::orchestrator::CreateDMLRequest(
+      _fbb,
+      query ? _fbb.CreateString(query) : 0);
+}
+
+struct DDLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_QUERY = 4
+  };
+  const flatbuffers::String *query() const {
+    return GetPointer<const flatbuffers::String *>(VT_QUERY);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_QUERY) &&
+           verifier.Verify(query()) &&
+           verifier.EndTable();
+  }
+};
+
+struct DDLRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_query(flatbuffers::Offset<flatbuffers::String> query) {
+    fbb_.AddOffset(DDLRequest::VT_QUERY, query);
+  }
+  explicit DDLRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  DDLRequestBuilder &operator=(const DDLRequestBuilder &);
+  flatbuffers::Offset<DDLRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<DDLRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<DDLRequest> CreateDDLRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> query = 0) {
+  DDLRequestBuilder builder_(_fbb);
+  builder_.add_query(query);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<DDLRequest> CreateDDLRequestDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *query = nullptr) {
+  return blazingdb::protocol::orchestrator::CreateDDLRequest(
       _fbb,
       query ? _fbb.CreateString(query) : 0);
 }
@@ -514,15 +652,14 @@ inline flatbuffers::Offset<DMLRequest> CreateDMLRequestDirect(
 
 struct GetResultRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_TOKEN = 4
+    VT_RESULTTOKEN = 4
   };
-  const flatbuffers::String *token() const {
-    return GetPointer<const flatbuffers::String *>(VT_TOKEN);
+  uint64_t resultToken() const {
+    return GetField<uint64_t>(VT_RESULTTOKEN, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_TOKEN) &&
-           verifier.Verify(token()) &&
+           VerifyField<uint64_t>(verifier, VT_RESULTTOKEN) &&
            verifier.EndTable();
   }
 };
@@ -530,8 +667,8 @@ struct GetResultRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct GetResultRequestBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_token(flatbuffers::Offset<flatbuffers::String> token) {
-    fbb_.AddOffset(GetResultRequest::VT_TOKEN, token);
+  void add_resultToken(uint64_t resultToken) {
+    fbb_.AddElement<uint64_t>(GetResultRequest::VT_RESULTTOKEN, resultToken, 0);
   }
   explicit GetResultRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -547,18 +684,10 @@ struct GetResultRequestBuilder {
 
 inline flatbuffers::Offset<GetResultRequest> CreateGetResultRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> token = 0) {
+    uint64_t resultToken = 0) {
   GetResultRequestBuilder builder_(_fbb);
-  builder_.add_token(token);
+  builder_.add_resultToken(resultToken);
   return builder_.Finish();
-}
-
-inline flatbuffers::Offset<GetResultRequest> CreateGetResultRequestDirect(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    const char *token = nullptr) {
-  return blazingdb::protocol::interpreter::CreateGetResultRequest(
-      _fbb,
-      token ? _fbb.CreateString(token) : 0);
 }
 
 }  // namespace interpreter
@@ -623,50 +752,6 @@ inline flatbuffers::Offset<Request> CreateRequestDirect(
       header,
       payload ? _fbb.CreateVector<uint8_t>(*payload) : 0);
 }
-
-namespace authorization {
-
-struct AuthResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_ACCESSTOKEN = 4
-  };
-  uint64_t accessToken() const {
-    return GetField<uint64_t>(VT_ACCESSTOKEN, 0);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<uint64_t>(verifier, VT_ACCESSTOKEN) &&
-           verifier.EndTable();
-  }
-};
-
-struct AuthResponseBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_accessToken(uint64_t accessToken) {
-    fbb_.AddElement<uint64_t>(AuthResponse::VT_ACCESSTOKEN, accessToken, 0);
-  }
-  explicit AuthResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  AuthResponseBuilder &operator=(const AuthResponseBuilder &);
-  flatbuffers::Offset<AuthResponse> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<AuthResponse>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<AuthResponse> CreateAuthResponse(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    uint64_t accessToken = 0) {
-  AuthResponseBuilder builder_(_fbb);
-  builder_.add_accessToken(accessToken);
-  return builder_.Finish();
-}
-
-}  // namespace authorization
 
 namespace calcite {
 
@@ -751,17 +836,56 @@ inline flatbuffers::Offset<DDLResponse> CreateDDLResponse(
 
 namespace orchestrator {
 
+struct AuthResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_ACCESSTOKEN = 4
+  };
+  uint64_t accessToken() const {
+    return GetField<uint64_t>(VT_ACCESSTOKEN, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint64_t>(verifier, VT_ACCESSTOKEN) &&
+           verifier.EndTable();
+  }
+};
+
+struct AuthResponseBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_accessToken(uint64_t accessToken) {
+    fbb_.AddElement<uint64_t>(AuthResponse::VT_ACCESSTOKEN, accessToken, 0);
+  }
+  explicit AuthResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  AuthResponseBuilder &operator=(const AuthResponseBuilder &);
+  flatbuffers::Offset<AuthResponse> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<AuthResponse>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<AuthResponse> CreateAuthResponse(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint64_t accessToken = 0) {
+  AuthResponseBuilder builder_(_fbb);
+  builder_.add_accessToken(accessToken);
+  return builder_.Finish();
+}
+
 struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_RESULTTOKEN = 4
   };
-  const flatbuffers::String *resultToken() const {
-    return GetPointer<const flatbuffers::String *>(VT_RESULTTOKEN);
+  uint64_t resultToken() const {
+    return GetField<uint64_t>(VT_RESULTTOKEN, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_RESULTTOKEN) &&
-           verifier.Verify(resultToken()) &&
+           VerifyField<uint64_t>(verifier, VT_RESULTTOKEN) &&
            verifier.EndTable();
   }
 };
@@ -769,8 +893,8 @@ struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct DMLResponseBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_resultToken(flatbuffers::Offset<flatbuffers::String> resultToken) {
-    fbb_.AddOffset(DMLResponse::VT_RESULTTOKEN, resultToken);
+  void add_resultToken(uint64_t resultToken) {
+    fbb_.AddElement<uint64_t>(DMLResponse::VT_RESULTTOKEN, resultToken, 0);
   }
   explicit DMLResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -786,18 +910,38 @@ struct DMLResponseBuilder {
 
 inline flatbuffers::Offset<DMLResponse> CreateDMLResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> resultToken = 0) {
+    uint64_t resultToken = 0) {
   DMLResponseBuilder builder_(_fbb);
   builder_.add_resultToken(resultToken);
   return builder_.Finish();
 }
 
-inline flatbuffers::Offset<DMLResponse> CreateDMLResponseDirect(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    const char *resultToken = nullptr) {
-  return blazingdb::protocol::orchestrator::CreateDMLResponse(
-      _fbb,
-      resultToken ? _fbb.CreateString(resultToken) : 0);
+struct DDLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct DDLResponseBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit DDLResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  DDLResponseBuilder &operator=(const DDLResponseBuilder &);
+  flatbuffers::Offset<DDLResponse> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<DDLResponse>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<DDLResponse> CreateDDLResponse(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  DDLResponseBuilder builder_(_fbb);
+  return builder_.Finish();
 }
 
 }  // namespace orchestrator
@@ -808,13 +952,12 @@ struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_RESULTTOKEN = 4
   };
-  const flatbuffers::String *resultToken() const {
-    return GetPointer<const flatbuffers::String *>(VT_RESULTTOKEN);
+  uint64_t resultToken() const {
+    return GetField<uint64_t>(VT_RESULTTOKEN, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_RESULTTOKEN) &&
-           verifier.Verify(resultToken()) &&
+           VerifyField<uint64_t>(verifier, VT_RESULTTOKEN) &&
            verifier.EndTable();
   }
 };
@@ -822,8 +965,8 @@ struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct DMLResponseBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_resultToken(flatbuffers::Offset<flatbuffers::String> resultToken) {
-    fbb_.AddOffset(DMLResponse::VT_RESULTTOKEN, resultToken);
+  void add_resultToken(uint64_t resultToken) {
+    fbb_.AddElement<uint64_t>(DMLResponse::VT_RESULTTOKEN, resultToken, 0);
   }
   explicit DMLResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -839,38 +982,299 @@ struct DMLResponseBuilder {
 
 inline flatbuffers::Offset<DMLResponse> CreateDMLResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> resultToken = 0) {
+    uint64_t resultToken = 0) {
   DMLResponseBuilder builder_(_fbb);
   builder_.add_resultToken(resultToken);
   return builder_.Finish();
 }
 
-inline flatbuffers::Offset<DMLResponse> CreateDMLResponseDirect(
+namespace gdf {
+
+struct gdf_dtype_extra_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_TIME_UNIT = 4
+  };
+  gdf_time_unit time_unit() const {
+    return static_cast<gdf_time_unit>(GetField<int8_t>(VT_TIME_UNIT, 0));
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_TIME_UNIT) &&
+           verifier.EndTable();
+  }
+};
+
+struct gdf_dtype_extra_infoBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_time_unit(gdf_time_unit time_unit) {
+    fbb_.AddElement<int8_t>(gdf_dtype_extra_info::VT_TIME_UNIT, static_cast<int8_t>(time_unit), 0);
+  }
+  explicit gdf_dtype_extra_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  gdf_dtype_extra_infoBuilder &operator=(const gdf_dtype_extra_infoBuilder &);
+  flatbuffers::Offset<gdf_dtype_extra_info> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<gdf_dtype_extra_info>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<gdf_dtype_extra_info> Creategdf_dtype_extra_info(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const char *resultToken = nullptr) {
-  return blazingdb::protocol::interpreter::CreateDMLResponse(
+    gdf_time_unit time_unit = gdf_time_unit_TIME_UNIT_NONE) {
+  gdf_dtype_extra_infoBuilder builder_(_fbb);
+  builder_.add_time_unit(time_unit);
+  return builder_.Finish();
+}
+
+struct cudaIpcMemHandle_t FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_RESERVED = 4
+  };
+  const flatbuffers::Vector<int8_t> *reserved() const {
+    return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_RESERVED);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_RESERVED) &&
+           verifier.Verify(reserved()) &&
+           verifier.EndTable();
+  }
+};
+
+struct cudaIpcMemHandle_tBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_reserved(flatbuffers::Offset<flatbuffers::Vector<int8_t>> reserved) {
+    fbb_.AddOffset(cudaIpcMemHandle_t::VT_RESERVED, reserved);
+  }
+  explicit cudaIpcMemHandle_tBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  cudaIpcMemHandle_tBuilder &operator=(const cudaIpcMemHandle_tBuilder &);
+  flatbuffers::Offset<cudaIpcMemHandle_t> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<cudaIpcMemHandle_t>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<cudaIpcMemHandle_t> CreatecudaIpcMemHandle_t(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<int8_t>> reserved = 0) {
+  cudaIpcMemHandle_tBuilder builder_(_fbb);
+  builder_.add_reserved(reserved);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<cudaIpcMemHandle_t> CreatecudaIpcMemHandle_tDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<int8_t> *reserved = nullptr) {
+  return blazingdb::protocol::interpreter::gdf::CreatecudaIpcMemHandle_t(
       _fbb,
-      resultToken ? _fbb.CreateString(resultToken) : 0);
+      reserved ? _fbb.CreateVector<int8_t>(*reserved) : 0);
+}
+
+struct gdf_column FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_DATA = 4,
+    VT_VALID = 6,
+    VT_SIZE = 8,
+    VT_DTYPE = 10,
+    VT_DTYPE_INFO = 12
+  };
+  const cudaIpcMemHandle_t *data() const {
+    return GetPointer<const cudaIpcMemHandle_t *>(VT_DATA);
+  }
+  const cudaIpcMemHandle_t *valid() const {
+    return GetPointer<const cudaIpcMemHandle_t *>(VT_VALID);
+  }
+  uint16_t size() const {
+    return GetField<uint16_t>(VT_SIZE, 0);
+  }
+  gdf_dtype dtype() const {
+    return static_cast<gdf_dtype>(GetField<int8_t>(VT_DTYPE, 0));
+  }
+  const gdf_dtype_extra_info *dtype_info() const {
+    return GetPointer<const gdf_dtype_extra_info *>(VT_DTYPE_INFO);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_DATA) &&
+           verifier.VerifyTable(data()) &&
+           VerifyOffset(verifier, VT_VALID) &&
+           verifier.VerifyTable(valid()) &&
+           VerifyField<uint16_t>(verifier, VT_SIZE) &&
+           VerifyField<int8_t>(verifier, VT_DTYPE) &&
+           VerifyOffset(verifier, VT_DTYPE_INFO) &&
+           verifier.VerifyTable(dtype_info()) &&
+           verifier.EndTable();
+  }
+};
+
+struct gdf_columnBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_data(flatbuffers::Offset<cudaIpcMemHandle_t> data) {
+    fbb_.AddOffset(gdf_column::VT_DATA, data);
+  }
+  void add_valid(flatbuffers::Offset<cudaIpcMemHandle_t> valid) {
+    fbb_.AddOffset(gdf_column::VT_VALID, valid);
+  }
+  void add_size(uint16_t size) {
+    fbb_.AddElement<uint16_t>(gdf_column::VT_SIZE, size, 0);
+  }
+  void add_dtype(gdf_dtype dtype) {
+    fbb_.AddElement<int8_t>(gdf_column::VT_DTYPE, static_cast<int8_t>(dtype), 0);
+  }
+  void add_dtype_info(flatbuffers::Offset<gdf_dtype_extra_info> dtype_info) {
+    fbb_.AddOffset(gdf_column::VT_DTYPE_INFO, dtype_info);
+  }
+  explicit gdf_columnBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  gdf_columnBuilder &operator=(const gdf_columnBuilder &);
+  flatbuffers::Offset<gdf_column> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<gdf_column>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<gdf_column> Creategdf_column(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<cudaIpcMemHandle_t> data = 0,
+    flatbuffers::Offset<cudaIpcMemHandle_t> valid = 0,
+    uint16_t size = 0,
+    gdf_dtype dtype = gdf_dtype_GDF_invalid,
+    flatbuffers::Offset<gdf_dtype_extra_info> dtype_info = 0) {
+  gdf_columnBuilder builder_(_fbb);
+  builder_.add_dtype_info(dtype_info);
+  builder_.add_valid(valid);
+  builder_.add_data(data);
+  builder_.add_size(size);
+  builder_.add_dtype(dtype);
+  return builder_.Finish();
+}
+
+}  // namespace gdf
+
+struct BlazingMetadata FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_STATUS = 4,
+    VT_MESSAGE = 6,
+    VT_TIME = 8,
+    VT_ROWS = 10
+  };
+  const flatbuffers::String *status() const {
+    return GetPointer<const flatbuffers::String *>(VT_STATUS);
+  }
+  const flatbuffers::String *message() const {
+    return GetPointer<const flatbuffers::String *>(VT_MESSAGE);
+  }
+  double time() const {
+    return GetField<double>(VT_TIME, 0.0);
+  }
+  int32_t rows() const {
+    return GetField<int32_t>(VT_ROWS, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_STATUS) &&
+           verifier.Verify(status()) &&
+           VerifyOffset(verifier, VT_MESSAGE) &&
+           verifier.Verify(message()) &&
+           VerifyField<double>(verifier, VT_TIME) &&
+           VerifyField<int32_t>(verifier, VT_ROWS) &&
+           verifier.EndTable();
+  }
+};
+
+struct BlazingMetadataBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_status(flatbuffers::Offset<flatbuffers::String> status) {
+    fbb_.AddOffset(BlazingMetadata::VT_STATUS, status);
+  }
+  void add_message(flatbuffers::Offset<flatbuffers::String> message) {
+    fbb_.AddOffset(BlazingMetadata::VT_MESSAGE, message);
+  }
+  void add_time(double time) {
+    fbb_.AddElement<double>(BlazingMetadata::VT_TIME, time, 0.0);
+  }
+  void add_rows(int32_t rows) {
+    fbb_.AddElement<int32_t>(BlazingMetadata::VT_ROWS, rows, 0);
+  }
+  explicit BlazingMetadataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BlazingMetadataBuilder &operator=(const BlazingMetadataBuilder &);
+  flatbuffers::Offset<BlazingMetadata> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BlazingMetadata>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BlazingMetadata> CreateBlazingMetadata(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> status = 0,
+    flatbuffers::Offset<flatbuffers::String> message = 0,
+    double time = 0.0,
+    int32_t rows = 0) {
+  BlazingMetadataBuilder builder_(_fbb);
+  builder_.add_time(time);
+  builder_.add_rows(rows);
+  builder_.add_message(message);
+  builder_.add_status(status);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<BlazingMetadata> CreateBlazingMetadataDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *status = nullptr,
+    const char *message = nullptr,
+    double time = 0.0,
+    int32_t rows = 0) {
+  return blazingdb::protocol::interpreter::CreateBlazingMetadata(
+      _fbb,
+      status ? _fbb.CreateString(status) : 0,
+      message ? _fbb.CreateString(message) : 0,
+      time,
+      rows);
 }
 
 struct GetResultResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_NAMES = 4,
-    VT_VALUES = 6
+    VT_METADATA = 4,
+    VT_FIELDNAMES = 6,
+    VT_VALUES = 8
   };
-  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *names() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_NAMES);
+  const BlazingMetadata *metadata() const {
+    return GetPointer<const BlazingMetadata *>(VT_METADATA);
   }
-  const flatbuffers::Vector<uint8_t> *values() const {
-    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_VALUES);
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *fieldNames() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_FIELDNAMES);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::interpreter::gdf::gdf_column>> *values() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::interpreter::gdf::gdf_column>> *>(VT_VALUES);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_NAMES) &&
-           verifier.Verify(names()) &&
-           verifier.VerifyVectorOfStrings(names()) &&
+           VerifyOffset(verifier, VT_METADATA) &&
+           verifier.VerifyTable(metadata()) &&
+           VerifyOffset(verifier, VT_FIELDNAMES) &&
+           verifier.Verify(fieldNames()) &&
+           verifier.VerifyVectorOfStrings(fieldNames()) &&
            VerifyOffset(verifier, VT_VALUES) &&
            verifier.Verify(values()) &&
+           verifier.VerifyVectorOfTables(values()) &&
            verifier.EndTable();
   }
 };
@@ -878,10 +1282,13 @@ struct GetResultResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct GetResultResponseBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_names(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> names) {
-    fbb_.AddOffset(GetResultResponse::VT_NAMES, names);
+  void add_metadata(flatbuffers::Offset<BlazingMetadata> metadata) {
+    fbb_.AddOffset(GetResultResponse::VT_METADATA, metadata);
   }
-  void add_values(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> values) {
+  void add_fieldNames(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> fieldNames) {
+    fbb_.AddOffset(GetResultResponse::VT_FIELDNAMES, fieldNames);
+  }
+  void add_values(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::interpreter::gdf::gdf_column>>> values) {
     fbb_.AddOffset(GetResultResponse::VT_VALUES, values);
   }
   explicit GetResultResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -898,22 +1305,26 @@ struct GetResultResponseBuilder {
 
 inline flatbuffers::Offset<GetResultResponse> CreateGetResultResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> names = 0,
-    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> values = 0) {
+    flatbuffers::Offset<BlazingMetadata> metadata = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> fieldNames = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::interpreter::gdf::gdf_column>>> values = 0) {
   GetResultResponseBuilder builder_(_fbb);
   builder_.add_values(values);
-  builder_.add_names(names);
+  builder_.add_fieldNames(fieldNames);
+  builder_.add_metadata(metadata);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<GetResultResponse> CreateGetResultResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<flatbuffers::Offset<flatbuffers::String>> *names = nullptr,
-    const std::vector<uint8_t> *values = nullptr) {
+    flatbuffers::Offset<BlazingMetadata> metadata = 0,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *fieldNames = nullptr,
+    const std::vector<flatbuffers::Offset<blazingdb::protocol::interpreter::gdf::gdf_column>> *values = nullptr) {
   return blazingdb::protocol::interpreter::CreateGetResultResponse(
       _fbb,
-      names ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*names) : 0,
-      values ? _fbb.CreateVector<uint8_t>(*values) : 0);
+      metadata,
+      fieldNames ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*fieldNames) : 0,
+      values ? _fbb.CreateVector<flatbuffers::Offset<blazingdb::protocol::interpreter::gdf::gdf_column>>(*values) : 0);
 }
 
 }  // namespace interpreter
@@ -1028,10 +1439,6 @@ inline flatbuffers::Offset<ResponseError> CreateResponseErrorDirect(
       errors ? _fbb.CreateString(errors) : 0);
 }
 
-namespace authorization {
-
-}  // namespace authorization
-
 namespace calcite {
 
 }  // namespace calcite
@@ -1050,10 +1457,6 @@ namespace interpreter {
 
 }  // namespace interpreter
 
-namespace authorization {
-
-}  // namespace authorization
-
 namespace calcite {
 
 }  // namespace calcite
@@ -1063,6 +1466,10 @@ namespace orchestrator {
 }  // namespace orchestrator
 
 namespace interpreter {
+
+namespace gdf {
+
+}  // namespace gdf
 
 }  // namespace interpreter
 
