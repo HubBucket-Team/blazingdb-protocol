@@ -37,7 +37,7 @@ auto InterpreterService(const blazingdb::protocol::Buffer &requestBuffer)
       flatbuffers::FlatBufferBuilder builder;
       std::vector<std::string> names{"iron", "man"};
       auto vectorOfNames = builder.CreateVectorOfStrings(names);
-      builder.Finish(CreateGetResultResponse(builder, vectorOfNames));
+      builder.Finish(CreateGetResultResponse(builder, 0, vectorOfNames));
       std::shared_ptr<flatbuffers::DetachedBuffer> payload =
           std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
       ResponseMessage responseMessage(Status::Status_Success, payload);

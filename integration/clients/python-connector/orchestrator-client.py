@@ -65,7 +65,7 @@ class PyConnector:
     self.client = self._open_client(self._interpreter_path)
 
     getResultRequest = blazingdb.protocol.interpreter.GetResultRequestSchema(
-      token=result_token)
+      resultToken=result_token)
 
     requestBuffer = blazingdb.protocol.transport.channel.MakeRequestBuffer(
       InterpreterMessage.GetResult, self.accessToken, getResultRequest)
@@ -78,14 +78,11 @@ class PyConnector:
     if response.status == blazingdb.protocol.transport.channel.Status.Error:
       raise ValueError('Error status')
 
-    getResultResponse = blazingdb.protocol.orchestrator.DMLResponseSchema.From(
-      response.payload)
+    getResultResponse = \
+      blazingdb.protocol.interpreter.GetResultResponseSchema.From(
+        response.payload)
 
-    grr = blazingdb.protocol.interpreter.GetResultResponse
-    grr = grr.GetResultResponse.GetRootAsGetResultResponse(response.payload, 0)
-
-    print(grr.Names(0))
-    print(grr.Names(1))
+    print(list(getResultResponse.fieldNames))
 
 
 def main():

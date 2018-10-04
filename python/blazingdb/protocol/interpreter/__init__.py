@@ -19,9 +19,8 @@ class DMLResponseSchema(transport.schema(DMLResponse)):
 
 
 class GetResultRequestSchema(transport.schema(GetResultRequest)):
-  token = transport.StringSegment()
+  resultToken = transport.StringSegment()
 
 
 class GetResultResponseSchema(transport.schema(GetResultResponse)):
-  names = transport.StringSegment()
-  values = transport.StringSegment()
+  fieldNames = transport.VectorSegment()

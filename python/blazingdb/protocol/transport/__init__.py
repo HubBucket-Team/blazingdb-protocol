@@ -169,8 +169,8 @@ class NumberSegment(Segment, Inline):
   def _bytes(self, builder, schema):
     return schema._values[self._name]
 
-  def _from(self, obj):
-    return getattr(obj, self._object_name())()
+  def _from(self, object_):
+    return getattr(object_, self._object_name())()
 
 
 class StringSegment(Segment, Nested):
@@ -178,8 +178,8 @@ class StringSegment(Segment, Nested):
   def _bytes(self, builder, schema):
     return builder.CreateString(schema._values[self._name])
 
-  def _from(self, obj):
-    return getattr(obj, self._object_name())()
+  def _from(self, object_):
+    return getattr(object_, self._object_name())()
 
 
 class BytesSegment(Segment, Nested):
@@ -194,10 +194,10 @@ class BytesSegment(Segment, Nested):
       builder.PrependByte(byte)
     return builder.EndVector(len(buffer))
 
-  def _from(self, obj):
+  def _from(self, object_):
     name = self._object_name()
-    byte = getattr(obj, name)
-    return bytes(byte(i) for i in range(getattr(obj, name + 'Length')()))
+    byte = getattr(object_, name)
+    return bytes(byte(i) for i in range(getattr(object_, name + 'Length')()))
 
 
 class StructSegment(Segment, Inline):
@@ -211,9 +211,20 @@ class StructSegment(Segment, Inline):
     value = schema._values[self._name]
     return getattr(module, 'Create' + name)(builder, **value)
 
-  def _from(self, obj):
-    struct = getattr(obj, self._object_name())()
+  def _from(self, object_):
+    struct = getattr(object_, self._object_name())()
     members = {name[0].lower() + name[1:]: getattr(struct, name)()
                for name in set(dir(struct)) - set(('Init', ))
                if name[0].isalpha()}
     return type(self._name, (), members)
+
+
+class VectorSegment(Segment, Inline):
+
+  def _bytes(self, builder, schema):
+    return NotImplemented
+
+  def _from(self, object_):
+    name = self._object_name()
+    get = getattr(object_, name)
+    return (get(i) for i in range(getattr(object_, name + 'Length')()))
