@@ -144,7 +144,11 @@ public:
   int8_t  messageType() const { 
     return header.messageType();
   }
-   
+
+  uint64_t  accessToken() const {
+    return header.accessToken();
+  }
+
 
 private:
     Header            header;
@@ -153,6 +157,34 @@ private:
     std::shared_ptr<flatbuffers::DetachedBuffer>  _copy_payload; 
 };
 
+
+template<typename T, typename SchemaType>
+class TypedMessage : public IMessage {
+public:
+  TypedMessage(const T& val) : IMessage(), value_ (val){
+
+  }
+
+  using PointerToMethod = T (SchemaType::*)() const;
+
+  TypedMessage (const uint8_t* buffer, PointerToMethod pmfn)
+      : IMessage()
+  {
+    auto pointer = flatbuffers::GetRoot<SchemaType>(buffer);
+    value_ = (pointer->*pmfn)();
+  }
+
+  template<class CreateFunctionPtr>
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferDataUsing(CreateFunctionPtr &&create_function) const  {
+    flatbuffers::FlatBufferBuilder builder{0};
+    auto root_offset = create_function(builder, value_);
+    builder.Finish(root_offset);
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+  }
+
+protected:
+  T value_;
+};
 
 template<typename SchemaType>
 class StringTypeMessage : public IMessage {
@@ -167,7 +199,6 @@ public:
     : IMessage()
   {
     auto pointer = flatbuffers::GetRoot<SchemaType>(buffer);
-    // auto string_buffer = std::invoke(pointer, pmfn);
     auto string_buffer = (pointer->*pmfn)();
     string_value = std::string {string_buffer->c_str()};
   }

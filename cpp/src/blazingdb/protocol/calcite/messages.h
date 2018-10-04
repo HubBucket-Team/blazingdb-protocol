@@ -12,21 +12,21 @@ namespace protocol {
 namespace calcite {
 
 class DMLResponseMessage : public StringTypeMessage<calcite::DMLResponse> {
-private: 
+private:
 
-public:  
-  
-  DMLResponseMessage(const std::string& logicalPlan) 
-    : StringTypeMessage<calcite::DMLResponse>(logicalPlan) 
+public:
+
+  DMLResponseMessage(const std::string& logicalPlan)
+    : StringTypeMessage<calcite::DMLResponse>(logicalPlan)
   {
   }
-  
-  DMLResponseMessage (const uint8_t* buffer) 
+
+  DMLResponseMessage (const uint8_t* buffer)
     :  StringTypeMessage<calcite::DMLResponse>(buffer, &calcite::DMLResponse::logicalPlan)
   {
   }
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(orchestrator::CreateDMLResponseDirect);
+    return this->getBufferDataUsing(calcite::CreateDMLResponseDirect);
   }
 
   std::string getLogicalPlan () {

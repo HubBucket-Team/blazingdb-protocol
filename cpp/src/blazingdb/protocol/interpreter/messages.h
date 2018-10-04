@@ -33,25 +33,25 @@ public:
 
 
 
-class DMLResponseMessage : public StringTypeMessage<interpreter::DMLResponse> {
+class DMLResponseMessage : public TypedMessage<uint64_t, interpreter::DMLResponse> {
 public:
 
-  DMLResponseMessage(const std::string& string_value)
-      : StringTypeMessage<interpreter::DMLResponse>(string_value)
+  DMLResponseMessage(const uint64_t& value)
+      : TypedMessage<uint64_t, interpreter::DMLResponse>(value)
   {
   }
 
   DMLResponseMessage (const uint8_t* buffer)
-      :  StringTypeMessage<interpreter::DMLResponse>(buffer, &interpreter::DMLResponse::resultToken)
+      :  TypedMessage<uint64_t, interpreter::DMLResponse>(buffer, &interpreter::DMLResponse::resultToken)
   {
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(interpreter::CreateDMLResponseDirect);
+    return this->getBufferDataUsing(interpreter::CreateDMLResponse);
   }
 
-  std::string getToken () {
-    return string_value;
+  uint64_t getToken () {
+    return value_;
   }
 };
 

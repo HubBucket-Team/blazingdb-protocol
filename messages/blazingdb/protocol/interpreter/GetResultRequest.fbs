@@ -1,7 +1,7 @@
 namespace blazingdb.protocol.interpreter;
 
 table GetResultRequest {
-	token: string;
+	resultToken: ulong;
 }
 
 root_type DMLRequest;

@@ -4,6 +4,7 @@
 
 #include <blazingdb/protocol/interpreter/messages.h>
 
+<<<<<<< HEAD:integration/services/ral-service/src/ral-server.cc
 namespace blazingdb
 {
 namespace protocol
@@ -20,7 +21,11 @@ auto InterpreterService(const blazingdb::protocol::Buffer &requestBuffer)
 
   if (request.messageType() == interpreter::MessageType_ExecutePlan)
     {
-      std::string token = "JIFY*DSA%^F*(*(S)DIKFJLNDVOYD(";
+      DMLRequestMessage requestPayload(request.getPayloadBuffer());
+
+      std::cout << "query: " << requestPayload.getLogicalPlan() << std::endl;
+
+      uint64_t token = 543210L;
 
       DMLResponseMessage responsePayload{token};
       ResponseMessage responseObject{Status_Success, responsePayload};
@@ -35,10 +40,10 @@ auto InterpreterService(const blazingdb::protocol::Buffer &requestBuffer)
       auto vectorOfNames = builder.CreateVectorOfStrings(names);
       builder.Finish(CreateGetResultResponse(builder, vectorOfNames));
       std::shared_ptr<flatbuffers::DetachedBuffer> payload =
-        std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+          std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
       ResponseMessage responseMessage(Status::Status_Success, payload);
       std::shared_ptr<flatbuffers::DetachedBuffer> response =
-        responseMessage.getBufferData();
+          responseMessage.getBufferData();
       return Buffer{response->data(), response->size()};
     }
 }

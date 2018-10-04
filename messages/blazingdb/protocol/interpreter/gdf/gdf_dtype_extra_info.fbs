@@ -1,6 +1,6 @@
-include "gdf_time_unit.fbs";
+include "blazingdb/protocol/interpreter/gdf/gdf_time_unit.fbs";
 
-namespace blazingdb.protocol;
+namespace blazingdb.protocol.interpreter.gdf;
 
 table gdf_dtype_extra_info {
     time_unit:gdf_time_unit;

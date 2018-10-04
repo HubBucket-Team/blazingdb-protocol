@@ -1,0 +1,9 @@
+include "blazingdb/protocol/orchestrator/MessageType.fbs";
+
+namespace blazingdb.protocol.orchestrator;
+
+table AuthRequest {
+
+}
+
+root_type AuthRequest;

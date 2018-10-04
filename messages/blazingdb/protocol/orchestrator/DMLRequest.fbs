@@ -1,7 +1,5 @@
 namespace blazingdb.protocol.orchestrator;
 
-enum MessageType : byte { DDL = 0, DML }
-
 table DMLRequest {
 	query: string;
 }

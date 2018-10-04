@@ -1,6 +1,6 @@
-namespace blazingdb.protocol.interpreter;
+include "blazingdb/protocol/interpreter/MessageType.fbs";
 
-enum MessageType : byte { ExecutePlan = 0, GetResult }
+namespace blazingdb.protocol.interpreter;
 
 table DMLRequest {
 	logicalPlan: string;

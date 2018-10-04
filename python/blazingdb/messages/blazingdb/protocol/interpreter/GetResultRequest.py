@@ -19,12 +19,12 @@ class GetResultRequest(object):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # GetResultRequest
-    def Token(self):
+    def ResultToken(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
-            return self._tab.String(o + self._tab.Pos)
-        return None
+            return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
+        return 0
 
 def GetResultRequestStart(builder): builder.StartObject(1)
-def GetResultRequestAddToken(builder, token): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(token), 0)
+def GetResultRequestAddResultToken(builder, resultToken): builder.PrependUint64Slot(0, resultToken, 0)
 def GetResultRequestEnd(builder): return builder.EndObject()

@@ -18,7 +18,7 @@ int main() {
   {
     std::string logicalPlan = "LogicalUnion(all=[false])";
     try {
-      std::string token = client.executePlan(logicalPlan);
+      auto token = client.executePlan(logicalPlan, 123456L);
       std::cout << token << std::endl;
     } catch (std::runtime_error &error) {
       std::cout << error.what() << std::endl;

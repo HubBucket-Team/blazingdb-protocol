@@ -32,25 +32,25 @@ public:
 };
 
 
-class DMLResponseMessage : public StringTypeMessage<orchestrator::DMLResponse> {
+class DMLResponseMessage : public TypedMessage<uint64_t, orchestrator::DMLResponse> {
 public:  
   
-  DMLResponseMessage(const std::string& string_value) 
-    : StringTypeMessage<orchestrator::DMLResponse>(string_value) 
+  DMLResponseMessage(const std::uint64_t& value)
+    : TypedMessage<uint64_t, orchestrator::DMLResponse>(value)
   {
   }
   
   DMLResponseMessage (const uint8_t* buffer) 
-    :  StringTypeMessage<orchestrator::DMLResponse>(buffer, &orchestrator::DMLResponse::resultToken)
+    :  TypedMessage<uint64_t, orchestrator::DMLResponse>(buffer, &orchestrator::DMLResponse::resultToken)
   {
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(orchestrator::CreateDMLResponseDirect);
+    return this->getBufferDataUsing(orchestrator::CreateDMLResponse);
   }
 
-  std::string getToken () {
-    return string_value;
+  uint64_t  getToken () {
+    return value_;
   }
 };
 
@@ -86,8 +86,61 @@ public:
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(orchestrator::CreateDMLResponseDirect);
+    return this->getBufferDataUsing(orchestrator::CreateDMLRequestDirect);
   }
+};
+
+
+// authorization
+
+class AuthRequestMessage : IMessage {
+public:
+  AuthRequestMessage( )
+      : IMessage{}
+  {
+  }
+
+  AuthRequestMessage (const uint8_t* buffer)
+      : IMessage{}
+  {
+  }
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override  {
+    return nullptr;
+  }
+};
+
+class AuthResponseMessage : public IMessage {
+public:
+
+  AuthResponseMessage(int64_t access_token)
+      : IMessage{}, access_token_{access_token}
+  {
+  }
+
+  AuthResponseMessage ( AuthResponseMessage && ) = default;
+
+  AuthResponseMessage (const uint8_t* buffer)
+      :   IMessage{}
+  {
+    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::orchestrator::AuthResponse>(buffer);
+
+    access_token_ = pointer->accessToken();
+  }
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
+    flatbuffers::FlatBufferBuilder builder{0};
+    auto root_offset = CreateAuthResponse(builder, access_token_);
+    builder.Finish(root_offset);
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+  }
+
+  int64_t getAccessToken () {
+    return access_token_;
+  }
+
+private:
+  int64_t access_token_;
 };
 
 } // orchestrator

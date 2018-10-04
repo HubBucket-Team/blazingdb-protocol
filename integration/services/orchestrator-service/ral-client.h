@@ -21,11 +21,10 @@ public:
   InterpreterClient(blazingdb::protocol::Connection & connection) : client {connection}
   {}
 
-  std::string executePlan(std::string logicalPlan)  {
-    int64_t sessionToken = 0;
+  uint64_t executePlan(std::string logicalPlan, int64_t access_token)  {
     auto bufferedData = MakeRequest(interpreter::MessageType_ExecutePlan,
                                      logicalPlan.length(),
-                                     sessionToken,
+                                    access_token,
                                      DMLRequestMessage{logicalPlan});
     Buffer responseBuffer = client.send(bufferedData);
     auto response = MakeResponse<DMLResponseMessage>(responseBuffer);

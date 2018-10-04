@@ -1,4 +1,4 @@
-namespace blazingdb.protocol;
+namespace blazingdb.protocol.interpreter.gdf;
 
 enum gdf_time_unit : byte {
     TIME_UNIT_NONE=0, // default (undefined)
