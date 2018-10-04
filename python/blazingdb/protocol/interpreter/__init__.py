@@ -4,7 +4,8 @@ import blazingdb.protocol.transport as transport
 import blazingdb.protocol.transport
 
 from blazingdb.messages.blazingdb.protocol.interpreter \
-  import DMLRequest, DMLResponse, GetResultRequest, GetResultResponse
+  import (DMLRequest, DMLResponse, GetResultRequest, GetResultResponse,
+          gdf_column, BlazingMetadata)
 
 from blazingdb.messages.blazingdb.protocol.interpreter.MessageType \
   import MessageType as InterpreterMessage
@@ -19,9 +20,21 @@ class DMLResponseSchema(transport.schema(DMLResponse)):
 
 
 class GetResultRequestSchema(transport.schema(GetResultRequest)):
-  token = transport.StringSegment()
+  resultToken = transport.StringSegment()
+
+
+class gdf_columnSchema(transport.schema(gdf_column)):
+  size = transport.NumberSegment()
+
+
+class BlazingMetadataSchema(transport.schema(BlazingMetadata)):
+  status = transport.StringSegment()
+  message = transport.StringSegment()
+  time = transport.NumberSegment()
+  rows = transport.NumberSegment()
 
 
 class GetResultResponseSchema(transport.schema(GetResultResponse)):
-  names = transport.StringSegment()
-  values = transport.StringSegment()
+  metadata = transport.SchemaSegment(BlazingMetadataSchema)
+  fieldNames = transport.VectorSegment(transport.StringSegment)
+  values = transport.VectorSchemaSegment(gdf_columnSchema)

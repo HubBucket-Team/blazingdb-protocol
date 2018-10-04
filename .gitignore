@@ -56,3 +56,5 @@ integration/services/ral-service/build/
 python/resources/
 
 python/\.idea/
+
+integration/services/cpp/build/

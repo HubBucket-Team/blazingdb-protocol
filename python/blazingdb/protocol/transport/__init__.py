@@ -34,7 +34,7 @@ class MetaSchema(type):
   """
 
   def __init__(cls, name, bases, classdict):
-    super(MetaSchema, cls).__init__(name, bases, classdict)
+    super().__init__(name, bases, classdict)
     cls._fix_up_segments()
 
 
@@ -76,17 +76,16 @@ class Schema(metaclass=MetaSchema):
     for segment in self._nested:
       pairs.append((segment._name, segment._bytes(builder, self)))
 
-    module = self._module
-    name = module.__name__.split('.')[-1]
-    getattr(module, name + 'Start')(builder)
+    name = self._module_name()
+    getattr(self._module, name + 'Start')(builder)
 
     for segment in self._inline:
       pairs.append((segment._name, segment._bytes(builder, self)))
 
     for member, value in reversed(pairs):
-      member =  member[0].upper() + member[1:]
-      getattr(module, '%sAdd%s' % (name, member))(builder, value)
-    builder.Finish(getattr(module, name + 'End')(builder))
+      member = upperCamelCase(member)
+      getattr(self._module, '%sAdd%s' % (name, member))(builder, value)
+    builder.Finish(getattr(self._module, name + 'End')(builder))
 
     return builder.Output()
 
@@ -104,14 +103,16 @@ class Schema(metaclass=MetaSchema):
 
   @classmethod
   def From(cls, buffer):
-    module = cls._module
-    name = module.__name__.split('.')[-1]
-    obj = getattr(getattr(module, name), 'GetRootAs' + name)(buffer, 0)
+    name = cls._module_name()
+    obj = getattr(getattr(cls._module, name), 'GetRootAs' + name)(buffer, 0)
     members = {name: segment._from(obj)
                for name, segment in cls._segments.items()}
-    name = cls.__name__.split('.')[-1]
-    return type(name[0].lower() + name[1:], (), members)
+    name = cls._module_name()
+    return type(lowerCamelCase(name), (), members)
 
+  @classmethod
+  def _module_name(cls):
+    return _name_of(cls._module)
 
   @classmethod
   def _fix_up_segments(cls):
@@ -135,6 +136,17 @@ class Schema(metaclass=MetaSchema):
 
 
 class Segment(SchemaAttribute):
+  """A class describing a flatbuffers object segment attribute.
+
+  It's just a base class. To set segments for you schemas, there are specific
+  subclasses for various kind of flatbuffers object attributes.
+
+  A `Segment` subclass implementing a specific transformation between a `Schema`
+  and a flutbuffers object should implement `_bytes()` of member schema and
+  `_from()` flatbuffers object to DTO or literal types (like `int` or `str`).
+  """
+
+  # TODO(gcca): GenericSegment for dynamic conversion
 
   _name = None
 
@@ -146,14 +158,14 @@ class Segment(SchemaAttribute):
     return NotImplemented
 
   @abc.abstractmethod
-  def _from(self, obj):
+  def _from(self, _object):
     return NotImplemented
 
   def _set_value(self, schema, value):
     schema._values[self._name] = value
 
   def _object_name(self):
-    return self._name[0].upper() + self._name[1:]
+    return upperCamelCase(self._name)
 
 
 class Nested:
@@ -164,56 +176,128 @@ class Inline:
   """Mark for segments with inline data for flatbuffers objs."""
 
 
-class NumberSegment(Segment, Inline):
+class BuiltinSegment(Segment, abc.ABC):
+
+  @abc.abstractmethod
+  def _bytes(self, builder, schema):
+    return NotImplemented
+
+  def _from(self, _object):
+    return getattr(_object, self._object_name())()
+
+
+class NumberSegment(BuiltinSegment, Inline):
+  """A `Segment` whose value is a literal number `int`, `float` or `bool`."""
 
   def _bytes(self, builder, schema):
     return schema._values[self._name]
 
-  def _from(self, obj):
-    return getattr(obj, self._object_name())()
 
-
-class StringSegment(Segment, Nested):
+class StringSegment(BuiltinSegment, Nested):
+  """A `Segment` whose value is a literal string `str`."""
 
   def _bytes(self, builder, schema):
     return builder.CreateString(schema._values[self._name])
 
-  def _from(self, obj):
-    return getattr(obj, self._object_name())()
-
 
 class BytesSegment(Segment, Nested):
+  """A `Segment` whose value is a limited sequence of `bytes`."""
 
   def _bytes(self, builder, schema):
-    module = schema._module
-    name = module.__name__.split('.')[-1]
+    name = schema._module_name()
     member = self._object_name()
     buffer = schema._values[self._name]
-    getattr(module, '%sStart%sVector' % (name, member))(builder, len(buffer))
+    getattr(schema._module,
+            '%sStart%sVector' % (name, member))(builder, len(buffer))
     for byte in reversed(buffer):
       builder.PrependByte(byte)
     return builder.EndVector(len(buffer))
 
-  def _from(self, obj):
+  def _from(self, _object):
     name = self._object_name()
-    byte = getattr(obj, name)
-    return bytes(byte(i) for i in range(getattr(obj, name + 'Length')()))
+    byte = getattr(_object, name)
+    return bytes(byte(i) for i in range(getattr(_object, name + 'Length')()))
 
 
 class StructSegment(Segment, Inline):
+  """A segment whose value is itself a flatbuffers struct as a dict.
+
+  The keys are the flatbuffers object attributes in camelCase.
+  """
 
   def __init__(self, module):
     self._module = module
 
   def _bytes(self, builder, schema):
     module = self._module
-    name = module.__name__.split('.')[-1]
+    name = _name_of(module)
     value = schema._values[self._name]
     return getattr(module, 'Create' + name)(builder, **value)
 
-  def _from(self, obj):
-    struct = getattr(obj, self._object_name())()
-    members = {name[0].lower() + name[1:]: getattr(struct, name)()
-               for name in set(dir(struct)) - set(('Init', ))
-               if name[0].isalpha()}
-    return type(self._name, (), members)
+  def _from(self, _object):
+    return _dto(getattr(_object, self._object_name())(), self._name, ('Init',))
+
+
+class Vector(Segment, Inline):
+
+  def _make_iterable(self, _object, item):
+    return (item(i)
+            for i in range(getattr(_object, self._object_name() + 'Length')()))
+
+
+class VectorSegment(Vector):
+
+  def __init__(self, segment):
+    self._segment = segment
+
+  def _bytes(self, builder, schema):
+    return NotImplemented
+
+  def _from(self, _object):
+    return self._make_iterable(_object, getattr(_object, self._object_name()))
+
+
+class VectorSchemaSegment(VectorSegment):
+
+  def __init__(self, schema):
+    self._schema = schema
+
+  def _bytes(self, builder, schema):
+    return NotImplemented
+
+  def _from(self, _object):
+    nomembers = ('Init', 'GetRootAs' + self._schema._module_name())
+    return (_dto(member, self._name, nomembers)
+            for member in super()._from(_object))
+
+
+class SchemaSegment(Segment, Inline):
+
+  def __init__(self, schema):
+    self._schema = schema
+
+  def _bytes(self, builder, schema):
+    return NotImplemented
+
+  def _from(self, _object):
+    return _dto(getattr(_object, self._object_name())(),
+                self._name,
+                ('Init', 'GetRootAs' + self._schema._module_name()))
+
+
+def _name_of(module):
+  return module.__name__.split('.')[-1]
+
+
+def _dto(_object, name, nomembers):
+  return type(name, (), {lowerCamelCase(m): getattr(_object, m)()
+                         for m in set(dir(_object)) - set(nomembers)
+                         if m[0].isalpha()})
+
+
+def lowerCamelCase(s):
+  return s[0].lower() + s[1:]
+
+
+def upperCamelCase(s):
+  return s[0].upper() + s[1:]
