@@ -83,7 +83,7 @@ class Schema(metaclass=MetaSchema):
       pairs.append((segment._name, segment._bytes(builder, self)))
 
     for member, value in reversed(pairs):
-      member = member[0].upper() + member[1:]
+      member = upperCamelCase(member)
       getattr(self._module, '%sAdd%s' % (name, member))(builder, value)
     builder.Finish(getattr(self._module, name + 'End')(builder))
 
@@ -108,7 +108,7 @@ class Schema(metaclass=MetaSchema):
     members = {name: segment._from(obj)
                for name, segment in cls._segments.items()}
     name = cls._module_name()
-    return type(name[0].lower() + name[1:], (), members)
+    return type(lowerCamelCase(name), (), members)
 
   @classmethod
   def _module_name(cls):
@@ -165,7 +165,7 @@ class Segment(SchemaAttribute):
     schema._values[self._name] = value
 
   def _object_name(self):
-    return self._name[0].upper() + self._name[1:]
+    return upperCamelCase(self._name)
 
 
 class Nested:
@@ -235,9 +235,7 @@ class StructSegment(Segment, Inline):
     return getattr(module, 'Create' + name)(builder, **value)
 
   def _from(self, _object):
-    return _make_dto(getattr(_object, self._object_name())(),
-                     self._name,
-                     ('Init',))
+    return _dto(getattr(_object, self._object_name())(), self._name, ('Init',))
 
 
 class Vector(Segment, Inline):
@@ -268,8 +266,8 @@ class VectorSchemaSegment(VectorSegment):
     return NotImplemented
 
   def _from(self, _object):
-    no_members = ('Init', 'GetRootAs' + self._schema._module_name())
-    return (_make_dto(member, self._name, no_members)
+    nomembers = ('Init', 'GetRootAs' + self._schema._module_name())
+    return (_dto(member, self._name, nomembers)
             for member in super()._from(_object))
 
 
@@ -282,16 +280,24 @@ class SchemaSegment(Segment, Inline):
     return NotImplemented
 
   def _from(self, _object):
-    return _make_dto(getattr(_object, self._object_name())(),
-                     self._name,
-                     ('Init', 'GetRootAs' + self._schema._module_name()))
+    return _dto(getattr(_object, self._object_name())(),
+                self._name,
+                ('Init', 'GetRootAs' + self._schema._module_name()))
 
 
 def _name_of(module):
   return module.__name__.split('.')[-1]
 
 
-def _make_dto(_object, name, no_members):
-  return type(name, (), {m[0].lower() + m[1:]: getattr(_object, m)()
-                         for m in set(dir(_object)) - set(no_members)
+def _dto(_object, name, nomembers):
+  return type(name, (), {lowerCamelCase(m): getattr(_object, m)()
+                         for m in set(dir(_object)) - set(nomembers)
                          if m[0].isalpha()})
+
+
+def lowerCamelCase(s):
+  return s[0].lower() + s[1:]
+
+
+def upperCamelCase(s):
+  return s[0].upper() + s[1:]
