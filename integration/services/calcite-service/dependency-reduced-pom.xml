@@ -48,7 +48,11 @@
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.3.2</version>
         <configuration>
-          <finalName>blazingdb-protocol</finalName>
+          <archive>
+            <manifest>
+              <mainClass>com.blazingdb.protocol.examples.server.CalciteServiceExample</mainClass>
+            </manifest>
+          </archive>
         </configuration>
       </plugin>
       <plugin>
@@ -63,7 +67,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>com.blazingdb.App</mainClass>
+                  <mainClass>com.blazingdb.protocol.examples.server.CalciteServiceExample</mainClass>
                 </transformer>
               </transformers>
             </configuration>
