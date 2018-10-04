@@ -34,7 +34,7 @@ class MetaSchema(type):
   """
 
   def __init__(cls, name, bases, classdict):
-    super(MetaSchema, cls).__init__(name, bases, classdict)
+    super().__init__(name, bases, classdict)
     cls._fix_up_segments()
 
 
@@ -176,24 +176,28 @@ class Inline:
   """Mark for segments with inline data for flatbuffers objs."""
 
 
-class NumberSegment(Segment, Inline):
+class BuiltinSegment(Segment, abc.ABC):
+
+  @abc.abstractmethod
+  def _bytes(self, builder, schema):
+    return NotImplemented
+
+  def _from(self, _object):
+    return getattr(_object, self._object_name())()
+
+
+class NumberSegment(BuiltinSegment, Inline):
   """A `Segment` whose value is a literal number `int`, `float` or `bool`."""
 
   def _bytes(self, builder, schema):
     return schema._values[self._name]
 
-  def _from(self, _object):
-    return getattr(_object, self._object_name())()
 
-
-class StringSegment(Segment, Nested):
+class StringSegment(BuiltinSegment, Nested):
   """A `Segment` whose value is a literal string `str`."""
 
   def _bytes(self, builder, schema):
     return builder.CreateString(schema._values[self._name])
-
-  def _from(self, _object):
-    return getattr(_object, self._object_name())()
 
 
 class BytesSegment(Segment, Nested):
@@ -236,23 +240,37 @@ class StructSegment(Segment, Inline):
                      ('Init',))
 
 
-class VectorSegment(Segment, Inline):
+class Vector(Segment, Inline):
 
-  def __init__(self, schema=None):
+  def _make_iterable(self, _object, item):
+    return (item(i)
+            for i in range(getattr(_object, self._object_name() + 'Length')()))
+
+
+class VectorSegment(Vector):
+
+  def __init__(self, segment):
+    self._segment = segment
+
+  def _bytes(self, builder, schema):
+    return NotImplemented
+
+  def _from(self, _object):
+    return self._make_iterable(_object, getattr(_object, self._object_name()))
+
+
+class VectorSchemaSegment(VectorSegment):
+
+  def __init__(self, schema):
     self._schema = schema
 
   def _bytes(self, builder, schema):
     return NotImplemented
 
   def _from(self, _object):
-    name = self._object_name()
-    if self._schema and isinstance(self._schema, MetaSchema):
-      no_members = ('Init', 'GetRootAs' + self._schema._module_name())
-      member = getattr(_object, name)
-      get = lambda i: _make_dto(member(i), self._name, no_members)
-    else:
-      get = getattr(_object, name)
-    return (get(i) for i in range(getattr(_object, name + 'Length')()))
+    no_members = ('Init', 'GetRootAs' + self._schema._module_name())
+    return (_make_dto(member, self._name, no_members)
+            for member in super()._from(_object))
 
 
 class SchemaSegment(Segment, Inline):
