@@ -82,8 +82,15 @@ class PyConnector:
       blazingdb.protocol.interpreter.GetResultResponseSchema.From(
         response.payload)
 
-    print(list(getResultResponse.fieldNames))
-    print([value.size for value in getResultResponse.values])
+    print('GetResult Response')
+    print('  metadata:')
+    print('     status: %s' % getResultResponse.metadata.status)
+    print('    message: %s' % getResultResponse.metadata.message)
+    print('       time: %s' % getResultResponse.metadata.time)
+    print('       rows: %s' % getResultResponse.metadata.rows)
+    print('  fieldNames: %s' % list(getResultResponse.fieldNames))
+    print('  values:')
+    print('    size: %s' % [value.size for value in getResultResponse.values])
 
 
 def main():

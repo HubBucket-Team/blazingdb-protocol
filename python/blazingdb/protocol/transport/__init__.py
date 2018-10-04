@@ -231,11 +231,9 @@ class StructSegment(Segment, Inline):
     return getattr(module, 'Create' + name)(builder, **value)
 
   def _from(self, _object):
-    struct = getattr(_object, self._object_name())()
-    members = {name[0].lower() + name[1:]: getattr(struct, name)()
-               for name in set(dir(struct)) - set(('Init', ))
-               if name[0].isalpha()}
-    return type(self._name, (), members)
+    return _make_dto(getattr(_object, self._object_name())(),
+                     self._name,
+                     ('Init',))
 
 
 class VectorSegment(Segment, Inline):
@@ -248,18 +246,34 @@ class VectorSegment(Segment, Inline):
 
   def _from(self, _object):
     name = self._object_name()
-    get = getattr(_object, name)
     if self._schema and isinstance(self._schema, MetaSchema):
-      schemas = get
-      def get(i):  # NestedSchemaSegment
-        schema = schemas(i)
-        members = {name[0].lower() + name[1:]: getattr(schema, name)()
-                   for name in set(dir(schema))
-                   - set(('Init',
-                          'GetRootAs' + self._schema._module_name()))
-                   if name[0].isalpha()}
-        return type(self._name, (), members)
+      no_members = ('Init', 'GetRootAs' + self._schema._module_name())
+      member = getattr(_object, name)
+      get = lambda i: _make_dto(member(i), self._name, no_members)
+    else:
+      get = getattr(_object, name)
     return (get(i) for i in range(getattr(_object, name + 'Length')()))
+
+
+class SchemaSegment(Segment, Inline):
+
+  def __init__(self, schema):
+    self._schema = schema
+
+  def _bytes(self, builder, schema):
+    return NotImplemented
+
+  def _from(self, _object):
+    return _make_dto(getattr(_object, self._object_name())(),
+                     self._name,
+                     ('Init', 'GetRootAs' + self._schema._module_name()))
+
 
 def _name_of(module):
   return module.__name__.split('.')[-1]
+
+
+def _make_dto(_object, name, no_members):
+  return type(name, (), {m[0].lower() + m[1:]: getattr(_object, m)()
+                         for m in set(dir(_object)) - set(no_members)
+                         if m[0].isalpha()})
