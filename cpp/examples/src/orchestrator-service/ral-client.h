@@ -24,14 +24,35 @@ public:
   uint64_t executePlan(std::string logicalPlan, int64_t access_token)  {
     auto bufferedData = MakeRequest(interpreter::MessageType_ExecutePlan,
                                      logicalPlan.length(),
-                                    access_token,
+                                     access_token,
                                      DMLRequestMessage{logicalPlan});
+
     Buffer responseBuffer = client.send(bufferedData);
-    auto response = MakeResponse<DMLResponseMessage>(responseBuffer);
-    return response.getToken();
+    ResponseMessage response{responseBuffer.data()};
+
+    if (response.getStatus() == Status_Error) {
+      ResponseErrorMessage errorMessage{response.getPayloadBuffer()};
+      throw std::runtime_error(errorMessage.getMessage());
+    }
+    DMLResponseMessage responsePayload(response.getPayloadBuffer());
+    return responsePayload.getToken();
   }
 
-private:
+  Status closeConnection (int64_t access_token) {
+    auto bufferedData = MakeRequest(interpreter::MessageType_CloseConnection,
+                                    0,
+                                    access_token,
+                                    ZeroMessage{});
+    Buffer responseBuffer = client.send(bufferedData);
+    ResponseMessage response{responseBuffer.data()};
+    if (response.getStatus() == Status_Error) {
+      ResponseErrorMessage errorMessage{response.getPayloadBuffer()};
+      throw std::runtime_error(errorMessage.getMessage());
+    }
+    return response.getStatus();
+  }
+
+protected:
   blazingdb::protocol::Client client;
 };
 
