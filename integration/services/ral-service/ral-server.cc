@@ -4,7 +4,6 @@
 
 #include <blazingdb/protocol/interpreter/messages.h>
 
-<<<<<<< HEAD:integration/services/ral-service/src/ral-server.cc
 namespace blazingdb
 {
 namespace protocol

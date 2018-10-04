@@ -37,5 +37,5 @@ target_include_directories(Google::Flatbuffers
 target_link_libraries(Google::Flatbuffers
     INTERFACE ${GOOGLE_FLATBUFFERS_ROOT}/lib/libflatbuffers.a)
 
-add_executable(blazingdb-ral src/ral-server.cc)
+add_executable(blazingdb-ral ral-server.cc)
 target_link_libraries(blazingdb-ral BlazingDB::Protocol Google::Flatbuffers)
