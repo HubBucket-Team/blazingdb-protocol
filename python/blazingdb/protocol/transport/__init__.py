@@ -221,8 +221,8 @@ class StructSegment(Segment, Inline):
 
 class VectorSegment(Segment, Inline):
 
-  def __init__(self, segment=None):
-    self._segment = segment
+  def __init__(self, schema=None):
+    self._schema = schema
 
   def _bytes(self, builder, schema):
     return NotImplemented
@@ -230,7 +230,7 @@ class VectorSegment(Segment, Inline):
   def _from(self, object_):
     name = self._object_name()
     get = getattr(object_, name)
-    if self._segment:
+    if self._schema and isinstance(self._schema, MetaSchema):
       schemas = get
       def get(i):  # NestedSchemaSegment
         schema = schemas(i)
@@ -238,7 +238,7 @@ class VectorSegment(Segment, Inline):
                    for name in set(dir(schema))
                     - set(('Init',
                            'GetRootAs'
-                           + self._segment._module.__name__.split('.')[-1]))
+                           + self._schema._module.__name__.split('.')[-1]))
                    if name[0].isalpha()}
         return type(self._name, (), members)
     return (get(i) for i in range(getattr(object_, name + 'Length')()))
