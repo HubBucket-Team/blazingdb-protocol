@@ -77,38 +77,9 @@ public:
 };
 
 
-class DDLResponseMessage : public StringTypeMessage<orchestrator::DMLResponse> {
-public:
-
-  DDLResponseMessage(const std::string& string_value = "")
-      : StringTypeMessage<orchestrator::DMLResponse>(string_value)
-  {
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(orchestrator::CreateDMLRequestDirect);
-  }
-};
-
 
 // authorization
 
-class AuthRequestMessage : IMessage {
-public:
-  AuthRequestMessage( )
-      : IMessage{}
-  {
-  }
-
-  AuthRequestMessage (const uint8_t* buffer)
-      : IMessage{}
-  {
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override  {
-    return nullptr;
-  }
-};
 
 class AuthResponseMessage : public IMessage {
 public:

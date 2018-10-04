@@ -9,6 +9,7 @@ namespace blazingdb {
 namespace protocol {
 namespace interpreter {
 
+
 class DMLRequestMessage : public StringTypeMessage<interpreter::DMLRequest> {
 public:
   DMLRequestMessage(const std::string& string_value)
@@ -30,8 +31,31 @@ public:
   }
 };
 
+class  GetResultRequestMessage :  public TypedMessage<uint64_t, interpreter::GetResultRequest> {
+  public:
 
+  GetResultRequestMessage(const std::uint64_t& value)
+      : TypedMessage<uint64_t, interpreter::GetResultRequest>(value)
+  {
+  }
 
+  GetResultRequestMessage (const uint8_t* buffer)
+      :  TypedMessage<uint64_t, interpreter::GetResultRequest>(buffer, &interpreter::GetResultRequest::resultToken)
+  {
+  }
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
+  return this->getBufferDataUsing(orchestrator::CreateDMLResponse);
+}
+
+  uint64_t  getResultToken () {
+    return value_;
+  }
+};
+
+//class GetResultResponseMessage : public IMessage {
+  //
+//};
 
 class DMLResponseMessage : public TypedMessage<uint64_t, interpreter::DMLResponse> {
 public:

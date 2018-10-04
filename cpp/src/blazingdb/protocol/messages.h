@@ -216,6 +216,22 @@ protected:
  };
 
 
+//@todo create ZeroMessage Schema
+class  ZeroMessage : public StringTypeMessage<orchestrator::DMLResponse> {
+public:
+
+  ZeroMessage()
+      : StringTypeMessage<orchestrator::DMLResponse>("")
+  {
+  }
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
+    return this->getBufferDataUsing(orchestrator::CreateDMLRequestDirect);
+  }
+};
+
+
+
 auto MakeRequest(int8_t message_type, uint64_t payloadLength, uint64_t sessionToken, IMessage&& payload) -> std::shared_ptr<flatbuffers::DetachedBuffer>{
   RequestMessage request{ Header{message_type, payloadLength, sessionToken}, payload}; 
   auto bufferedData = request.getBufferData();

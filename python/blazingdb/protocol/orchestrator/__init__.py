@@ -16,6 +16,14 @@ from blazingdb.messages.blazingdb.protocol.orchestrator \
 class DMLRequestSchema(transport.schema(DMLRequest)):
   query = transport.StringSegment()
 
+class DDLRequestSchema(transport.schema(DDLRequest)):
+  query = transport.StringSegment()
+
+class DMLResponseSchema(transport.schema(DMLResponse)):
+  resultToken = transport.NumberSegment()
+
+class AuthResponseSchema(transport.schema(AuthResponse)):
+  accessToken = transport.NumberSegment()
 
 class DMLRequestDTO:
 
