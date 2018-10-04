@@ -76,17 +76,16 @@ class Schema(metaclass=MetaSchema):
     for segment in self._nested:
       pairs.append((segment._name, segment._bytes(builder, self)))
 
-    module = self._module
-    name = module.__name__.split('.')[-1]
-    getattr(module, name + 'Start')(builder)
+    name = self._module_name()
+    getattr(self._module, name + 'Start')(builder)
 
     for segment in self._inline:
       pairs.append((segment._name, segment._bytes(builder, self)))
 
     for member, value in reversed(pairs):
-      member =  member[0].upper() + member[1:]
-      getattr(module, '%sAdd%s' % (name, member))(builder, value)
-    builder.Finish(getattr(module, name + 'End')(builder))
+      member = member[0].upper() + member[1:]
+      getattr(self._module, '%sAdd%s' % (name, member))(builder, value)
+    builder.Finish(getattr(self._module, name + 'End')(builder))
 
     return builder.Output()
 
@@ -104,16 +103,16 @@ class Schema(metaclass=MetaSchema):
 
   @classmethod
   def From(cls, buffer):
-    module = cls._module
-    name = module.__name__.split('.')[-1]
-    obj = getattr(getattr(module, name), 'GetRootAs' + name)(buffer, 0)
+    name = cls._module_name()
+    obj = getattr(getattr(cls._module, name), 'GetRootAs' + name)(buffer, 0)
     members = {name: segment._from(obj)
                for name, segment in cls._segments.items()}
-    name = cls.__name__.split('.')[-1]
+    name = cls._module_name()
     return type(name[0].lower() + name[1:], (), members)
 
-  def _module_name(self):
-    return self._module.__name__.split('.')[-1]
+  @classmethod
+  def _module_name(cls):
+    return _name_of(cls._module)
 
   @classmethod
   def _fix_up_segments(cls):
@@ -159,7 +158,7 @@ class Segment(SchemaAttribute):
     return NotImplemented
 
   @abc.abstractmethod
-  def _from(self, obj):
+  def _from(self, _object):
     return NotImplemented
 
   def _set_value(self, schema, value):
@@ -183,8 +182,8 @@ class NumberSegment(Segment, Inline):
   def _bytes(self, builder, schema):
     return schema._values[self._name]
 
-  def _from(self, object_):
-    return getattr(object_, self._object_name())()
+  def _from(self, _object):
+    return getattr(_object, self._object_name())()
 
 
 class StringSegment(Segment, Nested):
@@ -193,8 +192,8 @@ class StringSegment(Segment, Nested):
   def _bytes(self, builder, schema):
     return builder.CreateString(schema._values[self._name])
 
-  def _from(self, object_):
-    return getattr(object_, self._object_name())()
+  def _from(self, _object):
+    return getattr(_object, self._object_name())()
 
 
 class BytesSegment(Segment, Nested):
@@ -210,10 +209,10 @@ class BytesSegment(Segment, Nested):
       builder.PrependByte(byte)
     return builder.EndVector(len(buffer))
 
-  def _from(self, object_):
+  def _from(self, _object):
     name = self._object_name()
-    byte = getattr(object_, name)
-    return bytes(byte(i) for i in range(getattr(object_, name + 'Length')()))
+    byte = getattr(_object, name)
+    return bytes(byte(i) for i in range(getattr(_object, name + 'Length')()))
 
 
 class StructSegment(Segment, Inline):
@@ -227,12 +226,12 @@ class StructSegment(Segment, Inline):
 
   def _bytes(self, builder, schema):
     module = self._module
-    name = module.__name__.split('.')[-1]
+    name = _name_of(module)
     value = schema._values[self._name]
     return getattr(module, 'Create' + name)(builder, **value)
 
-  def _from(self, object_):
-    struct = getattr(object_, self._object_name())()
+  def _from(self, _object):
+    struct = getattr(_object, self._object_name())()
     members = {name[0].lower() + name[1:]: getattr(struct, name)()
                for name in set(dir(struct)) - set(('Init', ))
                if name[0].isalpha()}
@@ -247,18 +246,20 @@ class VectorSegment(Segment, Inline):
   def _bytes(self, builder, schema):
     return NotImplemented
 
-  def _from(self, object_):
+  def _from(self, _object):
     name = self._object_name()
-    get = getattr(object_, name)
+    get = getattr(_object, name)
     if self._schema and isinstance(self._schema, MetaSchema):
       schemas = get
       def get(i):  # NestedSchemaSegment
         schema = schemas(i)
         members = {name[0].lower() + name[1:]: getattr(schema, name)()
                    for name in set(dir(schema))
-                    - set(('Init',
-                           'GetRootAs'
-                           + self._schema._module.__name__.split('.')[-1]))
+                   - set(('Init',
+                          'GetRootAs' + self._schema._module_name()))
                    if name[0].isalpha()}
         return type(self._name, (), members)
-    return (get(i) for i in range(getattr(object_, name + 'Length')()))
+    return (get(i) for i in range(getattr(_object, name + 'Length')()))
+
+def _name_of(module):
+  return module.__name__.split('.')[-1]
