@@ -201,6 +201,10 @@ class BytesSegment(Segment, Nested):
 
 
 class StructSegment(Segment, Inline):
+  """A segment whose value is itself a flatbuffers struct as a dict.
+
+  The keys are the flatbuffers object attributes in camelCase.
+  """
 
   def __init__(self, module):
     self._module = module

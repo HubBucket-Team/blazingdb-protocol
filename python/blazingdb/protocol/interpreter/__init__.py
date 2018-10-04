@@ -28,7 +28,10 @@ class gdf_columnSchema(transport.schema(gdf_column)):
 
 
 class BlazingMetadataSchema(transport.schema(BlazingMetadata)):
-  pass
+  status = transport.StringSegment()
+  message = transport.StringSegment()
+  time = transport.NumberSegment()
+  rows = transport.NumberSegment()
 
 
 class GetResultResponseSchema(transport.schema(GetResultResponse)):
