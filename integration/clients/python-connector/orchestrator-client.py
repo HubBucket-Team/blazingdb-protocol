@@ -83,6 +83,7 @@ class PyConnector:
         response.payload)
 
     print(list(getResultResponse.fieldNames))
+    print([value.size for value in getResultResponse.values])
 
 
 def main():

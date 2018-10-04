@@ -3,16 +3,16 @@ include "blazingdb/protocol/interpreter/gdf/gdf_column.fbs";
 namespace blazingdb.protocol.interpreter;
 
 table BlazingMetadata {
-  status:string;
-  message:string;
-  time:double;
-  rows:int;
+  status: string;
+  message: string;
+  time: double;
+  rows: int;
 }
 
 table GetResultResponse {
-  metadata:BlazingMetadata;
-  fieldNames:[string];
-  values:[gdf.gdf_column];
+  metadata: BlazingMetadata;
+  fieldNames: [string];
+  values: [gdf.gdf_column];
 }
 
-root_type GetResultResponse; 
+root_type GetResultResponse;

@@ -35,9 +35,17 @@ auto InterpreterService(const blazingdb::protocol::Buffer &requestBuffer)
   else if (request.messageType() == interpreter::MessageType_GetResult)
     {
       flatbuffers::FlatBufferBuilder builder;
+      auto metadata =
+          CreateBlazingMetadata(builder, builder.CreateString("OK"),
+                                builder.CreateString("Nothing"), 0.9, 2);
       std::vector<std::string> names{"iron", "man"};
       auto vectorOfNames = builder.CreateVectorOfStrings(names);
-      builder.Finish(CreateGetResultResponse(builder, 0, vectorOfNames));
+      std::vector<flatbuffers::Offset<gdf::gdf_column>> values{
+          gdf::Creategdf_column(builder, 0, 0, 12),
+          gdf::Creategdf_column(builder, 0, 0, 14)};
+      auto vectorOfValues = builder.CreateVector(values);
+      builder.Finish(CreateGetResultResponse(builder, metadata, vectorOfNames,
+                                             vectorOfValues));
       std::shared_ptr<flatbuffers::DetachedBuffer> payload =
           std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
       ResponseMessage responseMessage(Status::Status_Success, payload);
