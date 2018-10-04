@@ -112,6 +112,8 @@ class Schema(metaclass=MetaSchema):
     name = cls.__name__.split('.')[-1]
     return type(name[0].lower() + name[1:], (), members)
 
+  def _module_name(self):
+    return self._module.__name__.split('.')[-1]
 
   @classmethod
   def _fix_up_segments(cls):
@@ -135,6 +137,17 @@ class Schema(metaclass=MetaSchema):
 
 
 class Segment(SchemaAttribute):
+  """A class describing a flatbuffers object segment attribute.
+
+  It's just a base class. To set segments for you schemas, there are specific
+  subclasses for various kind of flatbuffers object attributes.
+
+  A `Segment` subclass implementing a specific transformation between a `Schema`
+  and a flutbuffers object should implement `_bytes()` of member schema and
+  `_from()` flatbuffers object to DTO or literal types (like `int` or `str`).
+  """
+
+  # TODO(gcca): GenericSegment for dynamic conversion
 
   _name = None
 
@@ -165,6 +178,7 @@ class Inline:
 
 
 class NumberSegment(Segment, Inline):
+  """A `Segment` whose value is a literal number `int`, `float` or `bool`."""
 
   def _bytes(self, builder, schema):
     return schema._values[self._name]
@@ -174,6 +188,7 @@ class NumberSegment(Segment, Inline):
 
 
 class StringSegment(Segment, Nested):
+  """A `Segment` whose value is a literal string `str`."""
 
   def _bytes(self, builder, schema):
     return builder.CreateString(schema._values[self._name])
@@ -183,13 +198,14 @@ class StringSegment(Segment, Nested):
 
 
 class BytesSegment(Segment, Nested):
+  """A `Segment` whose value is a limited sequence of `bytes`."""
 
   def _bytes(self, builder, schema):
-    module = schema._module
-    name = module.__name__.split('.')[-1]
+    name = schema._module_name()
     member = self._object_name()
     buffer = schema._values[self._name]
-    getattr(module, '%sStart%sVector' % (name, member))(builder, len(buffer))
+    getattr(schema._module,
+            '%sStart%sVector' % (name, member))(builder, len(buffer))
     for byte in reversed(buffer):
       builder.PrependByte(byte)
     return builder.EndVector(len(buffer))
