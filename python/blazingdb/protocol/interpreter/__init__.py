@@ -20,7 +20,7 @@ class DMLResponseSchema(transport.schema(DMLResponse)):
 
 
 class GetResultRequestSchema(transport.schema(GetResultRequest)):
-  resultToken = transport.StringSegment()
+  resultToken = transport.NumberSegment()
 
 
 class gdf_columnSchema(transport.schema(gdf_column)):
