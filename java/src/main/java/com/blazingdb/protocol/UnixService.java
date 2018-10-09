@@ -20,7 +20,7 @@ import jnr.unixsocket.UnixSocketAddress;
 import jnr.unixsocket.UnixSocketChannel;
 
 public class UnixService implements Runnable {
-    static int MAX_BUFFER_SIZE = 4096;
+    static int MAX_BUFFER_SIZE = 1024*10;
 
     interface Actor {
         boolean rxready(IService handler);

@@ -6,7 +6,7 @@ import blazingdb.protocol.transport as transport
 from blazingdb.messages.blazingdb.protocol.Status import Status
 from blazingdb.messages.blazingdb.protocol.ResponseError import ResponseError
 from blazingdb.messages.blazingdb.protocol.orchestrator \
-    import DMLRequest, DMLResponse, DDLRequest, DDLResponse
+    import DMLRequest, DMLResponse, DDLRequest, DDLResponse, DDLCreateTableRequest
 from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
   import MessageType as OrchestratorMessageType
 
@@ -19,6 +19,13 @@ class DMLRequestSchema(transport.schema(DMLRequest)):
 class DDLRequestSchema(transport.schema(DDLRequest)):
   query = transport.StringSegment()
 
+class DDLCreateTableRequestSchema(transport.schema(DDLCreateTableRequest)):
+  name = transport.StringSegment()
+  columnNames = transport.VectorStringSegment(transport.StringSegment)
+  columnTypes = transport.VectorStringSegment(transport.StringSegment)
+  dbName = transport.StringSegment()
+
+
 class DMLResponseSchema(transport.schema(DMLResponse)):
   resultToken = transport.NumberSegment()
 
@@ -27,6 +34,3 @@ class AuthResponseSchema(transport.schema(AuthResponse)):
 
 class AuthRequestSchema(transport.schema(AuthRequest)):
   pass
-
-class AuthResponseSchema(transport.schema(AuthResponse)):
-  accessToken = transport.NumberSegment()

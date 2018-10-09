@@ -1,0 +1,10 @@
+namespace blazingdb.protocol.orchestrator;
+
+table DDLCreateTableRequest {
+	name: string;
+	columnNames: [string];
+	columnTypes: [string];
+	dbName: string; 
+}
+
+root_type DDLCreateTableRequest;

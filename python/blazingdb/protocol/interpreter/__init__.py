@@ -5,7 +5,10 @@ import blazingdb.protocol.transport
 
 from blazingdb.messages.blazingdb.protocol.interpreter \
   import (DMLRequest, DMLResponse, GetResultRequest, GetResultResponse,
-          gdf_column, BlazingMetadata)
+           BlazingMetadata)
+
+from blazingdb.messages.blazingdb.protocol.interpreter.gdf \
+  import gdf_column
 
 from blazingdb.messages.blazingdb.protocol.interpreter.MessageType \
   import MessageType as InterpreterMessage

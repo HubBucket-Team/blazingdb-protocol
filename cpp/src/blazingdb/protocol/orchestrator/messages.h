@@ -77,6 +77,53 @@ public:
 };
 
 
+class DDLCreateTableRequestMessage : public IMessage {
+public:
+  
+  DDLCreateTableRequestMessage() 
+    : IMessage()
+  {
+
+  }
+  DDLCreateTableRequestMessage (const uint8_t* buffer)
+      : IMessage()
+  {
+    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DDLCreateTableRequest>(buffer);
+    name = std::string{pointer->name()->c_str()};
+    dbName = std::string{pointer->dbName()->c_str()};
+    auto name_list = pointer->columnNames();
+    for (const auto &item : (*name_list)) {
+      columnNames.push_back(std::string{item->c_str()});
+    }
+
+    auto type_list = pointer->columnTypes();
+    for (const auto &item : (*type_list)) {
+      columnTypes.push_back(std::string{item->c_str()});
+    }
+  }
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
+    flatbuffers::FlatBufferBuilder builder;
+    auto name_offset = builder.CreateString(name);
+
+    // std::vector<std::string> columnNames{"name", "surname"};
+    auto vectorOfColumnNames = builder.CreateVectorOfStrings(columnNames);
+    // std::vector<std::string> columnTypes{"string", "string"};
+    auto vectorOfColumnTypes = builder.CreateVectorOfStrings(columnTypes);
+
+    auto dbname_offset = builder.CreateString(dbName);
+
+    builder.Finish(orchestrator::CreateDDLCreateTableRequest(builder, name_offset,vectorOfColumnNames, vectorOfColumnTypes, dbname_offset));
+
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+  }
+private:
+  std::string name;
+  std::vector<std::string> columnNames;
+  std::vector<std::string> columnTypes;
+  std::string dbName;
+  
+};
 
 // authorization
 

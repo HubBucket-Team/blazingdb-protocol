@@ -1,4 +1,4 @@
-namespace blazingdb.protocol.calcite;
+namespace blazingdb.protocol.orchestrator;
 
 table DDLDropTableRequest {
 	name: string;

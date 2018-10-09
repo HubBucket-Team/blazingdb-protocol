@@ -12,17 +12,19 @@ namespace calcite {
 
 struct DMLRequest;
 
-}  // namespace calcite
-
-namespace flatbuf {
-namespace calcite {
-
 struct DDLRequest;
 
+struct DDLCreateTableRequest;
+
+struct DDLDropTableRequest;
+
 }  // namespace calcite
-}  // namespace flatbuf
 
 namespace orchestrator {
+
+struct DDLCreateTableRequest;
+
+struct DDLDropTableRequest;
 
 struct AuthRequest;
 
@@ -91,14 +93,18 @@ namespace calcite {
 enum MessageType {
   MessageType_DDL = 0,
   MessageType_DML = 1,
+  MessageType_DDL_CREATE_TABLE = 2,
+  MessageType_DDL_DROP_TABLE = 3,
   MessageType_MIN = MessageType_DDL,
-  MessageType_MAX = MessageType_DML
+  MessageType_MAX = MessageType_DDL_DROP_TABLE
 };
 
-inline const MessageType (&EnumValuesMessageType())[2] {
+inline const MessageType (&EnumValuesMessageType())[4] {
   static const MessageType values[] = {
     MessageType_DDL,
-    MessageType_DML
+    MessageType_DML,
+    MessageType_DDL_CREATE_TABLE,
+    MessageType_DDL_DROP_TABLE
   };
   return values;
 }
@@ -107,6 +113,8 @@ inline const char * const *EnumNamesMessageType() {
   static const char * const names[] = {
     "DDL",
     "DML",
+    "DDL_CREATE_TABLE",
+    "DDL_DROP_TABLE",
     nullptr
   };
   return names;
@@ -124,16 +132,20 @@ namespace orchestrator {
 enum MessageType {
   MessageType_DDL = 0,
   MessageType_DML = 1,
-  MessageType_AuthOpen = 2,
-  MessageType_AuthClose = 3,
+  MessageType_DDL_CREATE_TABLE = 2,
+  MessageType_DDL_DROP_TABLE = 3,
+  MessageType_AuthOpen = 4,
+  MessageType_AuthClose = 5,
   MessageType_MIN = MessageType_DDL,
   MessageType_MAX = MessageType_AuthClose
 };
 
-inline const MessageType (&EnumValuesMessageType())[4] {
+inline const MessageType (&EnumValuesMessageType())[6] {
   static const MessageType values[] = {
     MessageType_DDL,
     MessageType_DML,
+    MessageType_DDL_CREATE_TABLE,
+    MessageType_DDL_DROP_TABLE,
     MessageType_AuthOpen,
     MessageType_AuthClose
   };
@@ -144,6 +156,8 @@ inline const char * const *EnumNamesMessageType() {
   static const char * const names[] = {
     "DDL",
     "DML",
+    "DDL_CREATE_TABLE",
+    "DDL_DROP_TABLE",
     "AuthOpen",
     "AuthClose",
     nullptr
@@ -415,11 +429,6 @@ inline flatbuffers::Offset<DMLRequest> CreateDMLRequestDirect(
       query ? _fbb.CreateString(query) : 0);
 }
 
-}  // namespace calcite
-
-namespace flatbuf {
-namespace calcite {
-
 struct DDLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_QUERY = 4
@@ -464,15 +473,318 @@ inline flatbuffers::Offset<DDLRequest> CreateDDLRequest(
 inline flatbuffers::Offset<DDLRequest> CreateDDLRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *query = nullptr) {
-  return blazingdb::protocol::flatbuf::calcite::CreateDDLRequest(
+  return blazingdb::protocol::calcite::CreateDDLRequest(
       _fbb,
       query ? _fbb.CreateString(query) : 0);
 }
 
+struct DDLCreateTableRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_NAME = 4,
+    VT_COLUMNNAMES = 6,
+    VT_COLUMNTYPES = 8,
+    VT_DBNAME = 10
+  };
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *columnNames() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_COLUMNNAMES);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *columnTypes() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_COLUMNTYPES);
+  }
+  const flatbuffers::String *dbName() const {
+    return GetPointer<const flatbuffers::String *>(VT_DBNAME);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.Verify(name()) &&
+           VerifyOffset(verifier, VT_COLUMNNAMES) &&
+           verifier.Verify(columnNames()) &&
+           verifier.VerifyVectorOfStrings(columnNames()) &&
+           VerifyOffset(verifier, VT_COLUMNTYPES) &&
+           verifier.Verify(columnTypes()) &&
+           verifier.VerifyVectorOfStrings(columnTypes()) &&
+           VerifyOffset(verifier, VT_DBNAME) &&
+           verifier.Verify(dbName()) &&
+           verifier.EndTable();
+  }
+};
+
+struct DDLCreateTableRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(DDLCreateTableRequest::VT_NAME, name);
+  }
+  void add_columnNames(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNames) {
+    fbb_.AddOffset(DDLCreateTableRequest::VT_COLUMNNAMES, columnNames);
+  }
+  void add_columnTypes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnTypes) {
+    fbb_.AddOffset(DDLCreateTableRequest::VT_COLUMNTYPES, columnTypes);
+  }
+  void add_dbName(flatbuffers::Offset<flatbuffers::String> dbName) {
+    fbb_.AddOffset(DDLCreateTableRequest::VT_DBNAME, dbName);
+  }
+  explicit DDLCreateTableRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  DDLCreateTableRequestBuilder &operator=(const DDLCreateTableRequestBuilder &);
+  flatbuffers::Offset<DDLCreateTableRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<DDLCreateTableRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<DDLCreateTableRequest> CreateDDLCreateTableRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNames = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnTypes = 0,
+    flatbuffers::Offset<flatbuffers::String> dbName = 0) {
+  DDLCreateTableRequestBuilder builder_(_fbb);
+  builder_.add_dbName(dbName);
+  builder_.add_columnTypes(columnTypes);
+  builder_.add_columnNames(columnNames);
+  builder_.add_name(name);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<DDLCreateTableRequest> CreateDDLCreateTableRequestDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *columnNames = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *columnTypes = nullptr,
+    const char *dbName = nullptr) {
+  return blazingdb::protocol::calcite::CreateDDLCreateTableRequest(
+      _fbb,
+      name ? _fbb.CreateString(name) : 0,
+      columnNames ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*columnNames) : 0,
+      columnTypes ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*columnTypes) : 0,
+      dbName ? _fbb.CreateString(dbName) : 0);
+}
+
+struct DDLDropTableRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_NAME = 4,
+    VT_DBNAME = 6
+  };
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  const flatbuffers::String *dbName() const {
+    return GetPointer<const flatbuffers::String *>(VT_DBNAME);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.Verify(name()) &&
+           VerifyOffset(verifier, VT_DBNAME) &&
+           verifier.Verify(dbName()) &&
+           verifier.EndTable();
+  }
+};
+
+struct DDLDropTableRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(DDLDropTableRequest::VT_NAME, name);
+  }
+  void add_dbName(flatbuffers::Offset<flatbuffers::String> dbName) {
+    fbb_.AddOffset(DDLDropTableRequest::VT_DBNAME, dbName);
+  }
+  explicit DDLDropTableRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  DDLDropTableRequestBuilder &operator=(const DDLDropTableRequestBuilder &);
+  flatbuffers::Offset<DDLDropTableRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<DDLDropTableRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<DDLDropTableRequest> CreateDDLDropTableRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    flatbuffers::Offset<flatbuffers::String> dbName = 0) {
+  DDLDropTableRequestBuilder builder_(_fbb);
+  builder_.add_dbName(dbName);
+  builder_.add_name(name);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<DDLDropTableRequest> CreateDDLDropTableRequestDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
+    const char *dbName = nullptr) {
+  return blazingdb::protocol::calcite::CreateDDLDropTableRequest(
+      _fbb,
+      name ? _fbb.CreateString(name) : 0,
+      dbName ? _fbb.CreateString(dbName) : 0);
+}
+
 }  // namespace calcite
-}  // namespace flatbuf
 
 namespace orchestrator {
+
+struct DDLCreateTableRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_NAME = 4,
+    VT_COLUMNNAMES = 6,
+    VT_COLUMNTYPES = 8,
+    VT_DBNAME = 10
+  };
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *columnNames() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_COLUMNNAMES);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *columnTypes() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_COLUMNTYPES);
+  }
+  const flatbuffers::String *dbName() const {
+    return GetPointer<const flatbuffers::String *>(VT_DBNAME);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.Verify(name()) &&
+           VerifyOffset(verifier, VT_COLUMNNAMES) &&
+           verifier.Verify(columnNames()) &&
+           verifier.VerifyVectorOfStrings(columnNames()) &&
+           VerifyOffset(verifier, VT_COLUMNTYPES) &&
+           verifier.Verify(columnTypes()) &&
+           verifier.VerifyVectorOfStrings(columnTypes()) &&
+           VerifyOffset(verifier, VT_DBNAME) &&
+           verifier.Verify(dbName()) &&
+           verifier.EndTable();
+  }
+};
+
+struct DDLCreateTableRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(DDLCreateTableRequest::VT_NAME, name);
+  }
+  void add_columnNames(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNames) {
+    fbb_.AddOffset(DDLCreateTableRequest::VT_COLUMNNAMES, columnNames);
+  }
+  void add_columnTypes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnTypes) {
+    fbb_.AddOffset(DDLCreateTableRequest::VT_COLUMNTYPES, columnTypes);
+  }
+  void add_dbName(flatbuffers::Offset<flatbuffers::String> dbName) {
+    fbb_.AddOffset(DDLCreateTableRequest::VT_DBNAME, dbName);
+  }
+  explicit DDLCreateTableRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  DDLCreateTableRequestBuilder &operator=(const DDLCreateTableRequestBuilder &);
+  flatbuffers::Offset<DDLCreateTableRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<DDLCreateTableRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<DDLCreateTableRequest> CreateDDLCreateTableRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNames = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnTypes = 0,
+    flatbuffers::Offset<flatbuffers::String> dbName = 0) {
+  DDLCreateTableRequestBuilder builder_(_fbb);
+  builder_.add_dbName(dbName);
+  builder_.add_columnTypes(columnTypes);
+  builder_.add_columnNames(columnNames);
+  builder_.add_name(name);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<DDLCreateTableRequest> CreateDDLCreateTableRequestDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *columnNames = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *columnTypes = nullptr,
+    const char *dbName = nullptr) {
+  return blazingdb::protocol::orchestrator::CreateDDLCreateTableRequest(
+      _fbb,
+      name ? _fbb.CreateString(name) : 0,
+      columnNames ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*columnNames) : 0,
+      columnTypes ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*columnTypes) : 0,
+      dbName ? _fbb.CreateString(dbName) : 0);
+}
+
+struct DDLDropTableRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_NAME = 4,
+    VT_DBNAME = 6
+  };
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  const flatbuffers::String *dbName() const {
+    return GetPointer<const flatbuffers::String *>(VT_DBNAME);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.Verify(name()) &&
+           VerifyOffset(verifier, VT_DBNAME) &&
+           verifier.Verify(dbName()) &&
+           verifier.EndTable();
+  }
+};
+
+struct DDLDropTableRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(DDLDropTableRequest::VT_NAME, name);
+  }
+  void add_dbName(flatbuffers::Offset<flatbuffers::String> dbName) {
+    fbb_.AddOffset(DDLDropTableRequest::VT_DBNAME, dbName);
+  }
+  explicit DDLDropTableRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  DDLDropTableRequestBuilder &operator=(const DDLDropTableRequestBuilder &);
+  flatbuffers::Offset<DDLDropTableRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<DDLDropTableRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<DDLDropTableRequest> CreateDDLDropTableRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    flatbuffers::Offset<flatbuffers::String> dbName = 0) {
+  DDLDropTableRequestBuilder builder_(_fbb);
+  builder_.add_dbName(dbName);
+  builder_.add_name(name);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<DDLDropTableRequest> CreateDDLDropTableRequestDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
+    const char *dbName = nullptr) {
+  return blazingdb::protocol::orchestrator::CreateDDLDropTableRequest(
+      _fbb,
+      name ? _fbb.CreateString(name) : 0,
+      dbName ? _fbb.CreateString(dbName) : 0);
+}
 
 struct AuthRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
@@ -1445,12 +1757,6 @@ inline flatbuffers::Offset<ResponseError> CreateResponseErrorDirect(
 namespace calcite {
 
 }  // namespace calcite
-
-namespace flatbuf {
-namespace calcite {
-
-}  // namespace calcite
-}  // namespace flatbuf
 
 namespace orchestrator {
 

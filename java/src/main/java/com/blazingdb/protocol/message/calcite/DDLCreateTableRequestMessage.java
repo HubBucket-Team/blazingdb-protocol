@@ -1,7 +1,7 @@
 package com.blazingdb.protocol.message.calcite;
 
-import blazingdb.protocol.flatbuf.calcite.DDLCreateTableRequest;
-import blazingdb.protocol.flatbuf.calcite.DDLRequest;
+import blazingdb.protocol.calcite.DDLCreateTableRequest;
+import blazingdb.protocol.calcite.DDLRequest;
 
 
 import com.blazingdb.protocol.message.IMessage;

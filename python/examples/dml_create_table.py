@@ -64,6 +64,34 @@ class PyConnector:
     print(response.status)
     return response.status
 
+  def run_ddl_create_table(self, tableName, columnNames, columnTypes, dbName):
+    print(tableName)
+    dmlRequestSchema = blazingdb.protocol.orchestrator.DDLCreateTableRequestSchema(name=tableName, columnNames=columnNames, columnTypes=columnTypes, dbName=dbName)
+    requestBuffer = blazingdb.protocol.transport.channel.MakeRequestBuffer(OrchestratorMessageType.DDL_CREATE_TABLE,
+                                                                           self.accessToken, dmlRequestSchema)
+
+    print(bytes(requestBuffer).hex())
+    responseBuffer = self._send_request(self._orchestrator_path, requestBuffer)
+    response = blazingdb.protocol.transport.channel.ResponseSchema.From(responseBuffer)
+    if response.status == Status.Error:
+      errorResponse = blazingdb.protocol.transport.channel.ResponseErrorSchema.From(response.payload)
+      raise Error(errorResponse.errors)
+    print(response.status)
+    return response.status
+
+  def run_ddl_drop_table(self, query):
+    print(query)
+    dmlRequestSchema = blazingdb.protocol.orchestrator.DDLRequestSchema(query=query)
+    requestBuffer = blazingdb.protocol.transport.channel.MakeRequestBuffer(OrchestratorMessageType.DDL,
+                                                                           self.accessToken, dmlRequestSchema)
+    responseBuffer = self._send_request(self._orchestrator_path, requestBuffer)
+    response = blazingdb.protocol.transport.channel.ResponseSchema.From(responseBuffer)
+    if response.status == Status.Error:
+      errorResponse = blazingdb.protocol.transport.channel.ResponseErrorSchema.From(response.payload)
+      raise Error(errorResponse.errors)
+    print(response.status)
+    return response.status
+
   def close_connection(self):
     print("close connection")
     authSchema = blazingdb.protocol.orchestrator.AuthRequestSchema()
@@ -108,8 +136,21 @@ class PyConnector:
     print('  values:')
     print('    size: %s' % [value.size for value in getResultResponse.values])
 
+def dml_create_table_example(tableName, columnNames, columnTypes, dbName):
+  dmlRequestSchema = blazingdb.protocol.orchestrator.DDLCreateTableRequestSchema(name=tableName,
+                                                                                 columnNames=columnNames,
+                                                                                 columnTypes=columnTypes, dbName=dbName)
+  payload = dmlRequestSchema.ToBuffer()
+  response = blazingdb.protocol.orchestrator.DDLCreateTableRequestSchema.From(payload)
+
+  print(response.name)
+  print(response.dbName)
+  print(list(response.columnNames))
+  print(list(response.columnTypes))
 
 def main():
+  dml_create_table_example('user', ['name', 'surname', 'age'], ['string', 'string', 'int'], 'alexdb')
+
   client = PyConnector('/tmp/orchestrator.socket', '/tmp/ral.socket')
 
   try:
@@ -118,27 +159,16 @@ def main():
     print(err)
 
   try:
-    client.run_dml_query('select * from Table')
-  except SyntaxError as err:
-    print(err)
-
-  try:
-    client.run_dml_query('@typo * from Table')
+    client.run_ddl_create_table('user', ['name', 'surname', 'age'], ['string', 'string', 'int'], 'alexdb')
   except Error as err:
     print(err)
 
-  try:
-    client.run_ddl_query('create database alexdb')
-  except Error as err:
-    print(err)
-    
-  try:
-    client.run_ddl_query('@typo database alexdb')
-  except Error as err:
-    print(err)
+  # try:
+  #   client.run_ddl_drop_table('user')
+  # except Error as err:
+  #   print(err)
 
   client.close_connection()
-
 
 if __name__ == '__main__':
   main()

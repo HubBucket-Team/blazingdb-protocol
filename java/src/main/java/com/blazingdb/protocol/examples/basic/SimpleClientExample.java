@@ -1,28 +1,23 @@
-package com.blazingdb.protocol.examples.simple;
-
+package com.blazingdb.protocol.examples.basic;
 import com.blazingdb.protocol.UnixClient;
-import com.blazingdb.protocol.message.IMessage;
-import com.blazingdb.protocol.message.calcite.DMLRequestMessage;
-import com.blazingdb.protocol.message.calcite.DMLResponseMessage;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
-public class CalciteClientExample {
+public class SimpleClientExample{
 
     public static void main(String []args) throws IOException, InterruptedException {
         File unixSocketFile = new File("/tmp/socket");
-        String statement = "select * from orders";
-        IMessage request =  new DMLRequestMessage(statement);
+        String statement = "select * from orders\r\n";
 
         wait(unixSocketFile);
 
         UnixClient client = new UnixClient(unixSocketFile);
-        ByteBuffer result = client.send(request.getBufferData());
-        DMLResponseMessage response = new DMLResponseMessage(result);
-        System.out.println(response.getLogicalPlan());
+        System.out.println("send message : " + statement);
+		byte [] result = client.send(statement.getBytes());
+        System.out.println("receive reply: " + new String(result));
+
     }
 
     static void wait(File unixSocketFile) throws InterruptedException, IOException {

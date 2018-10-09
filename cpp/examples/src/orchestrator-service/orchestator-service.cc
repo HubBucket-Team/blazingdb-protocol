@@ -14,7 +14,7 @@
 using namespace blazingdb::protocol;
 using result_pair = std::pair<Status, std::shared_ptr<flatbuffers::DetachedBuffer>>;
 
-static result_pair  openConnectionService(uint64_t nonAccessToken, const uint8_t* buffer)  {
+static result_pair  openConnectionService(uint64_t nonAccessToken, Buffer&& buffer)  {
   int64_t token = 123456789L; // get_uuid()
   orchestrator::AuthResponseMessage response{token};
   std::cout << "authorizationService: " << token << std::endl;
@@ -22,7 +22,7 @@ static result_pair  openConnectionService(uint64_t nonAccessToken, const uint8_t
 };
 
 
-static result_pair  closeConnectionService(uint64_t accessToken, const uint8_t* buffer)  {
+static result_pair  closeConnectionService(uint64_t accessToken, Buffer&& buffer)  {
   blazingdb::protocol::UnixSocketConnection ral_client_connection{"/tmp/ral.socket"};
   interpreter::InterpreterClient ral_client{ral_client_connection};
   try {
@@ -39,8 +39,8 @@ static result_pair  closeConnectionService(uint64_t accessToken, const uint8_t* 
 
 
 
-static result_pair  dmlService(uint64_t accessToken, const uint8_t* buffer)  {
-  orchestrator::DMLRequestMessage requestPayload(buffer);
+static result_pair  dmlService(uint64_t accessToken, Buffer&& buffer)  {
+  orchestrator::DMLRequestMessage requestPayload(buffer.data());
   auto query = requestPayload.getQuery();
   std::cout << "DML: " << query << std::endl;
   uint64_t resultToken = 0L;
@@ -70,15 +70,16 @@ static result_pair  dmlService(uint64_t accessToken, const uint8_t* buffer)  {
   orchestrator::DMLResponseMessage response{resultToken};
   return std::make_pair(Status_Success, response.getBufferData());
 };
-
-static result_pair ddlService(uint64_t accessToken, const uint8_t* buffer)  {
-  orchestrator::DDLRequestMessage requestPayload(buffer);
-  auto query = requestPayload.getQuery();
-  std::cout << "DDL: " << query << std::endl;
+ 
+ 
+static result_pair ddlCreateTableService(uint64_t accessToken, Buffer&& buffer)  {
+  std::cout << "DDL Create Table: " << std::endl;
    try {
     blazingdb::protocol::UnixSocketConnection calcite_client_connection{"/tmp/calcite.socket"};
     calcite::CalciteClient calcite_client{calcite_client_connection};
-    auto status = calcite_client.updateSchema(query);
+
+    orchestrator::DDLCreateTableRequestMessage payload(buffer.data()); 
+    auto status = calcite_client.createTable(  payload );
     std::cout << "status:" << status << std::endl;
   } catch (std::runtime_error &error) {
      // error with ddl query
@@ -90,7 +91,15 @@ static result_pair ddlService(uint64_t accessToken, const uint8_t* buffer)  {
   return std::make_pair(Status_Success, response.getBufferData());
 };
 
-using FunctionType = result_pair (*)(uint64_t, const uint8_t* buffer);
+
+static result_pair ddlDropTableService(uint64_t accessToken, Buffer&& buffer)  {
+  
+  ZeroMessage response{};
+  return std::make_pair(Status_Success, response.getBufferData());
+};
+
+
+using FunctionType = result_pair (*)(uint64_t, Buffer&&);
 
 int main() {
   blazingdb::protocol::UnixSocketConnection server_connection({"/tmp/orchestrator.socket", std::allocator<char>()});
@@ -99,7 +108,10 @@ int main() {
 
   std::map<int8_t, FunctionType> services;
   services.insert(std::make_pair(orchestrator::MessageType_DML, &dmlService));
-  services.insert(std::make_pair(orchestrator::MessageType_DDL, &ddlService));
+
+  services.insert(std::make_pair(orchestrator::MessageType_DDL_CREATE_TABLE, &ddlCreateTableService));
+  services.insert(std::make_pair(orchestrator::MessageType_DDL_DROP_TABLE, &ddlDropTableService));
+
   services.insert(std::make_pair(orchestrator::MessageType_AuthOpen, &openConnectionService));
   services.insert(std::make_pair(orchestrator::MessageType_AuthClose, &closeConnectionService));
 

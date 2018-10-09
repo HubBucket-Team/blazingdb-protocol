@@ -5,6 +5,8 @@
 class MessageType(object):
     DDL = 0
     DML = 1
-    AuthOpen = 2
-    AuthClose = 3
+    DDL_CREATE_TABLE = 2
+    DDL_DROP_TABLE = 3
+    AuthOpen = 4
+    AuthClose = 5
 

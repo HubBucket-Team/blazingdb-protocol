@@ -1,7 +1,7 @@
 package com.blazingdb.protocol.message.calcite;
 
 import blazingdb.protocol.calcite.DMLRequest;
-import blazingdb.protocol.flatbuf.calcite.DDLRequest;
+import blazingdb.protocol.calcite.DDLRequest;
 
 import com.blazingdb.protocol.message.IMessage;
 import com.blazingdb.protocol.util.ByteBufferUtil;

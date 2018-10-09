@@ -5,4 +5,6 @@
 class MessageType(object):
     DDL = 0
     DML = 1
+    DDL_CREATE_TABLE = 2
+    DDL_DROP_TABLE = 3
 

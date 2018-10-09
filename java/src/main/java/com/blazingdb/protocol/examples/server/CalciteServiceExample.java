@@ -9,10 +9,7 @@ import com.blazingdb.protocol.UnixService;
 import com.blazingdb.protocol.message.RequestMessage;
 import com.blazingdb.protocol.message.ResponseErrorMessage;
 import com.blazingdb.protocol.message.ResponseMessage;
-import com.blazingdb.protocol.message.calcite.DDLRequestMessage;
-import com.blazingdb.protocol.message.calcite.DDLResponseMessage;
-import com.blazingdb.protocol.message.calcite.DMLRequestMessage;
-import com.blazingdb.protocol.message.calcite.DMLResponseMessage;
+import com.blazingdb.protocol.message.calcite.*;
 import com.blazingdb.protocol.util.ByteBufferUtil;
 
 import java.io.File;
@@ -49,16 +46,20 @@ public class CalciteServiceExample {
                     }
                     return response.getBufferData();
                 }
-                else if(requestMessage.getHeaderType() == MessageType.DDL) {
-                    DDLRequestMessage requestPayload = new DDLRequestMessage(requestMessage.getPayloadBuffer());
-                    ResponseMessage response = null;
-                    System.out.println("DDL: " + requestPayload.getQuery());
+                else if(requestMessage.getHeaderType() == MessageType.DDL_CREATE_TABLE) {
 
-                    if (requestPayload.getQuery().contains("create") || requestPayload.getQuery().contains("drop")){
+                    DDLCreateTableRequestMessage requestPayload = new DDLCreateTableRequestMessage(requestMessage.getPayloadBuffer());
+                    ResponseMessage response = null;
+                    System.out.println("DDL Create Table: " + requestPayload.getName());
+                    System.out.println("\tdbName: " + requestPayload.getDbName());
+                    System.out.println("\tColumnNames: " + requestPayload.getColumnNames());
+                    System.out.println("\tColumnTypes: " + requestPayload.getColumnTypes());
+
+                    if (requestPayload.getDbName().contains("alexdb") ){
                         DDLResponseMessage responsePayload = new DDLResponseMessage();
                         response = new ResponseMessage(Status.Success, responsePayload.getBufferData());
                     } else {
-                        ResponseErrorMessage error = new ResponseErrorMessage("error: it is not a DDL query");
+                        ResponseErrorMessage error = new ResponseErrorMessage("error: it is not a valid DDL Create Table Request");
                         response = new ResponseMessage(Status.Error, error.getBufferData());
                     }
                     return response.getBufferData();
