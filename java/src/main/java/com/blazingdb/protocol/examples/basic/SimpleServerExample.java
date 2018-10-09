@@ -1,4 +1,4 @@
-package com.blazingdb.protocol.examples;
+package com.blazingdb.protocol.examples.basic;
 
 import com.blazingdb.protocol.IService;
 import com.blazingdb.protocol.UnixService;

@@ -27,12 +27,12 @@ class ResponseErrorSchema(transport.schema(ResponseError)):
 
 def MakeRequestBuffer(messageType, accessToken, schema, builderInitialSize=0):
   payload = schema.ToBuffer()
-  return RequestSchema(header={
+  request = RequestSchema(header={
     'messageType': messageType,
     'payloadLength': len(payload),
     'accessToken': accessToken,
   }, payload=payload).ToBuffer()
-
+  return request
 
 def RequestSchemaFrom(buffer_):
   return RequestSchema.From(buffer_)

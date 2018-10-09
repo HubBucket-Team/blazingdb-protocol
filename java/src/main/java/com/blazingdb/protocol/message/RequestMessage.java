@@ -31,7 +31,7 @@ public class RequestMessage implements IMessage {
         payloadBuffer =  pointer.payloadAsByteBuffer();
 
         this.header = new HeaderMessage(headerPointer.messageType(), headerPointer.payloadLength(), headerPointer.accessToken());
-     }
+    }
 
     @Override
     public ByteBuffer getBufferData() {

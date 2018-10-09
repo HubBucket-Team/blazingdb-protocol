@@ -253,6 +253,34 @@ class VectorSegment(Vector):
   def _bytes(self, builder, schema):
     return NotImplemented
 
+
+  def _from(self, _object):
+    return self._make_iterable(_object, getattr(_object, self._object_name()))
+
+
+
+class VectorStringSegment(Vector, Nested):
+
+  def __init__(self, segment):
+    self._segment = segment
+
+  def _bytes(self, builder, schema):
+
+    name = schema._module_name()
+    member = self._object_name()
+    buffer = schema._values[self._name]
+
+    offset_list = []
+    for string_val in reversed(buffer):
+      offset_list.append(builder.CreateString(string_val))
+
+    getattr(schema._module,
+            '%sStart%sVector' % (name, member))(builder, len(buffer))
+
+    for offset in offset_list:
+      builder.PrependUOffsetTRelative(offset)
+    return builder.EndVector(len(buffer))
+
   def _from(self, _object):
     return self._make_iterable(_object, getattr(_object, self._object_name()))
 

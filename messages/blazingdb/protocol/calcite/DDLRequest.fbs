@@ -1,4 +1,4 @@
-namespace blazingdb.protocol.flatbuf.calcite;
+namespace blazingdb.protocol.calcite;
 
 table DDLRequest {
 	query: string;

@@ -133,8 +133,8 @@ public:
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
 
-  const uint8_t* getPayloadBuffer() {
-    return payloadBuffer;
+  Buffer getPayloadBuffer() {
+    return Buffer{payloadBuffer, payloadBufferSize};
   }
 
   size_t getPayloadBufferSize() {
@@ -237,6 +237,12 @@ auto MakeRequest(int8_t message_type, uint64_t payloadLength, uint64_t sessionTo
   auto bufferedData = request.getBufferData();
   return bufferedData;
 }
+auto MakeRequest(int8_t message_type, uint64_t payloadLength, uint64_t sessionToken, IMessage& payload) -> std::shared_ptr<flatbuffers::DetachedBuffer>{
+  RequestMessage request{ Header{message_type, payloadLength, sessionToken}, payload}; 
+  auto bufferedData = request.getBufferData();
+  return bufferedData;
+}
+ 
 
 template <typename ResponseType>
 ResponseType MakeResponse (Buffer &responseBuffer) {

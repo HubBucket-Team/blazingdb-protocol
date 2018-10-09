@@ -5,4 +5,5 @@
 class MessageType(object):
     ExecutePlan = 0
     GetResult = 1
+    CloseConnection = 2
 

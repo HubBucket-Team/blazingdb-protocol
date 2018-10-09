@@ -1,5 +1,9 @@
 include "blazingdb/protocol/calcite/DMLRequest.fbs";
 include "blazingdb/protocol/calcite/DDLRequest.fbs";
+include "blazingdb/protocol/calcite/DDLCreateTableRequest.fbs";
+include "blazingdb/protocol/calcite/DDLDropTableRequest.fbs";
+include "blazingdb/protocol/orchestrator/DDLCreateTableRequest.fbs";
+include "blazingdb/protocol/orchestrator/DDLDropTableRequest.fbs";
 include "blazingdb/protocol/orchestrator/AuthRequest.fbs";
 include "blazingdb/protocol/orchestrator/DMLRequest.fbs";
 include "blazingdb/protocol/orchestrator/DDLRequest.fbs";
