@@ -35,9 +35,11 @@ public final class DDLCreateTableRequestMessage implements IMessage {
 		return types;
 	}
 	
-    public DDLCreateTableRequestMessage(final List<String> columnNames, final List<String> types) {
+    public DDLCreateTableRequestMessage(final List<String> columnNames, final List<String> types, String name, String dbName) {
         this.columnNames = columnNames;
         this.types = types;
+        this.name = name;
+        this.dbName = dbName;
     }
 
     public DDLCreateTableRequestMessage(ByteBuffer buffer) {
@@ -59,7 +61,8 @@ public final class DDLCreateTableRequestMessage implements IMessage {
     @Override
     public ByteBuffer getBufferData() {
         FlatBufferBuilder builder = new FlatBufferBuilder(1024);
-        int tableNameOffset = builder.createString(this.name);
+        
+        
         int[] columnNameOffsets = new int[columnNames.size()];
         int[] columnTypeOffsets = new int[types.size()];
         
@@ -72,7 +75,7 @@ public final class DDLCreateTableRequestMessage implements IMessage {
        
         int root = DDLCreateTableRequest.createDDLCreateTableRequest(
         		builder, 
-        		tableNameOffset, 
+        		builder.createString(this.name), 
         		DDLCreateTableRequest.createColumnNamesVector(builder, columnNameOffsets), 
         		DDLCreateTableRequest.createColumnTypesVector(builder,columnTypeOffsets),
         		builder.createString(dbName));

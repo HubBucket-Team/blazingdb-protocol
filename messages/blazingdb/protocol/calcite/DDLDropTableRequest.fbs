@@ -1,0 +1,8 @@
+namespace blazingdb.protocol.flatbuf.calcite;
+
+table DDLDropTableRequest {
+	name: string;
+	dbName: string;
+}
+
+root_type DDLDropTableRequest;
