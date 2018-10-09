@@ -8,9 +8,9 @@
 using namespace blazingdb::protocol;
 
 using result_pair = std::pair<Status, std::shared_ptr<flatbuffers::DetachedBuffer>>;
-using FunctionType = result_pair (*)(uint64_t, const uint8_t* buffer);
+using FunctionType = result_pair (*)(uint64_t, Buffer&& buffer);
 
-static result_pair closeConnectionService(uint64_t accessToken, const uint8_t* requestPayloadBuffer) {
+static result_pair closeConnectionService(uint64_t accessToken, Buffer&& requestPayloadBuffer) {
   std::cout << "accessToken: " << accessToken << std::endl;
   // remove from repository using accessToken
 
@@ -18,10 +18,10 @@ static result_pair closeConnectionService(uint64_t accessToken, const uint8_t* r
   return std::make_pair(Status_Success, response.getBufferData());
 }
 
-static result_pair getResultService(uint64_t accessToken, const uint8_t* requestPayloadBuffer) {
+static result_pair getResultService(uint64_t accessToken, Buffer&& requestPayloadBuffer) {
    std::cout << "accessToken: " << accessToken << std::endl;
 
-  interpreter::GetResultRequestMessage requestPayload(requestPayloadBuffer);
+  interpreter::GetResultRequestMessage requestPayload(requestPayloadBuffer.data());
   std::cout << "resultToken: " << requestPayload.getResultToken() << std::endl;
 
   // remove from repository using accessToken and resultToken
@@ -44,8 +44,8 @@ static result_pair getResultService(uint64_t accessToken, const uint8_t* request
 }
 
 
-static result_pair executePlanService(uint64_t accessToken, const uint8_t* requestPayloadBuffer)   {
-  interpreter::DMLRequestMessage requestPayload(requestPayloadBuffer);
+static result_pair executePlanService(uint64_t accessToken, Buffer&& requestPayloadBuffer)   {
+  interpreter::DMLRequestMessage requestPayload(requestPayloadBuffer.data());
 
   // ExecutePlan
   std::cout << "accessToken: " << accessToken << std::endl;
