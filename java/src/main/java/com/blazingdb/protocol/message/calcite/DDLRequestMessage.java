@@ -1,6 +1,8 @@
 package com.blazingdb.protocol.message.calcite;
 
 import blazingdb.protocol.calcite.DMLRequest;
+import blazingdb.protocol.flatbuf.calcite.DDLRequest;
+
 import com.blazingdb.protocol.message.IMessage;
 import com.blazingdb.protocol.util.ByteBufferUtil;
 import com.google.flatbuffers.FlatBufferBuilder;
@@ -28,7 +30,7 @@ public final class DDLRequestMessage implements IMessage {
     public ByteBuffer getBufferData() {
         FlatBufferBuilder builder = new FlatBufferBuilder(1024);
         int statement_string_data = builder.createString(ByteBuffer.wrap(query.getBytes(StandardCharsets.US_ASCII)));
-        int root = DMLRequest.createDMLRequest(builder, statement_string_data);
+        int root = DDLRequest.createDDLRequest(builder, statement_string_data);
         builder.finish(root);
         return ByteBufferUtil.addEof(builder.dataBuffer());
     }

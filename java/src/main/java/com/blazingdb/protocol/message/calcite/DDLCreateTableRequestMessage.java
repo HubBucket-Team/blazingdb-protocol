@@ -2,7 +2,7 @@ package com.blazingdb.protocol.message.calcite;
 
 import blazingdb.protocol.flatbuf.calcite.DDLCreateTableRequest;
 import blazingdb.protocol.flatbuf.calcite.DDLRequest;
-import blazingdb.protocol.flatbuf.calcite.DataType;
+
 
 import com.blazingdb.protocol.message.IMessage;
 import com.blazingdb.protocol.util.ByteBufferUtil;
@@ -69,7 +69,7 @@ public final class DDLCreateTableRequestMessage implements IMessage {
         	curColumn = builder.createString(types.get(i));
         	columnTypeOffsets[i] = curColumn;
         }
-        
+       
         int root = DDLCreateTableRequest.createDDLCreateTableRequest(
         		builder, 
         		tableNameOffset, 

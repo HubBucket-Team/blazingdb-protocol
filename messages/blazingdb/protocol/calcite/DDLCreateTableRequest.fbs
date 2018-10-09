@@ -1,19 +1,5 @@
 namespace blazingdb.protocol.flatbuf.calcite;
 
-enum DataType : byte { 		GDF_INT8 = 0,
-	    GDF_INT16,
-	    GDF_INT32,
-	    GDF_INT64,
-	    GDF_FLOAT32,
-	    GDF_FLOAT64,
-	    GDF_DATE32,   	
-	    GDF_DATE64,   	
-	    GDF_TIMESTAMP,	
-	    GDF_CATEGORY,
-	    GDF_STRING
- }
-	
-
 table DDLCreateTableRequest {
 	name: string;
 	columnNames: [string];
