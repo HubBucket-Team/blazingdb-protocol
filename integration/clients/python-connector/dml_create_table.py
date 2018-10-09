@@ -69,8 +69,6 @@ class PyConnector:
     dmlRequestSchema = blazingdb.protocol.orchestrator.DDLCreateTableRequestSchema(name=tableName, columnNames=columnNames, columnTypes=columnTypes, dbName=dbName)
     requestBuffer = blazingdb.protocol.transport.channel.MakeRequestBuffer(OrchestratorMessageType.DDL_CREATE_TABLE,
                                                                            self.accessToken, dmlRequestSchema)
-
-    print(bytes(requestBuffer).hex())
     responseBuffer = self._send_request(self._orchestrator_path, requestBuffer)
     response = blazingdb.protocol.transport.channel.ResponseSchema.From(responseBuffer)
     if response.status == Status.Error:
@@ -79,10 +77,10 @@ class PyConnector:
     print(response.status)
     return response.status
 
-  def run_ddl_drop_table(self, query):
-    print(query)
-    dmlRequestSchema = blazingdb.protocol.orchestrator.DDLRequestSchema(query=query)
-    requestBuffer = blazingdb.protocol.transport.channel.MakeRequestBuffer(OrchestratorMessageType.DDL,
+  def run_ddl_drop_table(self, tableName, dbName):
+    print(tableName)
+    dmlRequestSchema = blazingdb.protocol.orchestrator.DDLDropTableRequestSchema(name=tableName, dbName=dbName)
+    requestBuffer = blazingdb.protocol.transport.channel.MakeRequestBuffer(OrchestratorMessageType.DDL_DROP_TABLE,
                                                                            self.accessToken, dmlRequestSchema)
     responseBuffer = self._send_request(self._orchestrator_path, requestBuffer)
     response = blazingdb.protocol.transport.channel.ResponseSchema.From(responseBuffer)
@@ -163,10 +161,10 @@ def main():
   except Error as err:
     print(err)
 
-  # try:
-  #   client.run_ddl_drop_table('user')
-  # except Error as err:
-  #   print(err)
+  try:
+    client.run_ddl_drop_table('user', 'alexdb')
+  except Error as err:
+    print(err)
 
   client.close_connection()
 

@@ -64,6 +64,22 @@ public class CalciteServiceExample {
                     }
                     return response.getBufferData();
                 }
+                else if(requestMessage.getHeaderType() == MessageType.DDL_DROP_TABLE) {
+
+                    DDLDropTableRequestMessage requestPayload = new DDLDropTableRequestMessage(requestMessage.getPayloadBuffer());
+                    ResponseMessage response = null;
+                    System.out.println("DDL Drop Table: " + requestPayload.getName());
+                    System.out.println("\tdbName: " + requestPayload.getDbName());
+
+                    if (requestPayload.getDbName().contains("alexdb") ){
+                        DDLResponseMessage responsePayload = new DDLResponseMessage();
+                        response = new ResponseMessage(Status.Success, responsePayload.getBufferData());
+                    } else {
+                        ResponseErrorMessage error = new ResponseErrorMessage("error: it is not a valid DDL Drop Table Request");
+                        response = new ResponseMessage(Status.Error, error.getBufferData());
+                    }
+                    return response.getBufferData();
+                }
                 return null;
             }
         };

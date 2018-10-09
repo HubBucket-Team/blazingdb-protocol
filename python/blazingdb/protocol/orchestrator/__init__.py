@@ -6,7 +6,7 @@ import blazingdb.protocol.transport as transport
 from blazingdb.messages.blazingdb.protocol.Status import Status
 from blazingdb.messages.blazingdb.protocol.ResponseError import ResponseError
 from blazingdb.messages.blazingdb.protocol.orchestrator \
-    import DMLRequest, DMLResponse, DDLRequest, DDLResponse, DDLCreateTableRequest
+    import DMLRequest, DMLResponse, DDLRequest, DDLResponse, DDLCreateTableRequest, DDLDropTableRequest
 from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
   import MessageType as OrchestratorMessageType
 
@@ -23,6 +23,10 @@ class DDLCreateTableRequestSchema(transport.schema(DDLCreateTableRequest)):
   name = transport.StringSegment()
   columnNames = transport.VectorStringSegment(transport.StringSegment)
   columnTypes = transport.VectorStringSegment(transport.StringSegment)
+  dbName = transport.StringSegment()
+
+class DDLDropTableRequestSchema(transport.schema(DDLDropTableRequest)):
+  name = transport.StringSegment()
   dbName = transport.StringSegment()
 
 

@@ -77,6 +77,38 @@ public:
 };
 
 
+class DDLDropTableRequestMessage : public IMessage {
+public:
+
+  DDLDropTableRequestMessage()
+      : IMessage()
+  {
+
+  }
+  DDLDropTableRequestMessage (const uint8_t* buffer)
+      : IMessage()
+  {
+    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DDLDropTableRequest>(buffer);
+    name = std::string{pointer->name()->c_str()};
+    dbName = std::string{pointer->dbName()->c_str()};
+
+  }
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
+    flatbuffers::FlatBufferBuilder builder;
+    auto name_offset = builder.CreateString(name);
+
+    auto dbname_offset = builder.CreateString(dbName);
+
+    builder.Finish(orchestrator::CreateDDLDropTableRequest(builder, name_offset, dbname_offset));
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+  }
+private:
+  std::string name;
+  std::string dbName;
+};
+
+
 class DDLCreateTableRequestMessage : public IMessage {
 public:
   
