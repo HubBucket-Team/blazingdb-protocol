@@ -1,0 +1,26 @@
+namespace blazingdb.protocol.flatbuf.calcite;
+
+enum DataType : byte { 		GDF_INT8 = 0,
+	    GDF_INT16,
+	    GDF_INT32,
+	    GDF_INT64,
+	    GDF_FLOAT32,
+	    GDF_FLOAT64,
+	    GDF_DATE32,   	
+	    GDF_DATE64,   	
+	    GDF_TIMESTAMP,	
+	    GDF_CATEGORY,
+	    GDF_STRING
+ }
+	
+
+table DDLCreateTableRequest {
+	name: string;
+	columnNames: [string];
+	columnTypes: [string];
+	dbName: string;
+//The struct version of types doesnt work becuase you cant put enums into structs in flatbuffers
+//the enum version was a pain int he ass to work with someone smarting than me or with more time needs to figure this out
+}
+
+root_type DDLCreateTableRequest;
