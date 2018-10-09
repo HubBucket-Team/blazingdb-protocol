@@ -50,6 +50,14 @@ cd integration
 bash build.sh
 ```
 
+
+## Clean Integration Tests
+
+```
+cd integration
+bash clean.sh
+```
+
 ## Initialize Services
 
 Initialize blazingsql services
@@ -63,5 +71,13 @@ Use blazingsql python client
 ```
 cd integration/clients/python-connector
 python3 py-connector.py
+
 ```
+
+Use blazingsql python client for create table 
+```
+cd integration/clients/python-connector
+python3 dml_create_table.py
+```
+
 
