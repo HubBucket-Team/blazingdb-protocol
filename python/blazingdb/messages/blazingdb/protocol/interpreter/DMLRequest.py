@@ -25,6 +25,18 @@ class DMLRequest(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def DMLRequestStart(builder): builder.StartObject(1)
+    # DMLRequest
+    def TableGroup(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from .TableGroup import TableGroup
+            obj = TableGroup()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+def DMLRequestStart(builder): builder.StartObject(2)
 def DMLRequestAddLogicalPlan(builder, logicalPlan): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(logicalPlan), 0)
+def DMLRequestAddTableGroup(builder, tableGroup): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(tableGroup), 0)
 def DMLRequestEnd(builder): return builder.EndObject()

@@ -134,7 +134,7 @@ class PyConnector:
     print('  values:')
     print('    size: %s' % [value.size for value in getResultResponse.values])
 
-def dml_create_table_example(tableName, columnNames, columnTypes, dbName):
+def ddl_create_table_example(tableName, columnNames, columnTypes, dbName):
   dmlRequestSchema = blazingdb.protocol.orchestrator.DDLCreateTableRequestSchema(name=tableName,
                                                                                  columnNames=columnNames,
                                                                                  columnTypes=columnTypes, dbName=dbName)
@@ -146,27 +146,51 @@ def dml_create_table_example(tableName, columnNames, columnTypes, dbName):
   print(list(response.columnNames))
   print(list(response.columnTypes))
 
+def dml_query():
+  tableGroup = {
+    'name': 'alexdb',
+    'tables': [
+      {
+        'name': 'user',
+        'columns': [{'data': 0, 'valid': 0, 'size': 0, 'dtype': 0, 'dtype_info': 0},
+                    {'data': 0, 'valid': 0, 'size': 20, 'dtype': 1, 'dtype_info': 1}],
+        'columnNames': ['id', 'age']
+      }
+    ]
+  }
+  query = 'select id, age from $0'
+  print(query)
+  dmlRequestSchema = blazingdb.protocol.orchestrator.DMLRequestSchema(query=query)
+
+
+
 def main():
-  dml_create_table_example('user', ['name', 'surname', 'age'], ['string', 'string', 'int'], 'alexdb')
+  ddl_create_table_example('user', ['name', 'surname', 'age'], ['string', 'string', 'int'], 'alexdb')
+  dml_query()
 
-  client = PyConnector('/tmp/orchestrator.socket', '/tmp/ral.socket')
-
-  try:
-    client.connect()
-  except Error as err:
-    print(err)
-
-  try:
-    client.run_ddl_create_table('user', ['name', 'surname', 'age'], ['string', 'string', 'int'], 'alexdb')
-  except Error as err:
-    print(err)
-
-  try:
-    client.run_ddl_drop_table('user', 'alexdb')
-  except Error as err:
-    print(err)
-
-  client.close_connection()
+  # client = PyConnector('/tmp/orchestrator.socket', '/tmp/ral.socket')
+  #
+  # try:
+  #   client.connect()
+  # except Error as err:
+  #   print(err)
+  #
+  # try:
+  #   client.run_dml_query('select * from Table')
+  # except SyntaxError as err:
+  #   print(err)
+  #
+  # try:
+  #   client.run_ddl_create_table('user', ['name', 'surname', 'age'], ['string', 'string', 'int'], 'alexdb')
+  # except Error as err:
+  #   print(err)
+  #
+  # try:
+  #   client.run_ddl_drop_table('user', 'alexdb')
+  # except Error as err:
+  #   print(err)
+  #
+  # client.close_connection()
 
 if __name__ == '__main__':
   main()
