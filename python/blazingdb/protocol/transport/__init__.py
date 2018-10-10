@@ -71,22 +71,7 @@ class Schema(metaclass=MetaSchema):
 
   def ToBuffer(self):
     builder = flatbuffers.Builder(0)
-
-    pairs = []
-    for segment in self._nested:
-      pairs.append((segment._name, segment._bytes(builder, self)))
-
-    name = self._module_name()
-    getattr(self._module, name + 'Start')(builder)
-
-    for segment in self._inline:
-      pairs.append((segment._name, segment._bytes(builder, self)))
-
-    for member, value in reversed(pairs):
-      member = upperCamelCase(member)
-      getattr(self._module, '%sAdd%s' % (name, member))(builder, value)
-    builder.Finish(getattr(self._module, name + 'End')(builder))
-
+    self._allocate_segments(builder)
     return builder.Output()
 
   def __init__(self, **kargs):
@@ -133,6 +118,24 @@ class Schema(metaclass=MetaSchema):
             cls._inline.append(attr)
           else:
             raise TypeError('Bad `%s` segment type' % name)
+
+  def _allocate_segments(self, builder):
+    pairs = [(segment._name, segment._bytes(builder, self))
+             for segment in self._nested]
+
+    name = self._module_name()
+    getattr(self._module, name + 'Start')(builder)
+
+    for segment in self._inline:
+      pairs.append((segment._name, segment._bytes(builder, self)))
+
+    for member, value in reversed(pairs):
+      member = upperCamelCase(member)
+      getattr(self._module, '%sAdd%s' % (name, member))(builder, value)
+    _object = getattr(self._module, name + 'End')(builder)
+    builder.Finish(_object)
+
+    return _object
 
 
 class Segment(SchemaAttribute):
@@ -299,13 +302,13 @@ class VectorSchemaSegment(VectorSegment):
             for member in super()._from(_object))
 
 
-class SchemaSegment(Segment, Inline):
+class SchemaSegment(Segment, Nested):
 
   def __init__(self, schema):
     self._schema = schema
 
   def _bytes(self, builder, schema):
-    return NotImplemented
+    return self._schema._allocate_segments(schema._values[self._name], builder)
 
   def _from(self, _object):
     return _dto(getattr(_object, self._object_name())(),
