@@ -1,7 +1,9 @@
+include "blazingdb/protocol/TableGroup.fbs";
 namespace blazingdb.protocol.orchestrator;
 
 table DMLRequest {
 	query: string;
+	tableGroup: TableGroup;
 }
 
 root_type DMLRequest;

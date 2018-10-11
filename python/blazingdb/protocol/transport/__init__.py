@@ -355,8 +355,19 @@ def _dto(_object, name, nomembers):
 
 
 def lowerCamelCase(s):
+  # //@todo: more than one _
+  index = -1
+  for i, c in enumerate(s):
+    if c.isupper():
+      index = i
+  if index > 0:
+    s = s[:index] + '_' + s[index:].lower()
   return s[0].lower() + s[1:]
 
 
 def upperCamelCase(s):
+  # //@todo: more than one _
+  index = s.find('_')
+  if index > 0:
+    s = s.replace(s[index:index+2], s[index+1].upper())
   return s[0].upper() + s[1:]

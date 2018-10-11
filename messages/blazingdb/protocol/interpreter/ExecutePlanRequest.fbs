@@ -1,9 +1,11 @@
 include "blazingdb/protocol/interpreter/MessageType.fbs";
-
+include "blazingdb/protocol/TableGroup.fbs";
 namespace blazingdb.protocol.interpreter;
+
 
 table DMLRequest {
 	logicalPlan: string;
+	tableGroup: TableGroup;
 }
 
 root_type DMLRequest;

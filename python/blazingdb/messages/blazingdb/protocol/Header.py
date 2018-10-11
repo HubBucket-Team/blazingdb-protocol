@@ -14,14 +14,11 @@ class Header(object):
     # Header
     def MessageType(self): return self._tab.Get(flatbuffers.number_types.Int8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
     # Header
-    def PayloadLength(self): return self._tab.Get(flatbuffers.number_types.Uint64Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8))
-    # Header
-    def AccessToken(self): return self._tab.Get(flatbuffers.number_types.Uint64Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(16))
+    def AccessToken(self): return self._tab.Get(flatbuffers.number_types.Uint64Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8))
 
-def CreateHeader(builder, messageType, payloadLength, accessToken):
-    builder.Prep(8, 24)
+def CreateHeader(builder, messageType, accessToken):
+    builder.Prep(8, 16)
     builder.PrependUint64(accessToken)
-    builder.PrependUint64(payloadLength)
     builder.Pad(7)
     builder.PrependInt8(messageType)
     return builder.Offset()

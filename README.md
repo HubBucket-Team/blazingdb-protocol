@@ -22,34 +22,19 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j8 install
 ```
 
-## Build
+## Build blazingdb-protocol library
 
-### Build cpp-library
 ```
-cd cpp
-mkdir build && cd build
-cmake ..
-make -j8 
-```
-### Build java-library
-```
-cd java
-mvn clean install
-```
-
-### Build python-library
-```
-cd python
-python3 setup.py install --user
+bash build.sh
 ```
 
 ## Build Integration Tests
+Before to build integration test you must build the blazingdb-protocol library
 
 ```
 cd integration
 bash build.sh
 ```
-
 
 ## Clean Integration Tests
 
@@ -73,11 +58,3 @@ cd integration/clients/python-connector
 python3 py-connector.py
 
 ```
-
-Use blazingsql python client for create table 
-```
-cd integration/clients/python-connector
-python3 dml_create_table.py
-```
-
-

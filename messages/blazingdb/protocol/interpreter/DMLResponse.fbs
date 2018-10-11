@@ -1,7 +1,0 @@
-namespace blazingdb.protocol.interpreter;
-
-table DMLResponse {
-	resultToken: ulong;
-}
-
-root_type DMLResponse;

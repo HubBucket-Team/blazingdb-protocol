@@ -1,4 +1,4 @@
-namespace blazingdb.protocol.interpreter.gdf;
+namespace blazingdb.protocol.gdf;
 
 // cuda9.2: CUDA_IPC_HANDLE_SIZE is 64
 table cudaIpcMemHandle_t {

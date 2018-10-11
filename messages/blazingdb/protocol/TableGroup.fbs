@@ -1,0 +1,10 @@
+include "blazingdb/protocol/BlazingTable.fbs";
+
+namespace blazingdb.protocol;
+
+table TableGroup {
+  tables: [BlazingTable];
+  name: string;
+}
+
+root_type TableGroup;
