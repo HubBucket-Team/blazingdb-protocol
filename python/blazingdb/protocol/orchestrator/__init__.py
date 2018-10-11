@@ -16,15 +16,15 @@ from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
 from blazingdb.messages.blazingdb.protocol.orchestrator \
   import AuthRequest, AuthResponse
 
-from blazingdb.messages.blazingdb.protocol.interpreter.gdf \
-  import gdf_column
+from blazingdb.messages.blazingdb.protocol.gdf \
+  import gdf_column_handler
 
-class gdf_columnSchema(transport.schema(gdf_column)):
+class gdf_column_handlerSchema(transport.schema(gdf_column_handler)):
   size = transport.NumberSegment()
 
 class BlazingTableSchema(transport.schema(BlazingTable)):
   name: transport.StringSegment()
-  columns = transport.VectorSchemaSegment(gdf_columnSchema)
+  columns = transport.VectorSchemaSegment(gdf_column_handlerSchema)
   columnNames: transport.VectorStringSegment(transport.StringSegment)
 
 class TableGroupSchema(transport.schema(TableGroup)):

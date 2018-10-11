@@ -1,0 +1,10 @@
+include "blazingdb/protocol/interpreter/NodeConnectionInformation.fbs";
+
+namespace blazingdb.protocol.interpreter;
+
+table ExecutePlanResponse {
+	resultToken: ulong;
+	connectionInfo: NodeConnectionInformation;
+}
+
+root_type ExecutePlanResponse;

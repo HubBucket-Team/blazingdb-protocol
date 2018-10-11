@@ -29,7 +29,6 @@ def MakeRequestBuffer(messageType, accessToken, schema, builderInitialSize=0):
   payload = schema.ToBuffer()
   request = RequestSchema(header={
     'messageType': messageType,
-    'payloadLength': len(payload),
     'accessToken': accessToken,
   }, payload=payload).ToBuffer()
   return request

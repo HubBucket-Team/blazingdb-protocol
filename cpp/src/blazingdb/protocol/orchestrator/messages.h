@@ -7,28 +7,46 @@
 
 namespace blazingdb {
 namespace protocol {
+
 namespace orchestrator {
 
 
-class DMLRequestMessage : public StringTypeMessage<orchestrator::DMLRequest> {
+class DMLRequestMessage  : public IMessage {
 public:
-  DMLRequestMessage(const std::string& string_value)
-    : StringTypeMessage<orchestrator::DMLRequest>(string_value) 
+
+  DMLRequestMessage(const std::string &query, const  ::blazingdb::protocol::TableGroupDTO &tableGroup)
+      : IMessage(), query{query}, tableGroup{tableGroup}
   {
+
   }
-  
-  DMLRequestMessage (const uint8_t* buffer) 
-    :  StringTypeMessage<orchestrator::DMLRequest>(buffer, &orchestrator::DMLRequest::query)
+
+  DMLRequestMessage (const uint8_t* buffer)
+      : IMessage()
   {
+    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DMLRequest>(buffer);
+    query = std::string{pointer->query()->c_str()};
+    tableGroup =  ::blazingdb::protocol::TableGroupDTOFrom(pointer->tableGroup());
+
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(orchestrator::CreateDMLRequestDirect);
+    flatbuffers::FlatBufferBuilder builder;
+    auto query_offset = builder.CreateString(query);
+    auto tableGroupOffset = ::blazingdb::protocol::BuildTableGroup(builder, tableGroup);
+    builder.Finish(orchestrator::CreateDMLRequest(builder, query_offset, tableGroupOffset));
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
 
   std::string getQuery () {
-    return string_value;
+    return query;
   }
+
+  ::blazingdb::protocol::TableGroupDTO getTableGroup() {
+    return tableGroup;
+  }
+private:
+  std::string query;
+  ::blazingdb::protocol::TableGroupDTO tableGroup;
 };
 
 
@@ -55,20 +73,20 @@ public:
 };
 
 
-class DDLRequestMessage : public StringTypeMessage<orchestrator::DMLRequest> {
+class DDLRequestMessage : public StringTypeMessage<orchestrator::DDLRequest> {
 public:
   DDLRequestMessage(const std::string& string_value)
-      : StringTypeMessage<orchestrator::DMLRequest>(string_value)
+      : StringTypeMessage<orchestrator::DDLRequest>(string_value)
   {
   }
 
   DDLRequestMessage (const uint8_t* buffer)
-      :  StringTypeMessage<orchestrator::DMLRequest>(buffer, &orchestrator::DMLRequest::query)
+      :  StringTypeMessage<orchestrator::DDLRequest>(buffer, &orchestrator::DDLRequest::query)
   {
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(orchestrator::CreateDMLRequestDirect);
+    return this->getBufferDataUsing(orchestrator::CreateDDLRequestDirect);
   }
 
   std::string getQuery () {
@@ -137,14 +155,9 @@ public:
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
     flatbuffers::FlatBufferBuilder builder;
     auto name_offset = builder.CreateString(name);
-
-    // std::vector<std::string> columnNames{"name", "surname"};
     auto vectorOfColumnNames = builder.CreateVectorOfStrings(columnNames);
-    // std::vector<std::string> columnTypes{"string", "string"};
     auto vectorOfColumnTypes = builder.CreateVectorOfStrings(columnTypes);
-
     auto dbname_offset = builder.CreateString(dbName);
-
     builder.Finish(orchestrator::CreateDDLCreateTableRequest(builder, name_offset,vectorOfColumnNames, vectorOfColumnTypes, dbname_offset));
 
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());

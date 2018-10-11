@@ -1,0 +1,11 @@
+
+namespace blazingdb.protocol.interpreter;
+
+enum NodeConnectionType : byte {TPC, IPC}
+
+table NodeConnectionInformation {
+	path: string;
+	type: NodeConnectionType;
+}
+ 
+root_type NodeConnectionInformation;

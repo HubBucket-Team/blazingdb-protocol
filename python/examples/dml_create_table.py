@@ -146,8 +146,13 @@ def ddl_create_table_example(tableName, columnNames, columnTypes, dbName):
   print(list(response.columnNames))
   print(list(response.columnTypes))
 
-def dml_query():
-  tableGroup = {
+
+from blazingdb.protocol.transport import schema, NumberSegment, SchemaSegment
+from blazingdb.messages.blazingdb.protocol.interpreter import BlazingMetadata, GetResultResponse
+
+def create_query():
+  query = 'select id, age from $0'
+  db = {
     'name': 'alexdb',
     'tables': [
       {
@@ -155,18 +160,47 @@ def dml_query():
         'columns': [{'data': 0, 'valid': 0, 'size': 0, 'dtype': 0, 'dtype_info': 0},
                     {'data': 0, 'valid': 0, 'size': 20, 'dtype': 1, 'dtype_info': 1}],
         'columnNames': ['id', 'age']
+      },
+      {
+        'name': 'computer',
+        'columns': [{'data': 0, 'valid': 0, 'size': 0, 'dtype': 0, 'dtype_info': 0},
+                    {'data': 0, 'valid': 0, 'size': 20, 'dtype': 1, 'dtype_info': 1}],
+        'columnNames': ['id', 'brand']
       }
     ]
   }
-  query = 'select id, age from $0'
   print(query)
-  dmlRequestSchema = blazingdb.protocol.orchestrator.DMLRequestSchema(query=query)
+  print(db['tables'][0]['columnNames'])
+  gdfColumns = blazingdb.protocol.orchestrator.gdf_column_handlerSchema(size=10)
+  table1 = blazingdb.protocol.orchestrator.BlazingTableSchema(name=db['name'], columns=gdfColumns, columnNames=db['tables'][0]['columnNames']);
+  table2 = blazingdb.protocol.orchestrator.BlazingTableSchema(name=db['name'], columns=gdfColumns, columnNames=db['tables'][0]['columnNames']);
+  tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=[table1, table2], name='alexdb')
+  dmlRequest = blazingdb.protocol.orchestrator.DMLRequestSchema(query=query, tableGroup=tableGroup)
 
+  payload = dmlRequest.ToBuffer()
+  response = blazingdb.protocol.orchestrator.DMLRequestSchema.From(payload)
 
+  print(response.query)
+  print(response.tableGroup)
+  print(list(response.tableGroup.name))
+
+  class B(schema(BlazingMetadata)):
+    rows = NumberSegment()
+
+  class A(schema(GetResultResponse)):
+    metadata = SchemaSegment(B)
+
+  b = B(rows=1235)
+  a = A(metadata=b)
+
+  ll = a.ToBuffer()
+
+  print(A.From(ll).metadata.rows)
 
 def main():
   ddl_create_table_example('user', ['name', 'surname', 'age'], ['string', 'string', 'int'], 'alexdb')
-  dml_query()
+
+  create_query()
 
   # client = PyConnector('/tmp/orchestrator.socket', '/tmp/ral.socket')
   #

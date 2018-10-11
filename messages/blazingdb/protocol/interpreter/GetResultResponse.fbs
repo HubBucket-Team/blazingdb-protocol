@@ -1,6 +1,7 @@
-include "blazingdb/protocol/interpreter/gdf/gdf_column.fbs";
+include "blazingdb/protocol/gdf/gdf_column_handler.fbs";
 
 namespace blazingdb.protocol.interpreter;
+
 
 table BlazingMetadata {
   status: string;
@@ -12,7 +13,7 @@ table BlazingMetadata {
 table GetResultResponse {
   metadata: BlazingMetadata;
   fieldNames: [string];
-  values: [gdf.gdf_column];
+  values: [blazingdb.protocol.gdf.gdf_column_handler];
 }
 
 root_type GetResultResponse;

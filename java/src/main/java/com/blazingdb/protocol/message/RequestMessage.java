@@ -30,7 +30,7 @@ public class RequestMessage implements IMessage {
         Header headerPointer =  pointer.header();
         payloadBuffer =  pointer.payloadAsByteBuffer();
 
-        this.header = new HeaderMessage(headerPointer.messageType(), headerPointer.payloadLength(), headerPointer.accessToken());
+        this.header = new HeaderMessage(headerPointer.messageType(), headerPointer.accessToken());
     }
 
     @Override
@@ -38,7 +38,7 @@ public class RequestMessage implements IMessage {
         FlatBufferBuilder builder = new FlatBufferBuilder(0);
         int payloadOffset = builder.createByteVector(payloadBuffer.array());
         Request.startRequest(builder);
-        Request.addHeader(builder, Header.createHeader(builder, (byte)header.messageType, (long)header.payloadLength, (long)header.accessToken));
+        Request.addHeader(builder, Header.createHeader(builder, (byte)header.messageType, (long)header.accessToken));
         Request.addPayload(builder, payloadOffset);
         int root = Request.endRequest(builder);
         builder.finish(root);

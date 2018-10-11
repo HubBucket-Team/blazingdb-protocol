@@ -32,9 +32,9 @@ static result_pair getResultService(uint64_t accessToken, Buffer&& requestPayloa
                             builder.CreateString("Nothing"), 0.9, 2);
   std::vector<std::string> names{"iron", "man"};
   auto vectorOfNames = builder.CreateVectorOfStrings(names);
-  std::vector<flatbuffers::Offset<interpreter::gdf::gdf_column>> values{
-      interpreter::gdf::Creategdf_column(builder, 0, 0, 12),
-      interpreter::gdf::Creategdf_column(builder, 0, 0, 14)};
+  std::vector<flatbuffers::Offset<gdf::gdf_column_handler>> values{
+      gdf::Creategdf_column_handler(builder, 0, 0, 12),
+      gdf::Creategdf_column_handler(builder, 0, 0, 14)};
   auto vectorOfValues = builder.CreateVector(values);
   builder.Finish(CreateGetResultResponse(builder, metadata, vectorOfNames,
                                          vectorOfValues));

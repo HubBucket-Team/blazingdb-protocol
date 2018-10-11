@@ -5,8 +5,6 @@ table DDLCreateTableRequest {
 	columnNames: [string];
 	columnTypes: [string];
 	dbName: string;
-//The struct version of types doesnt work becuase you cant put enums into structs in flatbuffers
-//the enum version was a pain int he ass to work with someone smarting than me or with more time needs to figure this out
 }
 
 root_type DDLCreateTableRequest;

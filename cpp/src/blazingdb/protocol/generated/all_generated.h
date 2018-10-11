@@ -28,6 +28,24 @@ struct DDLDropTableRequest;
 
 struct AuthRequest;
 
+}  // namespace orchestrator
+
+namespace gdf {
+
+struct gdf_dtype_extra_info;
+
+struct cudaIpcMemHandle_t;
+
+struct gdf_column_handler;
+
+}  // namespace gdf
+
+struct BlazingTable;
+
+struct TableGroup;
+
+namespace orchestrator {
+
 struct DMLRequest;
 
 struct DDLRequest;
@@ -66,17 +84,9 @@ struct DDLResponse;
 
 namespace interpreter {
 
-struct DMLResponse;
+struct NodeConnectionInformation;
 
-namespace gdf {
-
-struct gdf_dtype_extra_info;
-
-struct cudaIpcMemHandle_t;
-
-struct gdf_column;
-
-}  // namespace gdf
+struct ExecutePlanResponse;
 
 struct BlazingMetadata;
 
@@ -171,40 +181,6 @@ inline const char *EnumNameMessageType(MessageType e) {
 }
 
 }  // namespace orchestrator
-
-namespace interpreter {
-
-enum MessageType {
-  MessageType_ExecutePlan = 0,
-  MessageType_GetResult = 1,
-  MessageType_CloseConnection = 2,
-  MessageType_MIN = MessageType_ExecutePlan,
-  MessageType_MAX = MessageType_CloseConnection
-};
-
-inline const MessageType (&EnumValuesMessageType())[3] {
-  static const MessageType values[] = {
-    MessageType_ExecutePlan,
-    MessageType_GetResult,
-    MessageType_CloseConnection
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesMessageType() {
-  static const char * const names[] = {
-    "ExecutePlan",
-    "GetResult",
-    "CloseConnection",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameMessageType(MessageType e) {
-  const size_t index = static_cast<int>(e);
-  return EnumNamesMessageType()[index];
-}
 
 namespace gdf {
 
@@ -315,6 +291,70 @@ inline const char *EnumNamegdf_time_unit(gdf_time_unit e) {
 }
 
 }  // namespace gdf
+
+namespace interpreter {
+
+enum MessageType {
+  MessageType_ExecutePlan = 0,
+  MessageType_GetResult = 1,
+  MessageType_CloseConnection = 2,
+  MessageType_MIN = MessageType_ExecutePlan,
+  MessageType_MAX = MessageType_CloseConnection
+};
+
+inline const MessageType (&EnumValuesMessageType())[3] {
+  static const MessageType values[] = {
+    MessageType_ExecutePlan,
+    MessageType_GetResult,
+    MessageType_CloseConnection
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesMessageType() {
+  static const char * const names[] = {
+    "ExecutePlan",
+    "GetResult",
+    "CloseConnection",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameMessageType(MessageType e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesMessageType()[index];
+}
+
+enum NodeConnectionType {
+  NodeConnectionType_TPC = 0,
+  NodeConnectionType_IPC = 1,
+  NodeConnectionType_MIN = NodeConnectionType_TPC,
+  NodeConnectionType_MAX = NodeConnectionType_IPC
+};
+
+inline const NodeConnectionType (&EnumValuesNodeConnectionType())[2] {
+  static const NodeConnectionType values[] = {
+    NodeConnectionType_TPC,
+    NodeConnectionType_IPC
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesNodeConnectionType() {
+  static const char * const names[] = {
+    "TPC",
+    "IPC",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameNodeConnectionType(NodeConnectionType e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesNodeConnectionType()[index];
+}
+
 }  // namespace interpreter
 
 enum Status {
@@ -350,33 +390,28 @@ MANUALLY_ALIGNED_STRUCT(8) Header FLATBUFFERS_FINAL_CLASS {
  private:
   int8_t messageType_;
   int8_t padding0__;  int16_t padding1__;  int32_t padding2__;
-  uint64_t payloadLength_;
   uint64_t accessToken_;
 
  public:
   Header() {
     memset(this, 0, sizeof(Header));
   }
-  Header(int8_t _messageType, uint64_t _payloadLength, uint64_t _accessToken)
+  Header(int8_t _messageType, uint64_t _accessToken)
       : messageType_(flatbuffers::EndianScalar(_messageType)),
         padding0__(0),
         padding1__(0),
         padding2__(0),
-        payloadLength_(flatbuffers::EndianScalar(_payloadLength)),
         accessToken_(flatbuffers::EndianScalar(_accessToken)) {
     (void)padding0__;    (void)padding1__;    (void)padding2__;
   }
   int8_t messageType() const {
     return flatbuffers::EndianScalar(messageType_);
   }
-  uint64_t payloadLength() const {
-    return flatbuffers::EndianScalar(payloadLength_);
-  }
   uint64_t accessToken() const {
     return flatbuffers::EndianScalar(accessToken_);
   }
 };
-STRUCT_END(Header, 24);
+STRUCT_END(Header, 16);
 
 namespace calcite {
 
@@ -814,17 +849,343 @@ inline flatbuffers::Offset<AuthRequest> CreateAuthRequest(
   return builder_.Finish();
 }
 
+}  // namespace orchestrator
+
+namespace gdf {
+
+struct gdf_dtype_extra_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_TIME_UNIT = 4
+  };
+  gdf_time_unit time_unit() const {
+    return static_cast<gdf_time_unit>(GetField<int8_t>(VT_TIME_UNIT, 0));
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_TIME_UNIT) &&
+           verifier.EndTable();
+  }
+};
+
+struct gdf_dtype_extra_infoBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_time_unit(gdf_time_unit time_unit) {
+    fbb_.AddElement<int8_t>(gdf_dtype_extra_info::VT_TIME_UNIT, static_cast<int8_t>(time_unit), 0);
+  }
+  explicit gdf_dtype_extra_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  gdf_dtype_extra_infoBuilder &operator=(const gdf_dtype_extra_infoBuilder &);
+  flatbuffers::Offset<gdf_dtype_extra_info> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<gdf_dtype_extra_info>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<gdf_dtype_extra_info> Creategdf_dtype_extra_info(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    gdf_time_unit time_unit = gdf_time_unit_TIME_UNIT_NONE) {
+  gdf_dtype_extra_infoBuilder builder_(_fbb);
+  builder_.add_time_unit(time_unit);
+  return builder_.Finish();
+}
+
+struct cudaIpcMemHandle_t FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_RESERVED = 4
+  };
+  const flatbuffers::Vector<int8_t> *reserved() const {
+    return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_RESERVED);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_RESERVED) &&
+           verifier.Verify(reserved()) &&
+           verifier.EndTable();
+  }
+};
+
+struct cudaIpcMemHandle_tBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_reserved(flatbuffers::Offset<flatbuffers::Vector<int8_t>> reserved) {
+    fbb_.AddOffset(cudaIpcMemHandle_t::VT_RESERVED, reserved);
+  }
+  explicit cudaIpcMemHandle_tBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  cudaIpcMemHandle_tBuilder &operator=(const cudaIpcMemHandle_tBuilder &);
+  flatbuffers::Offset<cudaIpcMemHandle_t> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<cudaIpcMemHandle_t>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<cudaIpcMemHandle_t> CreatecudaIpcMemHandle_t(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<int8_t>> reserved = 0) {
+  cudaIpcMemHandle_tBuilder builder_(_fbb);
+  builder_.add_reserved(reserved);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<cudaIpcMemHandle_t> CreatecudaIpcMemHandle_tDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<int8_t> *reserved = nullptr) {
+  return blazingdb::protocol::gdf::CreatecudaIpcMemHandle_t(
+      _fbb,
+      reserved ? _fbb.CreateVector<int8_t>(*reserved) : 0);
+}
+
+struct gdf_column_handler FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_DATA = 4,
+    VT_VALID = 6,
+    VT_SIZE = 8,
+    VT_DTYPE = 10,
+    VT_DTYPE_INFO = 12
+  };
+  const cudaIpcMemHandle_t *data() const {
+    return GetPointer<const cudaIpcMemHandle_t *>(VT_DATA);
+  }
+  const cudaIpcMemHandle_t *valid() const {
+    return GetPointer<const cudaIpcMemHandle_t *>(VT_VALID);
+  }
+  uint16_t size() const {
+    return GetField<uint16_t>(VT_SIZE, 0);
+  }
+  gdf_dtype dtype() const {
+    return static_cast<gdf_dtype>(GetField<int8_t>(VT_DTYPE, 0));
+  }
+  const gdf_dtype_extra_info *dtype_info() const {
+    return GetPointer<const gdf_dtype_extra_info *>(VT_DTYPE_INFO);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_DATA) &&
+           verifier.VerifyTable(data()) &&
+           VerifyOffset(verifier, VT_VALID) &&
+           verifier.VerifyTable(valid()) &&
+           VerifyField<uint16_t>(verifier, VT_SIZE) &&
+           VerifyField<int8_t>(verifier, VT_DTYPE) &&
+           VerifyOffset(verifier, VT_DTYPE_INFO) &&
+           verifier.VerifyTable(dtype_info()) &&
+           verifier.EndTable();
+  }
+};
+
+struct gdf_column_handlerBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_data(flatbuffers::Offset<cudaIpcMemHandle_t> data) {
+    fbb_.AddOffset(gdf_column_handler::VT_DATA, data);
+  }
+  void add_valid(flatbuffers::Offset<cudaIpcMemHandle_t> valid) {
+    fbb_.AddOffset(gdf_column_handler::VT_VALID, valid);
+  }
+  void add_size(uint16_t size) {
+    fbb_.AddElement<uint16_t>(gdf_column_handler::VT_SIZE, size, 0);
+  }
+  void add_dtype(gdf_dtype dtype) {
+    fbb_.AddElement<int8_t>(gdf_column_handler::VT_DTYPE, static_cast<int8_t>(dtype), 0);
+  }
+  void add_dtype_info(flatbuffers::Offset<gdf_dtype_extra_info> dtype_info) {
+    fbb_.AddOffset(gdf_column_handler::VT_DTYPE_INFO, dtype_info);
+  }
+  explicit gdf_column_handlerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  gdf_column_handlerBuilder &operator=(const gdf_column_handlerBuilder &);
+  flatbuffers::Offset<gdf_column_handler> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<gdf_column_handler>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<gdf_column_handler> Creategdf_column_handler(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<cudaIpcMemHandle_t> data = 0,
+    flatbuffers::Offset<cudaIpcMemHandle_t> valid = 0,
+    uint16_t size = 0,
+    gdf_dtype dtype = gdf_dtype_GDF_invalid,
+    flatbuffers::Offset<gdf_dtype_extra_info> dtype_info = 0) {
+  gdf_column_handlerBuilder builder_(_fbb);
+  builder_.add_dtype_info(dtype_info);
+  builder_.add_valid(valid);
+  builder_.add_data(data);
+  builder_.add_size(size);
+  builder_.add_dtype(dtype);
+  return builder_.Finish();
+}
+
+}  // namespace gdf
+
+struct BlazingTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_NAME = 4,
+    VT_COLUMNS = 6,
+    VT_COLUMNNAMES = 8
+  };
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *columns() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *>(VT_COLUMNS);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *columnNames() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_COLUMNNAMES);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.Verify(name()) &&
+           VerifyOffset(verifier, VT_COLUMNS) &&
+           verifier.Verify(columns()) &&
+           verifier.VerifyVectorOfTables(columns()) &&
+           VerifyOffset(verifier, VT_COLUMNNAMES) &&
+           verifier.Verify(columnNames()) &&
+           verifier.VerifyVectorOfStrings(columnNames()) &&
+           verifier.EndTable();
+  }
+};
+
+struct BlazingTableBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(BlazingTable::VT_NAME, name);
+  }
+  void add_columns(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>>> columns) {
+    fbb_.AddOffset(BlazingTable::VT_COLUMNS, columns);
+  }
+  void add_columnNames(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNames) {
+    fbb_.AddOffset(BlazingTable::VT_COLUMNNAMES, columnNames);
+  }
+  explicit BlazingTableBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BlazingTableBuilder &operator=(const BlazingTableBuilder &);
+  flatbuffers::Offset<BlazingTable> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BlazingTable>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BlazingTable> CreateBlazingTable(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>>> columns = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNames = 0) {
+  BlazingTableBuilder builder_(_fbb);
+  builder_.add_columnNames(columnNames);
+  builder_.add_columns(columns);
+  builder_.add_name(name);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<BlazingTable> CreateBlazingTableDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
+    const std::vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *columns = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *columnNames = nullptr) {
+  return blazingdb::protocol::CreateBlazingTable(
+      _fbb,
+      name ? _fbb.CreateString(name) : 0,
+      columns ? _fbb.CreateVector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>>(*columns) : 0,
+      columnNames ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*columnNames) : 0);
+}
+
+struct TableGroup FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_TABLES = 4,
+    VT_NAME = 6
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<BlazingTable>> *tables() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<BlazingTable>> *>(VT_TABLES);
+  }
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_TABLES) &&
+           verifier.Verify(tables()) &&
+           verifier.VerifyVectorOfTables(tables()) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.Verify(name()) &&
+           verifier.EndTable();
+  }
+};
+
+struct TableGroupBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_tables(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<BlazingTable>>> tables) {
+    fbb_.AddOffset(TableGroup::VT_TABLES, tables);
+  }
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(TableGroup::VT_NAME, name);
+  }
+  explicit TableGroupBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  TableGroupBuilder &operator=(const TableGroupBuilder &);
+  flatbuffers::Offset<TableGroup> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<TableGroup>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<TableGroup> CreateTableGroup(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<BlazingTable>>> tables = 0,
+    flatbuffers::Offset<flatbuffers::String> name = 0) {
+  TableGroupBuilder builder_(_fbb);
+  builder_.add_name(name);
+  builder_.add_tables(tables);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<TableGroup> CreateTableGroupDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<BlazingTable>> *tables = nullptr,
+    const char *name = nullptr) {
+  return blazingdb::protocol::CreateTableGroup(
+      _fbb,
+      tables ? _fbb.CreateVector<flatbuffers::Offset<BlazingTable>>(*tables) : 0,
+      name ? _fbb.CreateString(name) : 0);
+}
+
+namespace orchestrator {
+
 struct DMLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_QUERY = 4
+    VT_QUERY = 4,
+    VT_TABLEGROUP = 6
   };
   const flatbuffers::String *query() const {
     return GetPointer<const flatbuffers::String *>(VT_QUERY);
+  }
+  const blazingdb::protocol::TableGroup *tableGroup() const {
+    return GetPointer<const blazingdb::protocol::TableGroup *>(VT_TABLEGROUP);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_QUERY) &&
            verifier.Verify(query()) &&
+           VerifyOffset(verifier, VT_TABLEGROUP) &&
+           verifier.VerifyTable(tableGroup()) &&
            verifier.EndTable();
   }
 };
@@ -834,6 +1195,9 @@ struct DMLRequestBuilder {
   flatbuffers::uoffset_t start_;
   void add_query(flatbuffers::Offset<flatbuffers::String> query) {
     fbb_.AddOffset(DMLRequest::VT_QUERY, query);
+  }
+  void add_tableGroup(flatbuffers::Offset<blazingdb::protocol::TableGroup> tableGroup) {
+    fbb_.AddOffset(DMLRequest::VT_TABLEGROUP, tableGroup);
   }
   explicit DMLRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -849,18 +1213,22 @@ struct DMLRequestBuilder {
 
 inline flatbuffers::Offset<DMLRequest> CreateDMLRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> query = 0) {
+    flatbuffers::Offset<flatbuffers::String> query = 0,
+    flatbuffers::Offset<blazingdb::protocol::TableGroup> tableGroup = 0) {
   DMLRequestBuilder builder_(_fbb);
+  builder_.add_tableGroup(tableGroup);
   builder_.add_query(query);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<DMLRequest> CreateDMLRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const char *query = nullptr) {
+    const char *query = nullptr,
+    flatbuffers::Offset<blazingdb::protocol::TableGroup> tableGroup = 0) {
   return blazingdb::protocol::orchestrator::CreateDMLRequest(
       _fbb,
-      query ? _fbb.CreateString(query) : 0);
+      query ? _fbb.CreateString(query) : 0,
+      tableGroup);
 }
 
 struct DDLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -918,15 +1286,21 @@ namespace interpreter {
 
 struct DMLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_LOGICALPLAN = 4
+    VT_LOGICALPLAN = 4,
+    VT_TABLEGROUP = 6
   };
   const flatbuffers::String *logicalPlan() const {
     return GetPointer<const flatbuffers::String *>(VT_LOGICALPLAN);
+  }
+  const blazingdb::protocol::TableGroup *tableGroup() const {
+    return GetPointer<const blazingdb::protocol::TableGroup *>(VT_TABLEGROUP);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_LOGICALPLAN) &&
            verifier.Verify(logicalPlan()) &&
+           VerifyOffset(verifier, VT_TABLEGROUP) &&
+           verifier.VerifyTable(tableGroup()) &&
            verifier.EndTable();
   }
 };
@@ -936,6 +1310,9 @@ struct DMLRequestBuilder {
   flatbuffers::uoffset_t start_;
   void add_logicalPlan(flatbuffers::Offset<flatbuffers::String> logicalPlan) {
     fbb_.AddOffset(DMLRequest::VT_LOGICALPLAN, logicalPlan);
+  }
+  void add_tableGroup(flatbuffers::Offset<blazingdb::protocol::TableGroup> tableGroup) {
+    fbb_.AddOffset(DMLRequest::VT_TABLEGROUP, tableGroup);
   }
   explicit DMLRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -951,18 +1328,22 @@ struct DMLRequestBuilder {
 
 inline flatbuffers::Offset<DMLRequest> CreateDMLRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> logicalPlan = 0) {
+    flatbuffers::Offset<flatbuffers::String> logicalPlan = 0,
+    flatbuffers::Offset<blazingdb::protocol::TableGroup> tableGroup = 0) {
   DMLRequestBuilder builder_(_fbb);
+  builder_.add_tableGroup(tableGroup);
   builder_.add_logicalPlan(logicalPlan);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<DMLRequest> CreateDMLRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const char *logicalPlan = nullptr) {
+    const char *logicalPlan = nullptr,
+    flatbuffers::Offset<blazingdb::protocol::TableGroup> tableGroup = 0) {
   return blazingdb::protocol::interpreter::CreateDMLRequest(
       _fbb,
-      logicalPlan ? _fbb.CreateString(logicalPlan) : 0);
+      logicalPlan ? _fbb.CreateString(logicalPlan) : 0,
+      tableGroup);
 }
 
 struct GetResultRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -1263,221 +1644,117 @@ inline flatbuffers::Offset<DDLResponse> CreateDDLResponse(
 
 namespace interpreter {
 
-struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct NodeConnectionInformation FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_RESULTTOKEN = 4
+    VT_PATH = 4,
+    VT_TYPE = 6
+  };
+  const flatbuffers::String *path() const {
+    return GetPointer<const flatbuffers::String *>(VT_PATH);
+  }
+  NodeConnectionType type() const {
+    return static_cast<NodeConnectionType>(GetField<int8_t>(VT_TYPE, 0));
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_PATH) &&
+           verifier.Verify(path()) &&
+           VerifyField<int8_t>(verifier, VT_TYPE) &&
+           verifier.EndTable();
+  }
+};
+
+struct NodeConnectionInformationBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_path(flatbuffers::Offset<flatbuffers::String> path) {
+    fbb_.AddOffset(NodeConnectionInformation::VT_PATH, path);
+  }
+  void add_type(NodeConnectionType type) {
+    fbb_.AddElement<int8_t>(NodeConnectionInformation::VT_TYPE, static_cast<int8_t>(type), 0);
+  }
+  explicit NodeConnectionInformationBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  NodeConnectionInformationBuilder &operator=(const NodeConnectionInformationBuilder &);
+  flatbuffers::Offset<NodeConnectionInformation> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<NodeConnectionInformation>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<NodeConnectionInformation> CreateNodeConnectionInformation(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> path = 0,
+    NodeConnectionType type = NodeConnectionType_TPC) {
+  NodeConnectionInformationBuilder builder_(_fbb);
+  builder_.add_path(path);
+  builder_.add_type(type);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<NodeConnectionInformation> CreateNodeConnectionInformationDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *path = nullptr,
+    NodeConnectionType type = NodeConnectionType_TPC) {
+  return blazingdb::protocol::interpreter::CreateNodeConnectionInformation(
+      _fbb,
+      path ? _fbb.CreateString(path) : 0,
+      type);
+}
+
+struct ExecutePlanResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_RESULTTOKEN = 4,
+    VT_CONNECTIONINFO = 6
   };
   uint64_t resultToken() const {
     return GetField<uint64_t>(VT_RESULTTOKEN, 0);
   }
+  const NodeConnectionInformation *connectionInfo() const {
+    return GetPointer<const NodeConnectionInformation *>(VT_CONNECTIONINFO);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_RESULTTOKEN) &&
+           VerifyOffset(verifier, VT_CONNECTIONINFO) &&
+           verifier.VerifyTable(connectionInfo()) &&
            verifier.EndTable();
   }
 };
 
-struct DMLResponseBuilder {
+struct ExecutePlanResponseBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_resultToken(uint64_t resultToken) {
-    fbb_.AddElement<uint64_t>(DMLResponse::VT_RESULTTOKEN, resultToken, 0);
+    fbb_.AddElement<uint64_t>(ExecutePlanResponse::VT_RESULTTOKEN, resultToken, 0);
   }
-  explicit DMLResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  void add_connectionInfo(flatbuffers::Offset<NodeConnectionInformation> connectionInfo) {
+    fbb_.AddOffset(ExecutePlanResponse::VT_CONNECTIONINFO, connectionInfo);
+  }
+  explicit ExecutePlanResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  DMLResponseBuilder &operator=(const DMLResponseBuilder &);
-  flatbuffers::Offset<DMLResponse> Finish() {
+  ExecutePlanResponseBuilder &operator=(const ExecutePlanResponseBuilder &);
+  flatbuffers::Offset<ExecutePlanResponse> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<DMLResponse>(end);
+    auto o = flatbuffers::Offset<ExecutePlanResponse>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<DMLResponse> CreateDMLResponse(
+inline flatbuffers::Offset<ExecutePlanResponse> CreateExecutePlanResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint64_t resultToken = 0) {
-  DMLResponseBuilder builder_(_fbb);
+    uint64_t resultToken = 0,
+    flatbuffers::Offset<NodeConnectionInformation> connectionInfo = 0) {
+  ExecutePlanResponseBuilder builder_(_fbb);
   builder_.add_resultToken(resultToken);
+  builder_.add_connectionInfo(connectionInfo);
   return builder_.Finish();
 }
-
-namespace gdf {
-
-struct gdf_dtype_extra_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_TIME_UNIT = 4
-  };
-  gdf_time_unit time_unit() const {
-    return static_cast<gdf_time_unit>(GetField<int8_t>(VT_TIME_UNIT, 0));
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, VT_TIME_UNIT) &&
-           verifier.EndTable();
-  }
-};
-
-struct gdf_dtype_extra_infoBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_time_unit(gdf_time_unit time_unit) {
-    fbb_.AddElement<int8_t>(gdf_dtype_extra_info::VT_TIME_UNIT, static_cast<int8_t>(time_unit), 0);
-  }
-  explicit gdf_dtype_extra_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  gdf_dtype_extra_infoBuilder &operator=(const gdf_dtype_extra_infoBuilder &);
-  flatbuffers::Offset<gdf_dtype_extra_info> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<gdf_dtype_extra_info>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<gdf_dtype_extra_info> Creategdf_dtype_extra_info(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    gdf_time_unit time_unit = gdf_time_unit_TIME_UNIT_NONE) {
-  gdf_dtype_extra_infoBuilder builder_(_fbb);
-  builder_.add_time_unit(time_unit);
-  return builder_.Finish();
-}
-
-struct cudaIpcMemHandle_t FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_RESERVED = 4
-  };
-  const flatbuffers::Vector<int8_t> *reserved() const {
-    return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_RESERVED);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_RESERVED) &&
-           verifier.Verify(reserved()) &&
-           verifier.EndTable();
-  }
-};
-
-struct cudaIpcMemHandle_tBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_reserved(flatbuffers::Offset<flatbuffers::Vector<int8_t>> reserved) {
-    fbb_.AddOffset(cudaIpcMemHandle_t::VT_RESERVED, reserved);
-  }
-  explicit cudaIpcMemHandle_tBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  cudaIpcMemHandle_tBuilder &operator=(const cudaIpcMemHandle_tBuilder &);
-  flatbuffers::Offset<cudaIpcMemHandle_t> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<cudaIpcMemHandle_t>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<cudaIpcMemHandle_t> CreatecudaIpcMemHandle_t(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<int8_t>> reserved = 0) {
-  cudaIpcMemHandle_tBuilder builder_(_fbb);
-  builder_.add_reserved(reserved);
-  return builder_.Finish();
-}
-
-inline flatbuffers::Offset<cudaIpcMemHandle_t> CreatecudaIpcMemHandle_tDirect(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<int8_t> *reserved = nullptr) {
-  return blazingdb::protocol::interpreter::gdf::CreatecudaIpcMemHandle_t(
-      _fbb,
-      reserved ? _fbb.CreateVector<int8_t>(*reserved) : 0);
-}
-
-struct gdf_column FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_DATA = 4,
-    VT_VALID = 6,
-    VT_SIZE = 8,
-    VT_DTYPE = 10,
-    VT_DTYPE_INFO = 12
-  };
-  const cudaIpcMemHandle_t *data() const {
-    return GetPointer<const cudaIpcMemHandle_t *>(VT_DATA);
-  }
-  const cudaIpcMemHandle_t *valid() const {
-    return GetPointer<const cudaIpcMemHandle_t *>(VT_VALID);
-  }
-  uint16_t size() const {
-    return GetField<uint16_t>(VT_SIZE, 0);
-  }
-  gdf_dtype dtype() const {
-    return static_cast<gdf_dtype>(GetField<int8_t>(VT_DTYPE, 0));
-  }
-  const gdf_dtype_extra_info *dtype_info() const {
-    return GetPointer<const gdf_dtype_extra_info *>(VT_DTYPE_INFO);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_DATA) &&
-           verifier.VerifyTable(data()) &&
-           VerifyOffset(verifier, VT_VALID) &&
-           verifier.VerifyTable(valid()) &&
-           VerifyField<uint16_t>(verifier, VT_SIZE) &&
-           VerifyField<int8_t>(verifier, VT_DTYPE) &&
-           VerifyOffset(verifier, VT_DTYPE_INFO) &&
-           verifier.VerifyTable(dtype_info()) &&
-           verifier.EndTable();
-  }
-};
-
-struct gdf_columnBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_data(flatbuffers::Offset<cudaIpcMemHandle_t> data) {
-    fbb_.AddOffset(gdf_column::VT_DATA, data);
-  }
-  void add_valid(flatbuffers::Offset<cudaIpcMemHandle_t> valid) {
-    fbb_.AddOffset(gdf_column::VT_VALID, valid);
-  }
-  void add_size(uint16_t size) {
-    fbb_.AddElement<uint16_t>(gdf_column::VT_SIZE, size, 0);
-  }
-  void add_dtype(gdf_dtype dtype) {
-    fbb_.AddElement<int8_t>(gdf_column::VT_DTYPE, static_cast<int8_t>(dtype), 0);
-  }
-  void add_dtype_info(flatbuffers::Offset<gdf_dtype_extra_info> dtype_info) {
-    fbb_.AddOffset(gdf_column::VT_DTYPE_INFO, dtype_info);
-  }
-  explicit gdf_columnBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  gdf_columnBuilder &operator=(const gdf_columnBuilder &);
-  flatbuffers::Offset<gdf_column> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<gdf_column>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<gdf_column> Creategdf_column(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<cudaIpcMemHandle_t> data = 0,
-    flatbuffers::Offset<cudaIpcMemHandle_t> valid = 0,
-    uint16_t size = 0,
-    gdf_dtype dtype = gdf_dtype_GDF_invalid,
-    flatbuffers::Offset<gdf_dtype_extra_info> dtype_info = 0) {
-  gdf_columnBuilder builder_(_fbb);
-  builder_.add_dtype_info(dtype_info);
-  builder_.add_valid(valid);
-  builder_.add_data(data);
-  builder_.add_size(size);
-  builder_.add_dtype(dtype);
-  return builder_.Finish();
-}
-
-}  // namespace gdf
 
 struct BlazingMetadata FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
@@ -1577,8 +1854,8 @@ struct GetResultResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *fieldNames() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_FIELDNAMES);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::interpreter::gdf::gdf_column>> *values() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::interpreter::gdf::gdf_column>> *>(VT_VALUES);
+  const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *values() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *>(VT_VALUES);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1603,7 +1880,7 @@ struct GetResultResponseBuilder {
   void add_fieldNames(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> fieldNames) {
     fbb_.AddOffset(GetResultResponse::VT_FIELDNAMES, fieldNames);
   }
-  void add_values(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::interpreter::gdf::gdf_column>>> values) {
+  void add_values(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>>> values) {
     fbb_.AddOffset(GetResultResponse::VT_VALUES, values);
   }
   explicit GetResultResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -1622,7 +1899,7 @@ inline flatbuffers::Offset<GetResultResponse> CreateGetResultResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<BlazingMetadata> metadata = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> fieldNames = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::interpreter::gdf::gdf_column>>> values = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>>> values = 0) {
   GetResultResponseBuilder builder_(_fbb);
   builder_.add_values(values);
   builder_.add_fieldNames(fieldNames);
@@ -1634,12 +1911,12 @@ inline flatbuffers::Offset<GetResultResponse> CreateGetResultResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<BlazingMetadata> metadata = 0,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *fieldNames = nullptr,
-    const std::vector<flatbuffers::Offset<blazingdb::protocol::interpreter::gdf::gdf_column>> *values = nullptr) {
+    const std::vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *values = nullptr) {
   return blazingdb::protocol::interpreter::CreateGetResultResponse(
       _fbb,
       metadata,
       fieldNames ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*fieldNames) : 0,
-      values ? _fbb.CreateVector<flatbuffers::Offset<blazingdb::protocol::interpreter::gdf::gdf_column>>(*values) : 0);
+      values ? _fbb.CreateVector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>>(*values) : 0);
 }
 
 }  // namespace interpreter
@@ -1762,6 +2039,14 @@ namespace orchestrator {
 
 }  // namespace orchestrator
 
+namespace gdf {
+
+}  // namespace gdf
+
+namespace orchestrator {
+
+}  // namespace orchestrator
+
 namespace interpreter {
 
 }  // namespace interpreter
@@ -1775,10 +2060,6 @@ namespace orchestrator {
 }  // namespace orchestrator
 
 namespace interpreter {
-
-namespace gdf {
-
-}  // namespace gdf
 
 }  // namespace interpreter
 
