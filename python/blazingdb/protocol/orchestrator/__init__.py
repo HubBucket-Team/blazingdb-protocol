@@ -31,7 +31,7 @@ class TableGroupSchema(transport.schema(TableGroup)):
 
 class DMLRequestSchema(transport.schema(DMLRequest)):
   query = transport.StringSegment()
-  groupTable = transport.SchemaSegment(TableGroupSchema)
+  tableGroup = transport.SchemaSegment(TableGroupSchema)
 
 class DDLRequestSchema(transport.schema(DDLRequest)):
   query = transport.StringSegment()
