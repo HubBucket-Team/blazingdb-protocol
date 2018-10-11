@@ -23,6 +23,7 @@ int main() {
                       .valid=nullptr,
                       .size = 10,
                       .dtype = (libgdf::gdf_dtype)0,
+                      .null_count = 0,
                       .dtype_info = libgdf::gdf_dtype_extra_info {
                           .time_unit = (libgdf::gdf_time_unit)0,
                       },
