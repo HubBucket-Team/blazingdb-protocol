@@ -502,15 +502,17 @@ static TableGroupDTO TableGroupDTOFrom(const blazingdb::protocol::TableGroup * t
     std::vector<std::string>  columnNames;
 
     for (const auto& c : *table->columns()){
-      columns.push_back(::libgdf::gdf_column {
+      ::libgdf::gdf_column column = {
           .data = CudaIpcMemHandlerFrom(c->data()),
           .valid = (unsigned char *)CudaIpcMemHandlerFrom(c->valid()),
           .size = c->size(),
           .dtype = (libgdf::gdf_dtype)c->dtype(),
+          .null_count = c->null_count(),
           .dtype_info = libgdf::gdf_dtype_extra_info {
              .time_unit = (libgdf::gdf_time_unit) c->dtype_info()->time_unit()
-          }
-      });
+          },
+      };
+      columns.push_back(column);
     }
 
     tables.push_back(BlazingTableDTO{
