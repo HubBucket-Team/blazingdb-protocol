@@ -8,6 +8,7 @@ from blazingdb.messages.blazingdb.protocol.Status import Status
 from blazingdb.protocol.interpreter import InterpreterMessage
 from blazingdb.protocol.orchestrator import OrchestratorMessageType
 
+from blazingdb.protocol.gdf import gdf_columnSchema
 
 class PyConnector:
   def __init__(self, orchestrator_path, interpreter_path):
@@ -171,18 +172,24 @@ def create_query():
   }
   print(query)
   print(db['tables'][0]['columnNames'])
-  gdfColumns = blazingdb.protocol.orchestrator.gdf_column_handlerSchema(size=10)
-  table1 = blazingdb.protocol.orchestrator.BlazingTableSchema(name=db['name'], columns=gdfColumns, columnNames=db['tables'][0]['columnNames']);
-  table2 = blazingdb.protocol.orchestrator.BlazingTableSchema(name=db['name'], columns=gdfColumns, columnNames=db['tables'][0]['columnNames']);
-  tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=[table1, table2], name='alexdb')
-  dmlRequest = blazingdb.protocol.orchestrator.DMLRequestSchema(query=query, tableGroup=tableGroup)
 
-  payload = dmlRequest.ToBuffer()
-  response = blazingdb.protocol.orchestrator.DMLRequestSchema.From(payload)
+  data = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved='data'.encode())
+  valid = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved='valid'.encode())
+  dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit=0)
+  gdfColumn = blazingdb.protocol.gdf.gdf_columnSchema(data=data, valid=valid, size=10, dtype=0, dtype_info=dtype_info)
 
-  print(response.query)
-  print(response.tableGroup)
-  print(list(response.tableGroup.name))
+  cloneGdf = blazingdb.protocol.gdf.gdf_columnSchema.From(gdfColumn.ToBuffer())
+  print(cloneGdf)
+  # table1 = blazingdb.protocol.orchestrator.BlazingTableSchema(name=db['name'], columns=gdfColumns, columnNames=db['tables'][0]['columnNames']);
+  # table2 = blazingdb.protocol.orchestrator.BlazingTableSchema(name=db['name'], columns=gdfColumns, columnNames=db['tables'][0]['columnNames']);
+  # tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=[table1, table2], name='alexdb')
+  # dmlRequest = blazingdb.protocol.orchestrator.DMLRequestSchema(query=query, tableGroup=tableGroup)
+  # payload = dmlRequest.ToBuffer()
+  # response = blazingdb.protocol.orchestrator.DMLRequestSchema.From(payload)
+  #
+  # print(response.query)
+  # print(response.tableGroup)
+  # print(list(response.tableGroup.name))
 
   class B(schema(BlazingMetadata)):
     rows = NumberSegment()

@@ -10,21 +10,19 @@ from blazingdb.messages.blazingdb.protocol \
 
 from blazingdb.messages.blazingdb.protocol.orchestrator \
     import DMLRequest, DMLResponse, DDLRequest, DDLResponse, DDLCreateTableRequest, DDLDropTableRequest
+
 from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
   import MessageType as OrchestratorMessageType
 
 from blazingdb.messages.blazingdb.protocol.orchestrator \
   import AuthRequest, AuthResponse
 
-from blazingdb.messages.blazingdb.protocol.gdf \
-  import gdf_column_handler
+from blazingdb.protocol.gdf import gdf_columnSchema
 
-class gdf_column_handlerSchema(transport.schema(gdf_column_handler)):
-  size = transport.NumberSegment()
 
 class BlazingTableSchema(transport.schema(BlazingTable)):
   name: transport.StringSegment()
-  columns = transport.VectorSchemaSegment(gdf_column_handlerSchema)
+  columns = transport.VectorSchemaSegment(gdf_columnSchema)
   columnNames: transport.VectorStringSegment(transport.StringSegment)
 
 class TableGroupSchema(transport.schema(TableGroup)):
