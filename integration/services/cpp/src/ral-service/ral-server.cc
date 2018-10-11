@@ -3,6 +3,7 @@
 #include <map>
 #include <blazingdb/protocol/api.h>
 
+#include <blazingdb/protocol/messages.h>
 #include <blazingdb/protocol/interpreter/messages.h>
 
 using namespace blazingdb::protocol;
@@ -45,15 +46,19 @@ static result_pair getResultService(uint64_t accessToken, Buffer&& requestPayloa
 
 
 static result_pair executePlanService(uint64_t accessToken, Buffer&& requestPayloadBuffer)   {
-  interpreter::DMLRequestMessage requestPayload(requestPayloadBuffer.data());
+  interpreter::ExecutePlanRequestMessage requestPayload(requestPayloadBuffer.data());
 
   // ExecutePlan
   std::cout << "accessToken: " << accessToken << std::endl;
   std::cout << "query: " << requestPayload.getLogicalPlan() << std::endl;
+  std::cout << "tableGroup: " << requestPayload.getTableGroup().name << std::endl;
 
   uint64_t resultToken = 543210L;
-
-  interpreter::DMLResponseMessage responsePayload{resultToken};
+  interpreter::NodeConnectionInformationDTO nodeInfo {
+      .path = "/tmp/ral.socket",
+      .type = interpreter::NodeConnectionType {interpreter::NodeConnectionType_IPC}
+  };
+  interpreter::ExecutePlanResponseMessage responsePayload{resultToken, nodeInfo};
   return std::make_pair(Status_Success, responsePayload.getBufferData());
 }
 
