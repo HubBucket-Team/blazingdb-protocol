@@ -3,6 +3,8 @@
 __author__ = 'BlazingDB Team'
 
 import abc
+import inspect
+import re
 
 import flatbuffers
 
@@ -241,25 +243,51 @@ class StructSegment(Segment, Inline):
     return _dto(getattr(_object, self._object_name())(), self._name, ('Init',))
 
 
-class Vector(Segment, Inline):
+class Vector(Segment):
 
   def _make_iterable(self, _object, item):
     return (item(i)
             for i in range(getattr(_object, self._object_name() + 'Length')()))
 
 
-class VectorSegment(Vector):
+class _VectorSegment(Vector):
 
   def __init__(self, segment):
     self._segment = segment
 
   def _bytes(self, builder, schema):
-    return NotImplemented
+    items = [self._segment._bytes(
+               self,
+               builder,
+               type(self._name, (), dict(_values={self._name: value})))
+             for value in schema._values[self._name]]
 
+    m = getattr(getattr(schema._module, schema._module_name()),
+                self._object_name())
+    m = inspect.unwrap(m)
+    block, base = inspect.findsource(m)
+    l = inspect.getblock(block[base:])[4].strip()
+    p = r'\._tab\.(?:(String)(?=\()|Get\(flatbuffers\.number_types\.(\w+)(?=,))'
+    o = next(value for value in re.search(p, l).groups() if value)
+    f = {
+      'String': builder.PrependUOffsetTRelative,
+    }[o]
+
+    getattr(schema._module,
+            '%sStart%sVector' % (schema._module_name(),
+                                 self._object_name()))(builder, len(items))
+
+    for item in reversed(items):
+      f(item)
+
+    return builder.EndVector(len(items))
 
   def _from(self, _object):
     return self._make_iterable(_object, getattr(_object, self._object_name()))
 
+
+class VectorSegment(_VectorSegment, Nested):
+  """VS"""
 
 
 class VectorStringSegment(Vector, Nested):
@@ -288,7 +316,7 @@ class VectorStringSegment(Vector, Nested):
     return self._make_iterable(_object, getattr(_object, self._object_name()))
 
 
-class VectorSchemaSegment(VectorSegment):
+class VectorSchemaSegment(_VectorSegment, Inline):
 
   def __init__(self, schema):
     self._schema = schema
