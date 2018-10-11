@@ -21,9 +21,9 @@ from blazingdb.protocol.gdf import gdf_columnSchema
 
 
 class BlazingTableSchema(transport.schema(BlazingTable)):
-  name: transport.StringSegment()
+  name = transport.StringSegment()
   columns = transport.VectorSchemaSegment(gdf_columnSchema)
-  columnNames: transport.VectorStringSegment(transport.StringSegment)
+  columnNames = transport.VectorStringSegment(transport.StringSegment)
 
 class TableGroupSchema(transport.schema(TableGroup)):
   tables = transport.VectorSchemaSegment(BlazingTableSchema)

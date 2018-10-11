@@ -57,7 +57,7 @@ public class MessageTest
 
         // int root = Request.createRequest(builder, headerOffset, payloadOffset);
         Request.startRequest(builder);
-        Request.addHeader(builder, Header.createHeader(builder, (byte)1, 2, 3));
+        Request.addHeader(builder, Header.createHeader(builder, (byte)1, 3));
         Request.addPayload(builder, payloadOffset);
         int root = Request.endRequest(builder);
 
@@ -67,11 +67,9 @@ public class MessageTest
         Request request = Request.getRootAsRequest(buf);
         Header header = request.header();
         assert header.messageType() == (byte)1;
-        assert header.payloadLength() == (long)2;
         assert header.accessToken() == (long)3;
 
         System.out.println(header.messageType() );
-        System.out.println(header.payloadLength() );
         System.out.println(header.accessToken() );
 
         System.out.println("payload:" );
@@ -88,7 +86,7 @@ public class MessageTest
     }
     public static void test2() {
         IMessage requestPayload = new DMLRequestMessage("query");
-        HeaderMessage header = new HeaderMessage(MessageType.DML, 0L, 0L);
+        HeaderMessage header = new HeaderMessage(MessageType.DML, 0L);
         RequestMessage requestObj =  new RequestMessage(header, requestPayload);
         ByteBuffer buf = requestObj.getBufferData();
         Request cloneRequest = Request.getRootAsRequest(buf);
@@ -103,7 +101,7 @@ public class MessageTest
         DMLRequestMessage requestPayload = new DMLRequestMessage("query3");
 
 
-        HeaderMessage header = new HeaderMessage(MessageType.DML, 0L, 0L);
+        HeaderMessage header = new HeaderMessage(MessageType.DML, 0L);
         RequestMessage requestObj =  new RequestMessage(header , requestPayload);
         ByteBuffer buf = requestObj.getBufferData();
         RequestMessage serverMessage = new RequestMessage(buf);
@@ -115,7 +113,7 @@ public class MessageTest
     }
     public static void test4 () {
         DMLRequestMessage requestPayload = new DMLRequestMessage("query4");
-        HeaderMessage header = new HeaderMessage(MessageType.DML, 0L, 0L);
+        HeaderMessage header = new HeaderMessage(MessageType.DML, 0L);
         RequestMessage requestObj =  new RequestMessage(header , requestPayload);
         ByteBuffer buf = requestObj.getBufferData();
 

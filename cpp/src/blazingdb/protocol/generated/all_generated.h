@@ -948,7 +948,8 @@ struct gdf_column_handler FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_VALID = 6,
     VT_SIZE = 8,
     VT_DTYPE = 10,
-    VT_DTYPE_INFO = 12
+    VT_DTYPE_INFO = 12,
+    VT_NULL_COUNT = 14
   };
   const cudaIpcMemHandle_t *data() const {
     return GetPointer<const cudaIpcMemHandle_t *>(VT_DATA);
@@ -965,6 +966,9 @@ struct gdf_column_handler FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const gdf_dtype_extra_info *dtype_info() const {
     return GetPointer<const gdf_dtype_extra_info *>(VT_DTYPE_INFO);
   }
+  uint16_t null_count() const {
+    return GetField<uint16_t>(VT_NULL_COUNT, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_DATA) &&
@@ -975,6 +979,7 @@ struct gdf_column_handler FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int8_t>(verifier, VT_DTYPE) &&
            VerifyOffset(verifier, VT_DTYPE_INFO) &&
            verifier.VerifyTable(dtype_info()) &&
+           VerifyField<uint16_t>(verifier, VT_NULL_COUNT) &&
            verifier.EndTable();
   }
 };
@@ -997,6 +1002,9 @@ struct gdf_column_handlerBuilder {
   void add_dtype_info(flatbuffers::Offset<gdf_dtype_extra_info> dtype_info) {
     fbb_.AddOffset(gdf_column_handler::VT_DTYPE_INFO, dtype_info);
   }
+  void add_null_count(uint16_t null_count) {
+    fbb_.AddElement<uint16_t>(gdf_column_handler::VT_NULL_COUNT, null_count, 0);
+  }
   explicit gdf_column_handlerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1015,11 +1023,13 @@ inline flatbuffers::Offset<gdf_column_handler> Creategdf_column_handler(
     flatbuffers::Offset<cudaIpcMemHandle_t> valid = 0,
     uint16_t size = 0,
     gdf_dtype dtype = gdf_dtype_GDF_invalid,
-    flatbuffers::Offset<gdf_dtype_extra_info> dtype_info = 0) {
+    flatbuffers::Offset<gdf_dtype_extra_info> dtype_info = 0,
+    uint16_t null_count = 0) {
   gdf_column_handlerBuilder builder_(_fbb);
   builder_.add_dtype_info(dtype_info);
   builder_.add_valid(valid);
   builder_.add_data(data);
+  builder_.add_null_count(null_count);
   builder_.add_size(size);
   builder_.add_dtype(dtype);
   return builder_.Finish();

@@ -65,10 +65,18 @@ class gdf_column_handler(object):
             return obj
         return None
 
-def gdf_column_handlerStart(builder): builder.StartObject(5)
+    # gdf_column_handler
+    def NullCount(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Uint16Flags, o + self._tab.Pos)
+        return 0
+
+def gdf_column_handlerStart(builder): builder.StartObject(6)
 def gdf_column_handlerAddData(builder, data): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0)
 def gdf_column_handlerAddValid(builder, valid): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(valid), 0)
 def gdf_column_handlerAddSize(builder, size): builder.PrependUint16Slot(2, size, 0)
 def gdf_column_handlerAddDtype(builder, dtype): builder.PrependInt8Slot(3, dtype, 0)
 def gdf_column_handlerAddDtypeInfo(builder, dtypeInfo): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(dtypeInfo), 0)
+def gdf_column_handlerAddNullCount(builder, nullCount): builder.PrependUint16Slot(5, nullCount, 0)
 def gdf_column_handlerEnd(builder): return builder.EndObject()
