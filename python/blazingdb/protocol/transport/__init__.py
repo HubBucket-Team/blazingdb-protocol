@@ -123,6 +123,11 @@ class Schema(metaclass=MetaSchema):
             raise TypeError('Bad `%s` segment type' % name)
 
   def _allocate_segments(self, builder):
+    _object = self._set_segments(builder)
+    builder.Finish(_object)
+    return _object
+
+  def _set_segments(self, builder):
     pairs = [(segment._name, segment._bytes(builder, self))
              for segment in self._nested]
 
@@ -135,10 +140,8 @@ class Schema(metaclass=MetaSchema):
     for member, value in reversed(pairs):
       member = upperCamelCase(member)
       getattr(self._module, '%sAdd%s' % (name, member))(builder, value)
-    _object = getattr(self._module, name + 'End')(builder)
-    builder.Finish(_object)
 
-    return _object
+    return getattr(self._module, name + 'End')(builder)
 
 
 class Segment(SchemaAttribute):
@@ -317,13 +320,22 @@ class VectorStringSegment(Vector, Nested):
     return self._make_iterable(_object, getattr(_object, self._object_name()))
 
 
-class VectorSchemaSegment(_VectorSegment, Inline):
+class VectorSchemaSegment(_VectorSegment, Nested):
 
   def __init__(self, schema):
     self._schema = schema
 
   def _bytes(self, builder, schema):
-    return NotImplemented
+    items = [self._schema._set_segments(value, builder)
+             for value in schema._values[self._name]]
+
+    getattr(schema._module,
+            '%sStart%sVector' % (schema._module_name(),
+                                 self._object_name()))(builder, len(items))
+    for item in reversed(items):
+      builder.PrependUOffsetTRelative(item)
+
+    return builder.EndVector(len(items))
 
   def _from(self, _object):
     nomembers = ('Init', 'GetRootAs' + self._schema._module_name())
