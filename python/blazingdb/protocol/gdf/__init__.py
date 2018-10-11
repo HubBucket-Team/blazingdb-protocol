@@ -17,3 +17,5 @@ class gdf_columnSchema(transport.schema(gdf_column_handler)):
   size = transport.NumberSegment()
   dtype = transport.NumberSegment()
   dtype_info = transport.SchemaSegment(gdf_dtype_extra_infoSchema)
+  null_count = transport.NumberSegment()
+

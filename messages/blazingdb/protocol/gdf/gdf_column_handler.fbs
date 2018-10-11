@@ -10,6 +10,9 @@ table gdf_column_handler {
     size: ushort;
     dtype: gdf_dtype;
     dtype_info: gdf_dtype_extra_info;
+    null_count: ushort;
+    //@todo
+    // char * col_name; // host-side:	null terminated string
 }
 
 root_type gdf_column_handler;

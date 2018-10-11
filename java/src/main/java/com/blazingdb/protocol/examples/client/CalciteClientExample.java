@@ -34,7 +34,7 @@ public class CalciteClientExample {
 
         public String getLogicalPlan(String query) throws SyntaxError {
             DMLRequestMessage requestPayload = new DMLRequestMessage(query);
-            HeaderMessage header = new HeaderMessage(MessageType.DML, 0L, 0L);
+            HeaderMessage header = new HeaderMessage(MessageType.DML, 0L);
             RequestMessage requestObj =  new RequestMessage(header , requestPayload);
             ByteBuffer buf = requestObj.getBufferData();
             ByteBuffer result =  client.send(buf);
@@ -49,7 +49,7 @@ public class CalciteClientExample {
 
         public byte updateSchema(String query) throws SyntaxError {
             IMessage requestPayload = new DMLRequestMessage(query);
-            HeaderMessage header = new HeaderMessage(MessageType.DDL, 0L, 0L);
+            HeaderMessage header = new HeaderMessage(MessageType.DDL, 0L);
 
             RequestMessage requestObj =  new RequestMessage(header, requestPayload);
             ByteBuffer result = client.send(requestObj.getBufferData());
