@@ -13,12 +13,8 @@ def main():
 
     print(request.header)
 
-    dml = blazingdb.protocol.orchestrator.DMLRequestSchema.From(request.payload)
-
-    print(dml.query)
-
     dmlResponse = blazingdb.protocol.orchestrator.DMLResponseSchema(
-      resultToken='T-O-K-E-N')
+      resultToken=123456)
 
     responseBuffer = \
       blazingdb.protocol.transport.channel.ResponseSchema(

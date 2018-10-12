@@ -13,7 +13,7 @@ def main():
   client = blazingdb.protocol.Client(connection)
 
   getResult = blazingdb.protocol.interpreter.GetResultRequestSchema(
-    token='RESULT_TOKEN')
+    resultToken=123456)
   requestBuffer = blazingdb.protocol.transport.channel.MakeRequestBuffer(
     InterpreterMessage.GetResult, ACCESS_TOKEN, getResult)
 
@@ -28,6 +28,8 @@ def main():
     response.payload)
 
   print(dmlResponse.resultToken)
+
+  responseBuffer = client.send(requestBuffer)
 
 if __name__ == '__main__':
   main()
