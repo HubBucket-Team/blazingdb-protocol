@@ -1,6 +1,7 @@
 import abc
 import os
 import socket
+import struct
 
 
 __all__ = ['UnixSocketConnection', 'Server', 'Client']
@@ -41,8 +42,10 @@ class Server:
     while True:
       client, address = self.connection_.socket_.accept()
       with client:
-        requestBuffer = client.recv(4096)
+        length = struct.unpack('I', client.recv(4))[0]
+        requestBuffer = client.recv(length)
         responseBuffer = callback(requestBuffer)
+        client.sendall(struct.pack('I', len(responseBuffer)))
         client.sendall(responseBuffer)
 
 
@@ -55,8 +58,9 @@ class Client:
     except socket.error:
       raise RuntimeError("connect error")
 
-  def send(self, buffer):
-    self.connection_.socket_.sendall(buffer)
-    responseBuffer = self.connection_.socket_.recv(4096)
-    return responseBuffer
-
+  def send(self, _buffer):
+    length = struct.pack('I', len(_buffer))
+    self.connection_.socket_.sendall(length)
+    self.connection_.socket_.sendall(_buffer)
+    length = struct.unpack('I', self.connection_.socket_.recv(4))[0]
+    return self.connection_.socket_.recv(length)
