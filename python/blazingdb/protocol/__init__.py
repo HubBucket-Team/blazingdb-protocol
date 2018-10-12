@@ -1,7 +1,9 @@
 import abc
 import os
+import random
 import socket
 import struct
+import threading
 
 
 __all__ = ['UnixSocketConnection', 'Server', 'Client']
@@ -30,6 +32,23 @@ class UnixSocketConnection:
 
 class Server:
 
+  class Thread(threading.Thread):
+
+    def __init__(self, callback, client, address):
+      name = 'ThreadFor%s%s' % (str(address), str(random.random()))
+      super().__init__(name=name, daemon=None)
+      self._callback = callback
+      self._client = client
+
+    def run(self):
+      bufferLength = self._client.recv(4)
+      while bufferLength:
+        requestBuffer = self._client.recv(struct.unpack('I', bufferLength)[0])
+        responseBuffer = self._callback(requestBuffer)
+        self._client.sendall(struct.pack('I', len(responseBuffer)))
+        self._client.sendall(responseBuffer)
+        bufferLength = self._client.recv(4)
+
   def __init__(self, connection):
     self.connection_ = connection
     address = connection.address()
@@ -40,13 +59,7 @@ class Server:
 
   def handle(self, callback):
     while True:
-      client, address = self.connection_.socket_.accept()
-      with client:
-        length = struct.unpack('I', client.recv(4))[0]
-        requestBuffer = client.recv(length)
-        responseBuffer = callback(requestBuffer)
-        client.sendall(struct.pack('I', len(responseBuffer)))
-        client.sendall(responseBuffer)
+      Server.Thread(callback, *self.connection_.socket_.accept()).start()
 
 
 class Client:
