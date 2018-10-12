@@ -8,6 +8,7 @@ from blazingdb.messages.blazingdb.protocol.Status import Status
 from blazingdb.protocol.interpreter import InterpreterMessage
 from blazingdb.protocol.orchestrator import OrchestratorMessageType
 
+from blazingdb.protocol.gdf import gdf_columnSchema
 
 class PyConnector:
   def __init__(self, orchestrator_path, interpreter_path):
@@ -134,7 +135,9 @@ class PyConnector:
     print('  values:')
     print('    size: %s' % [value.size for value in getResultResponse.values])
 
-def dml_create_table_example(tableName, columnNames, columnTypes, dbName):
+
+
+def ddl_create_table_example(tableName, columnNames, columnTypes, dbName):
   dmlRequestSchema = blazingdb.protocol.orchestrator.DDLCreateTableRequestSchema(name=tableName,
                                                                                  columnNames=columnNames,
                                                                                  columnTypes=columnTypes, dbName=dbName)
@@ -146,27 +149,116 @@ def dml_create_table_example(tableName, columnNames, columnTypes, dbName):
   print(list(response.columnNames))
   print(list(response.columnTypes))
 
-def main():
-  dml_create_table_example('user', ['name', 'surname', 'age'], ['string', 'string', 'int'], 'alexdb')
 
-  client = PyConnector('/tmp/orchestrator.socket', '/tmp/ral.socket')
+from blazingdb.protocol.transport import schema, NumberSegment, SchemaSegment
+from blazingdb.messages.blazingdb.protocol.interpreter import BlazingMetadata, GetResultResponse
 
-  try:
-    client.connect()
-  except Error as err:
-    print(err)
+def create_query():
+  query = 'select id, age from $0'
+  db = {
+    'name': 'alexdb',
+    'tables': [
+      {
+        'name': 'user',
+        'columns': [{'data': 0, 'valid': 0, 'size': 0, 'dtype': 0, 'dtype_info': 0},
+                    {'data': 0, 'valid': 0, 'size': 20, 'dtype': 1, 'dtype_info': 1}],
+        'columnNames': ['id', 'age']
+      },
+      {
+        'name': 'computer',
+        'columns': [{'data': 0, 'valid': 0, 'size': 0, 'dtype': 0, 'dtype_info': 0},
+                    {'data': 0, 'valid': 0, 'size': 20, 'dtype': 1, 'dtype_info': 1}],
+        'columnNames': ['id', 'brand']
+      }
+    ]
+  }
+  print(query)
+  print(db['tables'][0]['columnNames'])
 
-  try:
-    client.run_ddl_create_table('user', ['name', 'surname', 'age'], ['string', 'string', 'int'], 'alexdb')
-  except Error as err:
-    print(err)
+  data = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved='data'.encode())
+  valid = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved='valid'.encode())
+  dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit=0)
+  gdfColumn = blazingdb.protocol.gdf.gdf_columnSchema(data=data, valid=valid, size=10, dtype=0, dtype_info=dtype_info, null_count = 0)
 
-  try:
-    client.run_ddl_drop_table('user', 'alexdb')
-  except Error as err:
-    print(err)
+  cloneGdf = blazingdb.protocol.gdf.gdf_columnSchema.From(gdfColumn.ToBuffer())
+  print(cloneGdf.size)
 
-  client.close_connection()
+  table1 = blazingdb.protocol.orchestrator.BlazingTableSchema(name=db['name'], columns=[gdfColumn, gdfColumn], columnNames=['id', 'age'])
+
+  cloneTable1 = blazingdb.protocol.orchestrator.BlazingTableSchema.From(table1.ToBuffer())
+  print(cloneTable1.name)
+
+  # table2 = blazingdb.protocol.orchestrator.BlazingTableSchema(name=db['name'], columns=[gdfColumn, gdfColumn], columnNames=db['tables'][0]['columnNames'])
+  tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=[table1], name='alexdb')
+  dmlRequest = blazingdb.protocol.orchestrator.DMLRequestSchema(query=query, tableGroup=tableGroup)
+  payload = dmlRequest.ToBuffer()
+  response = blazingdb.protocol.orchestrator.DMLRequestSchema.From(payload)
+
+  print(response.query)
+  print(response.tableGroup)
+  print(list(response.tableGroup.name))
+
+  class B(schema(BlazingMetadata)):
+    rows = NumberSegment()
+
+  class A(schema(GetResultResponse)):
+    metadata = SchemaSegment(B)
+
+  b = B(rows=1235)
+  a = A(metadata=b)
+
+  ll = a.ToBuffer()
+
+  print(A.From(ll).metadata.rows)
+
+
+from blazingdb.messages.blazingdb.protocol.interpreter import \
+  BlazingMetadata, GetResultResponse
+
+import blazingdb.protocol as bp
+import blazingdb.protocol.gdf as bpg
+import blazingdb.protocol.orchestrator as bpo
+
+def createcol():
+  data = bpg.cudaIpcMemHandle_tSchema(reserved=b'data')
+  valid = bpg.cudaIpcMemHandle_tSchema(reserved=b'valid')
+  dtype_info = bpg.gdf_dtype_extra_infoSchema(time_unit=0)
+
+  return bpg.gdf_columnSchema(data=data, valid=valid, size=10,
+    dtype=0, dtype_info=dtype_info, null_count=0)
+
+def test():
+
+  # ddl_create_table_example('user', ['name', 'surname', 'age'], ['string', 'string', 'int'], 'alexdb')
+  # create_query()
+
+  col1 = createcol()
+  col2 = createcol()
+
+  tableA = bpo.BlazingTableSchema(name='tableA',
+                                  columns=[col1, col2],
+                                  columnNames=['id', 'age']
+                                  )
+
+
+  b = tableA.ToBuffer()
+  dto = bpo.BlazingTableSchema.From(b)
+
+  cloneTable1 = blazingdb.protocol.orchestrator.BlazingTableSchema.From(tableA.ToBuffer())
+  print(cloneTable1.name)
+  query = 'select id, age from user'
+
+  tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=[tableA], name='alexdb')
+  dmlRequest = blazingdb.protocol.orchestrator.DMLRequestSchema(query=query, tableGroup=tableGroup)
+  payload = dmlRequest.ToBuffer()
+  response = blazingdb.protocol.orchestrator.DMLRequestSchema.From(payload)
+
+  print(response.query)
+  print(response.tableGroup)
+  print(list(response.tableGroup.name))
+
+def main ():
+  test()
 
 if __name__ == '__main__':
   main()

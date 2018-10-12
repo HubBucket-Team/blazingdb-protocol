@@ -17,9 +17,9 @@ cd java
 mvn clean install
 
 cd $CWD
-echo "Build python library"
-cd python/blazingdb/messages/
-flatc -p --gen-all --gen-object-api ../../../messages/all.fbs
+# echo "Build python library"
+# cd python/blazingdb/messages/
+# flatc -p --gen-all --gen-object-api ../../../messages/all.fbs
 
 cd $CWD
 cd python/

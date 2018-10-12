@@ -51,7 +51,7 @@ class GetResultResponse(object):
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
-            from .gdf_column_handler import gdf_column_handler
+            from blazingdb.messages.blazingdb.protocol.gdf.gdf_column_handler import gdf_column_handler
             obj = gdf_column_handler()
             obj.Init(self._tab.Bytes, x)
             return obj
