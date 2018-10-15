@@ -1,4 +1,6 @@
 #!/bin/sh
+bash clean.sh
+
 CWD="$(pwd)"
 
 echo "Build calcite service"

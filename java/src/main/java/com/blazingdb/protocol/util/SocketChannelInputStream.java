@@ -5,6 +5,7 @@ import jnr.unixsocket.UnixSocketChannel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class SocketChannelInputStream extends InputStream {
 
@@ -17,6 +18,7 @@ public class SocketChannelInputStream extends InputStream {
     @Override
     public int read() throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
         ch.read(buffer);
         buffer.rewind();
         int size = buffer.getInt();

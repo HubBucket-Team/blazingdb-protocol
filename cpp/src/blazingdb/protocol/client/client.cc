@@ -34,8 +34,8 @@ Client::Client(const Connection &connection) : connection_(connection) {
 }
 
 Buffer Client::send(const Buffer &buffer) {
-  uint32_t bufferLength = buffer.size();
-  ssize_t written_bytes = write(connection_.fd(), (void*)&bufferLength, sizeof(uint32_t));
+  int bufferLength = buffer.size();
+  ssize_t written_bytes = write(connection_.fd(), (void*)&bufferLength, sizeof(int));
   written_bytes = write(connection_.fd(), (void*)buffer.data(), bufferLength);
   if (static_cast<std::size_t>(written_bytes) != buffer.size()) {
     throw std::runtime_error("write error");
