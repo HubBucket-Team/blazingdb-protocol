@@ -1,5 +1,6 @@
 #include "client.h"
 
+#include <string>
 #include <stdexcept>
 
 #include <unistd.h>
@@ -33,15 +34,21 @@ Client::Client(const Connection &connection) : connection_(connection) {
 }
 
 Buffer Client::send(const Buffer &buffer) {
-  ssize_t written_bytes = write(connection_.fd(), buffer.data(), buffer.size());
-
+  uint32_t bufferLength = buffer.size();
+  ssize_t written_bytes = write(connection_.fd(), (void*)&bufferLength, sizeof(uint32_t));
+  written_bytes = write(connection_.fd(), (void*)buffer.data(), bufferLength);
   if (static_cast<std::size_t>(written_bytes) != buffer.size()) {
     throw std::runtime_error("write error");
   }
 
-  StackBuffer responseBuffer;
+  uint32_t responseBufferLength;
   ssize_t nread =
-      read(connection_.fd(), responseBuffer.data(), responseBuffer.size());
+      read(connection_.fd(), (void*)&responseBufferLength, sizeof(uint32_t));
+  
+  Buffer responseBuffer;
+  responseBuffer.resize(responseBufferLength);
+  nread =
+      read(connection_.fd(), (void*)responseBuffer.data(), responseBufferLength);
 
   if (nread == -1) { throw std::runtime_error("error read"); }
 

@@ -159,7 +159,7 @@ def main():
       ]
     }
     client.run_dml_query('select * from Table', tableGroup)
-  except SyntaxError as err:
+  except Error as err:
     print(err)
 
   try:

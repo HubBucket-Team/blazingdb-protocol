@@ -76,16 +76,10 @@ public class CalciteClientExample {
                 System.out.println(error.getMessage());
             }
 
-            String statementDDL = "create database alexbd";
-            try {
-                byte status = client.updateSchema(statementDDL);
-                System.out.println(status);
-            } catch (SyntaxError error) {
-                System.out.println(error.getMessage());
-            }
+
         }
         {
-            String statement = "celect * from orders";
+            String statement = "@typo * from orders";
             try {
                 String logicalPlan = client.getLogicalPlan(statement);
                 System.out.println(logicalPlan);
@@ -93,13 +87,7 @@ public class CalciteClientExample {
                 System.out.println(error.getMessage());
             }
 
-            String statementDDL = "treate database alexbd";
-            try {
-                byte status = client.updateSchema(statementDDL);
-                System.out.println(status);
-            } catch (SyntaxError error) {
-                System.out.println(error.getMessage());
-            }
+
         }
     }
 }
