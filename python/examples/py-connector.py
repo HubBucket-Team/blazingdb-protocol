@@ -10,8 +10,7 @@ from blazingdb.protocol.orchestrator import OrchestratorMessageType
 
 from blazingdb.protocol.gdf import gdf_columnSchema
 import pycuda.driver as cuda
-import pycuda.gpuarray as gpuarray
-import numpy as np
+import numpy
 
 
 class PyConnector:
@@ -144,10 +143,19 @@ class PyConnector:
     print('  values:')
     print('    size: %s' % [value.size for value in getResultResponse.values])
 
+
+
+def create_sample_device_data():
+  a = numpy.random.randn(1, 32)
+  a = a.astype(numpy.int8)
+  print('orig: ', a)
+  a_gpu = cuda.mem_alloc(a.size * a.dtype.itemsize)
+  cuda.memcpy_htod(a_gpu, a)
+  return a_gpu
+
 def main():
 
   client = PyConnector('/tmp/orchestrator.socket', '/tmp/ral.socket')
-
 
   cuda.init()
   dev = cuda.Device(0)
@@ -163,10 +171,10 @@ def main():
   except Error as err:
     print(err)
 
-  x = np.asarray(np.random.rand(8), np.int8)
-  print('orig: ', x)
-  x_gpu = gpuarray.to_gpu(x)
-  handler = cuda.mem_get_ipc_handle(x_gpu.ptr)
+  data_gpu = create_sample_device_data()
+  data_handler = bytes(cuda.mem_get_ipc_handle(data_gpu))
+  valid_gpu = create_sample_device_data()
+  valid_handler = bytes(cuda.mem_get_ipc_handle(valid_gpu))
 
   try:
     tableGroup = {
@@ -174,7 +182,7 @@ def main():
       'tables': [
         {
           'name': 'user',
-          'columns': [{'data': handler, 'valid': handler, 'size': 4, 'dtype': 0, 'dtype_info': 0}],
+          'columns': [{'data': data_handler, 'valid': valid_handler, 'size': 32, 'dtype': 0, 'dtype_info': 0}],
           'columnNames': ['id', 'age']
         }
       ]
