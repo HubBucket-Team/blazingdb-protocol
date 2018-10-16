@@ -338,9 +338,10 @@ class VectorSchemaSegment(_VectorSegment, Nested):
     return builder.EndVector(len(items))
 
   def _from(self, _object):
-    nomembers = ('Init', 'GetRootAs' + self._schema._module_name())
-    return (_dto(member, self._name, nomembers)
-            for member in super()._from(_object))
+    return (type(lowerCamelCase(self._name), (), {
+      name: segment._from(_object)
+      for name, segment in self._schema._segments.items()
+    }) for _object in super()._from(_object))
 
 
 class SchemaSegment(Segment, Nested):
