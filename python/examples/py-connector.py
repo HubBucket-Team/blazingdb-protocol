@@ -9,6 +9,11 @@ from blazingdb.protocol.interpreter import InterpreterMessage
 from blazingdb.protocol.orchestrator import OrchestratorMessageType
 
 from blazingdb.protocol.gdf import gdf_columnSchema
+import pycuda.driver as cuda
+import pycuda.autoinit
+from pycuda.compiler import SourceModule
+import numpy
+
 
 class PyConnector:
   def __init__(self, orchestrator_path, interpreter_path):
@@ -38,14 +43,22 @@ class PyConnector:
     client = blazingdb.protocol.Client(connection)
     return client.send(requestBuffer)
 
-  def _BuildDMLRequestSchema(self, query, tableGroup):
-    data = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved='data'.encode())
-    valid = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved='valid'.encode())
-    dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit=0)
-    gdfColumn = blazingdb.protocol.gdf.gdf_columnSchema(data=data, valid=valid, size=10, dtype=0, dtype_info=dtype_info, null_count=0)
-
-    table1 = blazingdb.protocol.orchestrator.BlazingTableSchema(name='user', columns=[gdfColumn, gdfColumn], columnNames=['id', 'age'])
-    tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=[table1], name='alexdb')
+  def _BuildDMLRequestSchema(self, query, tableGroupDto):
+    tableGroupName = tableGroupDto['name']
+    tables = []
+    for index, t in enumerate(tableGroupDto['tables']):
+      tableName = t['name']
+      columnNames = t['columnNames']
+      columns = []
+      for i, c in enumerate(t['columns']):
+        data = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['data'])
+        valid = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['valid'])
+        dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit= c['dtype_info'])
+        gdfColumn = blazingdb.protocol.gdf.gdf_columnSchema(data=data, valid=valid, size=c['size'], dtype=c['dtype'], dtype_info=dtype_info, null_count=0)
+        columns.append(gdfColumn)
+      table = blazingdb.protocol.orchestrator.BlazingTableSchema(name=tableName, columns=columns, columnNames=columnNames)
+      tables.append(table)
+    tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=tables, name=tableGroupName)
     return blazingdb.protocol.orchestrator.DMLRequestSchema(query=query, tableGroup=tableGroup)
 
   def run_dml_query(self, query, tableGroup):
@@ -136,6 +149,11 @@ def main():
 
   client = PyConnector('/tmp/orchestrator.socket', '/tmp/ral.socket')
 
+
+  cuda.init()
+  dev = cuda.Device(0)
+  ctx_gpu = dev.make_context()
+
   try:
     client.connect()
   except Error as err:
@@ -147,13 +165,17 @@ def main():
     print(err)
 
   try:
+    a = numpy.random.randn(4, 4)
+    a = a.astype(numpy.int8)
+    a_gpu = cuda.mem_alloc(a.size * a.dtype.itemsize)
+    handler = cuda.mem_get_ipc_handle(a_gpu)
     tableGroup = {
       'name': 'alexdb',
       'tables': [
         {
           'name': 'user',
-          'columns': [{'data': 0, 'valid': 0, 'size': 0, 'dtype': 0, 'dtype_info': 0},
-                      {'data': 0, 'valid': 0, 'size': 20, 'dtype': 1, 'dtype_info': 1}],
+          'columns': [{'data': handler, 'valid': handler, 'size': 4, 'dtype': 0, 'dtype_info': 0},
+                      {'data': handler, 'valid': handler, 'size': 4, 'dtype': 0, 'dtype_info': 1}],
           'columnNames': ['id', 'age']
         }
       ]
@@ -168,6 +190,7 @@ def main():
     print(err)
 
   client.close_connection()
+  ctx_gpu.pop()
 
 if __name__ == '__main__':
   main()

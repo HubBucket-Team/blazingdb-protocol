@@ -7,25 +7,7 @@
 
 namespace blazingdb {
 namespace protocol {
-
-namespace {
-
-class StackBuffer : public Buffer {
-public:
-  static const std::size_t MAX_SIZE = 4096;
-
-  StackBuffer()
-      : Buffer(static_cast<const std::uint8_t *const>(actual_data_), MAX_SIZE),
-        actual_data_{0} {}
-
-  std::uint8_t *data() { return static_cast<std::uint8_t *>(actual_data_); }
-
-private:
-  std::uint8_t actual_data_[MAX_SIZE];
-};
-
-}  // namespace
-
+ 
 Client::Client(const Connection &connection) : connection_(connection) {
   int result =
       connect(connection.fd(), connection.address(), connection.length());

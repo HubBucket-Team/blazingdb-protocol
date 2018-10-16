@@ -6,7 +6,7 @@ cmake ..
 make clean
 make -j8
 
-cp src/blazingdb/protocol/all_generated.h ../src/blazingdb/protocol/generated/
+cp src/blazingdb/protocol/all_generated.h ../src/blazingdb/protocol/message/generated/
 echo "	copy updated compiled flatbuffer"
 make clean
 make -j8

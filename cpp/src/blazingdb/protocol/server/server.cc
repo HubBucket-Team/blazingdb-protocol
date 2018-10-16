@@ -24,25 +24,7 @@ Server::Server(const Connection &connection) : connection_(connection) {
   if (listen(connection_.fd(), 100) == -1) {
     throw std::runtime_error("listen error");
   }
-}
-
-ssize_t Server::_GetRequest(int fd, StackBuffer &buffer) const {
-  std::basic_string<uint8_t> request;
-  while (true) {
-    uint8_t next_byte;
-    int n = recv(fd, &next_byte, 1, 0);
-    if (n <= 0) {
-      break;
-    }
-    request.append(&next_byte, 1);
-    if (next_byte == (uint8_t)'\n') {
-      break;
-    }
-  }
-  assert (request.size() <= buffer.size());
-  std::copy(request.c_str(), request.c_str() + request.size(), buffer.data());
-  return request.size();
-}
+} 
 
 void Server::_Start(const __HandlerBaseType &handler) const {
   for (;;) {
