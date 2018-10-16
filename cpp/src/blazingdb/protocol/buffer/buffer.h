@@ -2,26 +2,26 @@
 #define BLAZINGDB_PROTOCOL_BUFFER_BUFFER_H_
 
 #include <cstdint>
+#include <string>
+#include "flatbuffers/flatbuffers.h"
 
 namespace blazingdb {
 namespace protocol {
 
-class Buffer {
+class Buffer : public std::basic_string<std::uint8_t> {
 public:
-  Buffer(const std::uint8_t *const data, const std::size_t size)
-      : data_(data), size_(size) {}
+  Buffer()
+      : std::basic_string<std::uint8_t >() {}
 
-  const std::uint8_t *data() const { return data_; }
+  Buffer(const std::uint8_t *const data, const size_t size)
+      : std::basic_string<std::uint8_t >(data, size) {}
 
-  std::size_t size() const { return size_; }
+  Buffer(const std::shared_ptr<flatbuffers::DetachedBuffer> & buffer)
+      : std::basic_string<std::uint8_t >(buffer->data(), buffer->size()) {}
 
   Buffer slice(const std::ptrdiff_t offset) const {
-    return {data_ + offset, size_ - static_cast<std::size_t>(offset)};
+    return {this->data() +  offset, this->size() - static_cast<std::size_t>(offset)};
   }
-
-private:
-  const std::uint8_t *const data_;
-  std::size_t size_;
 };
 
 }  // namespace protocol

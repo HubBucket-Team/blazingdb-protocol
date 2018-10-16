@@ -1,6 +1,21 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.11)
+project(cpp-services)
 
 set(CMAKE_CXX_STANDARD 11)
+message(STATUS "Using C++ standard: c++${CMAKE_CXX_STANDARD}")
+
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
+message(STATUS "CMAKE_MODULE_PATH:" "${CMAKE_MODULE_PATH}")
+
+# Include CMake modules
+include(FeatureSummary)
+include(CheckIncludeFiles)
+include(CheckLibraryExists)
+include(CTest)
+
+# NOTE Do not change the inclusion order
+# Configure dependencies
+include(ConfigureCUDA)
 
 include(ExternalProject)
 
@@ -37,8 +52,15 @@ target_include_directories(Google::Flatbuffers
 target_link_libraries(Google::Flatbuffers
     INTERFACE ${GOOGLE_FLATBUFFERS_ROOT}/lib/libflatbuffers.a)
 
-add_executable(blazingdb_orchestator_service src/orchestrator-service/orchestator-service.cc)
-target_link_libraries(blazingdb_orchestator_service BlazingDB::Protocol Google::Flatbuffers)
+find_package( Threads )
 
-add_executable(blazingdb_ral_service src/ral-service/ral-server.cc)
-target_link_libraries(blazingdb_ral_service BlazingDB::Protocol Google::Flatbuffers)
+set(LIBRARIES BlazingDB::Protocol Google::Flatbuffers  ${CMAKE_THREAD_LIBS_INIT} ${LIBRARIES} ${CUDA_CUDA_LIBRARY} ${CUDA_NVRTC_LIBRARY})
+
+cuda_add_executable(blazingdb_orchestator_service src/orchestrator-service/orchestator-service.cu)
+target_link_libraries(blazingdb_orchestator_service ${LIBRARIES} )
+
+cuda_add_executable(blazingdb_ral_service src/ral-service/ral-server.cu)
+target_link_libraries(blazingdb_ral_service ${LIBRARIES} )
+
+# Print the project summary
+feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

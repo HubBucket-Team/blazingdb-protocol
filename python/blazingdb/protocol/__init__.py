@@ -1,6 +1,9 @@
 import abc
 import os
+import random
 import socket
+import struct
+import threading
 
 
 __all__ = ['UnixSocketConnection', 'Server', 'Client']
@@ -29,6 +32,23 @@ class UnixSocketConnection:
 
 class Server:
 
+  class Thread(threading.Thread):
+
+    def __init__(self, callback, client, address):
+      name = 'ThreadFor%s%s' % (str(address), str(random.random()))
+      super().__init__(name=name, daemon=None)
+      self._callback = callback
+      self._client = client
+
+    def run(self):
+      bufferLength = self._client.recv(4)
+      while bufferLength:
+        requestBuffer = self._client.recv(struct.unpack('I', bufferLength)[0])
+        responseBuffer = self._callback(requestBuffer)
+        self._client.sendall(struct.pack('I', len(responseBuffer)))
+        self._client.sendall(responseBuffer)
+        bufferLength = self._client.recv(4)
+
   def __init__(self, connection):
     self.connection_ = connection
     address = connection.address()
@@ -39,11 +59,7 @@ class Server:
 
   def handle(self, callback):
     while True:
-      client, address = self.connection_.socket_.accept()
-      with client:
-        requestBuffer = client.recv(4096)
-        responseBuffer = callback(requestBuffer)
-        client.sendall(responseBuffer)
+      Server.Thread(callback, *self.connection_.socket_.accept()).start()
 
 
 class Client:
@@ -55,8 +71,9 @@ class Client:
     except socket.error:
       raise RuntimeError("connect error")
 
-  def send(self, buffer):
-    self.connection_.socket_.sendall(buffer)
-    responseBuffer = self.connection_.socket_.recv(4096)
-    return responseBuffer
-
+  def send(self, _buffer):
+    length = struct.pack('I', len(_buffer))
+    self.connection_.socket_.sendall(length)
+    self.connection_.socket_.sendall(_buffer)
+    length = struct.unpack('I', self.connection_.socket_.recv(4))[0]
+    return self.connection_.socket_.recv(length)

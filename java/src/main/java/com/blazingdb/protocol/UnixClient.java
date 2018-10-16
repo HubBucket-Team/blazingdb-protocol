@@ -5,6 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 
 import com.blazingdb.protocol.util.ByteBufferUtil;
+import com.blazingdb.protocol.util.SocketChannelInputStream;
+import com.blazingdb.protocol.util.SocketChannelOutputStream;
 import jnr.unixsocket.UnixSocketAddress;
 import jnr.unixsocket.UnixSocketChannel;
 
@@ -12,7 +14,6 @@ public class UnixClient {
     private final File unixSocket;
     UnixSocketAddress address = null;
     UnixSocketChannel channel = null;
-    static int MAX_BUFFER_SIZE = 4096;
 
     public UnixClient(File unixSocket) throws IOException {
         this.unixSocket = unixSocket;
@@ -32,21 +33,21 @@ public class UnixClient {
     }
 
     public byte[] send(byte[] message) {
-        byte[] result = new byte[MAX_BUFFER_SIZE];
-        OutputStream out = Channels.newOutputStream(channel);
+        OutputStream out = new SocketChannelOutputStream(channel);
+        byte[] result = null;
         try {
+            out.write(message.length);
             out.write(message);
-            out.flush();
-            InputStream inputStream = Channels.newInputStream(channel);
-            DataInputStream inStream = new DataInputStream(new BufferedInputStream(inputStream));
-            inStream.read(result);
+            SocketChannelInputStream inputStream = new SocketChannelInputStream(channel);
+            int length = inputStream.read();
+            result = new byte[length];
+            inputStream.read(result);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return result;
     }
     public ByteBuffer send(ByteBuffer message) {
-
         return ByteBuffer.wrap(send(ByteBufferUtil.getByteArrayFromByteBuffer(message).array()));
     }
 } 
