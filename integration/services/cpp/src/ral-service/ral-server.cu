@@ -3,13 +3,16 @@
 #include <map>
 #include <blazingdb/protocol/api.h>
 
-#include <blazingdb/protocol/messages.h>
-#include <blazingdb/protocol/interpreter/messages.h>
+#include <blazingdb/protocol/message/messages.h>
+#include <blazingdb/protocol/message/interpreter/messages.cuh>
+#include "../gdf/GDFColumn.cuh"
 
 using namespace blazingdb::protocol;
 
 using result_pair = std::pair<Status, std::shared_ptr<flatbuffers::DetachedBuffer>>;
 using FunctionType = result_pair (*)(uint64_t, Buffer&& buffer);
+
+
 
 static result_pair closeConnectionService(uint64_t accessToken, Buffer&& requestPayloadBuffer) {
   std::cout << "accessToken: " << accessToken << std::endl;
@@ -22,26 +25,35 @@ static result_pair closeConnectionService(uint64_t accessToken, Buffer&& request
 static result_pair getResultService(uint64_t accessToken, Buffer&& requestPayloadBuffer) {
    std::cout << "accessToken: " << accessToken << std::endl;
 
-  interpreter::GetResultRequestMessage requestPayload(requestPayloadBuffer.data());
-  std::cout << "resultToken: " << requestPayload.getResultToken() << std::endl;
+  interpreter::GetResultRequestMessage request(requestPayloadBuffer.data());
+  std::cout << "resultToken: " << request.getResultToken() << std::endl;
 
-  // remove from repository using accessToken and resultToken
 
-  flatbuffers::FlatBufferBuilder builder;
-  auto metadata =
-      interpreter::CreateBlazingMetadata(builder, builder.CreateString("OK"),
-                            builder.CreateString("Nothing"), 0.9, 2);
-  std::vector<std::string> names{"iron", "man"};
-  auto vectorOfNames = builder.CreateVectorOfStrings(names);
-  std::vector<flatbuffers::Offset<gdf::gdf_column_handler>> values{
-      gdf::Creategdf_column_handler(builder, 0, 0, 12),
-      gdf::Creategdf_column_handler(builder, 0, 0, 14)};
-  auto vectorOfValues = builder.CreateVector(values);
-  builder.Finish(CreateGetResultResponse(builder, metadata, vectorOfNames,
-                                         vectorOfValues));
-  std::shared_ptr<flatbuffers::DetachedBuffer> payload =
-      std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  return std::make_pair(Status_Success, payload);
+  libgdf::gdf_column_cpp one;
+  libgdf::create_sample_gdf_column(one); 
+  libgdf::print_column(one.get_gdf_column());
+
+  interpreter::BlazingMetadataDTO  metadata = {
+    .status = "OK",
+    .message = "metadata message",
+    .time = 0.1f,
+    .rows = 1
+  }; 
+  std::vector<std::string> fieldNames = {"id", "age"};
+  std::vector<::libgdf::gdf_column> values = {
+    ::libgdf::gdf_column {
+                      .data = one.data(),
+                      .valid = one.valid(),
+                      .size = one.size(),
+                      .dtype = (libgdf::gdf_dtype)one.dtype(),
+                      .null_count = one.null_count(),
+                      .dtype_info = libgdf::gdf_dtype_extra_info {
+                          .time_unit = (libgdf::gdf_time_unit)0,
+                      },
+                  }, 
+  };
+  interpreter::GetResultResponseMessage responsePayload(metadata, fieldNames, values);
+  return std::make_pair(Status_Success, responsePayload.getBufferData());
 }
 
 
@@ -52,6 +64,12 @@ static result_pair executePlanService(uint64_t accessToken, Buffer&& requestPayl
   std::cout << "accessToken: " << accessToken << std::endl;
   std::cout << "query: " << requestPayload.getLogicalPlan() << std::endl;
   std::cout << "tableGroup: " << requestPayload.getTableGroup().name << std::endl;
+	std::cout << "tableSize: " << requestPayload.getTableGroup().tables.size() << std::endl;
+	std::cout << "FirstColumnSize: "
+			<< requestPayload.getTableGroup().tables[0].columns[0].size
+			<< std::endl;
+
+	libgdf::print_column(&requestPayload.getTableGroup().tables[0].columns[0]);
 
   uint64_t resultToken = 543210L;
   interpreter::NodeConnectionInformationDTO nodeInfo {
@@ -78,10 +96,7 @@ int main() {
 
     auto result = services[request.messageType()] ( request.accessToken(),  request.getPayloadBuffer() );
     ResponseMessage responseObject{result.first, result.second};
-    auto bufferedData = responseObject.getBufferData();
-    Buffer buffer{bufferedData->data(),
-                  bufferedData->size()};
-    return buffer;
+    return Buffer{responseObject.getBufferData()};
   };
   server.handle(interpreterServices);
 

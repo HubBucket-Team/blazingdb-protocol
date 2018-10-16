@@ -139,9 +139,12 @@ class PyConnector:
     print('    message: %s' % getResultResponse.metadata.message)
     print('       time: %s' % getResultResponse.metadata.time)
     print('       rows: %s' % getResultResponse.metadata.rows)
-    print('  fieldNames: %s' % list(getResultResponse.fieldNames))
+    print('  fieldNames: %s' % list(getResultResponse.columnNames))
     print('  values:')
-    print('    size: %s' % [value.size for value in getResultResponse.values])
+    print('    size: %s' % [value.size for value in getResultResponse.columns])
+    # x_ptr = drv.IPCMemoryHandle(bytearray(bytes(h)))
+    # x_gpu = gpuarray.GPUArray((1, 32), numpy.int8, gpudata=x_ptr)
+    # print('gpu:  ', x_gpu.get())
 
 
 

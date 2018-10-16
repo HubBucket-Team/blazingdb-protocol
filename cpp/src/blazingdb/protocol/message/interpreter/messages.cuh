@@ -152,8 +152,8 @@ struct BlazingMetadataDTO{
 
 class GetResultResponseMessage : public IMessage {
 public:
-  GetResultResponseMessage (const BlazingMetadataDTO&  metadata, const std::vector<std::string>& fieldNames, const std::vector<::libgdf::gdf_column>& values)
-      : IMessage(), metadata{metadata}, fieldNames{fieldNames}, values{values}
+  GetResultResponseMessage (const BlazingMetadataDTO&  metadata, const std::vector<std::string>& columnNames, const std::vector<::libgdf::gdf_column>& columns)
+      : IMessage(), metadata{metadata}, columnNames{columnNames}, columns{columns}
   {
 
   }
@@ -170,18 +170,18 @@ public:
     };
     std::cout << "metadata: " << metadata.message << std::endl;
  
-    fieldNames = ColumnNamesFrom(pointer->fieldNames());
-    values = GdfColumnsFrom(pointer->values());
+    columnNames = ColumnNamesFrom(pointer->columnNames());
+    columns = GdfColumnsFrom(pointer->columns());
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
     flatbuffers::FlatBufferBuilder builder{0};
     auto metadata_offset = blazingdb::protocol::interpreter::CreateBlazingMetadataDirect(builder, metadata.status.data(), metadata.message.data(), metadata.time, metadata.rows);
  
-    auto fieldNames_offset = BuildFlatColumnNames(builder, fieldNames);
-    auto values_offset = BuildFlatColumns(builder, values);
+    auto names_offset = BuildFlatColumnNames(builder, columnNames);
+    auto values_offset = BuildFlatColumns(builder, columns);
 
-    auto root = interpreter::CreateGetResultResponse(builder, metadata_offset, builder.CreateVector(fieldNames_offset), builder.CreateVector(values_offset));
+    auto root = interpreter::CreateGetResultResponse(builder, metadata_offset, builder.CreateVector(values_offset), builder.CreateVector(names_offset));
     builder.Finish(root);
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
@@ -191,20 +191,20 @@ public:
     return metadata;
   }
 
-  std::vector<std::string> getFieldNames()
+  std::vector<std::string> getColumnNames()
   {
-    return fieldNames;
+    return columnNames;
   }
 
-  std::vector<::libgdf::gdf_column> getValues()
+  std::vector<::libgdf::gdf_column> getColumns()
   {
-    return values;
+    return columns;
   }
 
 public:
   BlazingMetadataDTO  metadata;
-  std::vector<std::string> fieldNames;
-  std::vector<::libgdf::gdf_column> values;
+  std::vector<std::string> columnNames;
+  std::vector<::libgdf::gdf_column> columns;
 };
 
 

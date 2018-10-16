@@ -1855,28 +1855,28 @@ inline flatbuffers::Offset<BlazingMetadata> CreateBlazingMetadataDirect(
 struct GetResultResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_METADATA = 4,
-    VT_FIELDNAMES = 6,
-    VT_VALUES = 8
+    VT_COLUMNS = 6,
+    VT_COLUMNNAMES = 8
   };
   const BlazingMetadata *metadata() const {
     return GetPointer<const BlazingMetadata *>(VT_METADATA);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *fieldNames() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_FIELDNAMES);
+  const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *columns() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *>(VT_COLUMNS);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *values() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *>(VT_VALUES);
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *columnNames() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_COLUMNNAMES);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_METADATA) &&
            verifier.VerifyTable(metadata()) &&
-           VerifyOffset(verifier, VT_FIELDNAMES) &&
-           verifier.Verify(fieldNames()) &&
-           verifier.VerifyVectorOfStrings(fieldNames()) &&
-           VerifyOffset(verifier, VT_VALUES) &&
-           verifier.Verify(values()) &&
-           verifier.VerifyVectorOfTables(values()) &&
+           VerifyOffset(verifier, VT_COLUMNS) &&
+           verifier.Verify(columns()) &&
+           verifier.VerifyVectorOfTables(columns()) &&
+           VerifyOffset(verifier, VT_COLUMNNAMES) &&
+           verifier.Verify(columnNames()) &&
+           verifier.VerifyVectorOfStrings(columnNames()) &&
            verifier.EndTable();
   }
 };
@@ -1887,11 +1887,11 @@ struct GetResultResponseBuilder {
   void add_metadata(flatbuffers::Offset<BlazingMetadata> metadata) {
     fbb_.AddOffset(GetResultResponse::VT_METADATA, metadata);
   }
-  void add_fieldNames(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> fieldNames) {
-    fbb_.AddOffset(GetResultResponse::VT_FIELDNAMES, fieldNames);
+  void add_columns(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>>> columns) {
+    fbb_.AddOffset(GetResultResponse::VT_COLUMNS, columns);
   }
-  void add_values(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>>> values) {
-    fbb_.AddOffset(GetResultResponse::VT_VALUES, values);
+  void add_columnNames(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNames) {
+    fbb_.AddOffset(GetResultResponse::VT_COLUMNNAMES, columnNames);
   }
   explicit GetResultResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -1908,11 +1908,11 @@ struct GetResultResponseBuilder {
 inline flatbuffers::Offset<GetResultResponse> CreateGetResultResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<BlazingMetadata> metadata = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> fieldNames = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>>> values = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>>> columns = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNames = 0) {
   GetResultResponseBuilder builder_(_fbb);
-  builder_.add_values(values);
-  builder_.add_fieldNames(fieldNames);
+  builder_.add_columnNames(columnNames);
+  builder_.add_columns(columns);
   builder_.add_metadata(metadata);
   return builder_.Finish();
 }
@@ -1920,13 +1920,13 @@ inline flatbuffers::Offset<GetResultResponse> CreateGetResultResponse(
 inline flatbuffers::Offset<GetResultResponse> CreateGetResultResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<BlazingMetadata> metadata = 0,
-    const std::vector<flatbuffers::Offset<flatbuffers::String>> *fieldNames = nullptr,
-    const std::vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *values = nullptr) {
+    const std::vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *columns = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *columnNames = nullptr) {
   return blazingdb::protocol::interpreter::CreateGetResultResponse(
       _fbb,
       metadata,
-      fieldNames ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*fieldNames) : 0,
-      values ? _fbb.CreateVector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>>(*values) : 0);
+      columns ? _fbb.CreateVector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>>(*columns) : 0,
+      columnNames ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*columnNames) : 0);
 }
 
 }  // namespace interpreter

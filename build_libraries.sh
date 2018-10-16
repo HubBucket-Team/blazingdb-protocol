@@ -6,6 +6,7 @@ cmake ..
 make clean
 make -j8
 
+rm -rf src/blazingdb/
 cp src/blazingdb/protocol/all_generated.h ../src/blazingdb/protocol/message/generated/
 echo "	copy updated compiled flatbuffer"
 make clean
@@ -16,7 +17,7 @@ echo "Build java library"
 cd java
 mvn clean install
 
-cd $CWD
+# cd $CWD
 # echo "Build python library"
 # cd python/blazingdb/messages/
 # flatc -p --gen-all --gen-object-api ../../../messages/all.fbs
