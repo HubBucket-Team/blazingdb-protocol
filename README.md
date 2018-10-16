@@ -22,10 +22,11 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j8 install
 ```
 
-## Build blazingdb-protocol library
+## Build and test blazingdb-protocol library
 
 ```
-bash build.sh
+bash build_libraries.sh
+bash test_libraries.sh
 ```
 
 ## Build Integration Tests
@@ -34,13 +35,6 @@ Before to build integration test you must build the blazingdb-protocol library
 ```
 cd integration
 bash build.sh
-```
-
-## Clean Integration Tests
-
-```
-cd integration
-bash clean.sh
 ```
 
 ## Initialize Services

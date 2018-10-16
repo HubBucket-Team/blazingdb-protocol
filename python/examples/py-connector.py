@@ -9,6 +9,10 @@ from blazingdb.protocol.interpreter import InterpreterMessage
 from blazingdb.protocol.orchestrator import OrchestratorMessageType
 
 from blazingdb.protocol.gdf import gdf_columnSchema
+import pycuda.gpuarray as gpuarray
+import pycuda.driver as cuda
+import numpy
+
 
 class PyConnector:
   def __init__(self, orchestrator_path, interpreter_path):
@@ -38,14 +42,22 @@ class PyConnector:
     client = blazingdb.protocol.Client(connection)
     return client.send(requestBuffer)
 
-  def _BuildDMLRequestSchema(self, query, tableGroup):
-    data = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved='data'.encode())
-    valid = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved='valid'.encode())
-    dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit=0)
-    gdfColumn = blazingdb.protocol.gdf.gdf_columnSchema(data=data, valid=valid, size=10, dtype=0, dtype_info=dtype_info, null_count=0)
-
-    table1 = blazingdb.protocol.orchestrator.BlazingTableSchema(name='user', columns=[gdfColumn, gdfColumn], columnNames=['id', 'age'])
-    tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=[table1], name='alexdb')
+  def _BuildDMLRequestSchema(self, query, tableGroupDto):
+    tableGroupName = tableGroupDto['name']
+    tables = []
+    for index, t in enumerate(tableGroupDto['tables']):
+      tableName = t['name']
+      columnNames = t['columnNames']
+      columns = []
+      for i, c in enumerate(t['columns']):
+        data = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['data'])
+        valid = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['valid'])
+        dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit= c['dtype_info'])
+        gdfColumn = blazingdb.protocol.gdf.gdf_columnSchema(data=data, valid=valid, size=c['size'], dtype=c['dtype'], dtype_info=dtype_info, null_count=0)
+        columns.append(gdfColumn)
+      table = blazingdb.protocol.orchestrator.BlazingTableSchema(name=tableName, columns=columns, columnNames=columnNames)
+      tables.append(table)
+    tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=tables, name=tableGroupName)
     return blazingdb.protocol.orchestrator.DMLRequestSchema(query=query, tableGroup=tableGroup)
 
   def run_dml_query(self, query, tableGroup):
@@ -60,7 +72,7 @@ class PyConnector:
       raise Error(errorResponse.errors)
     dmlResponseDTO = blazingdb.protocol.orchestrator.DMLResponseSchema.From(response.payload)
     print(dmlResponseDTO.resultToken)
-    self._get_result(dmlResponseDTO.resultToken)
+    return self._get_result(dmlResponseDTO.resultToken)
 
   def run_ddl_create_table(self, tableName, columnNames, columnTypes, dbName):
     print(tableName)
@@ -128,13 +140,36 @@ class PyConnector:
     print('    message: %s' % getResultResponse.metadata.message)
     print('       time: %s' % getResultResponse.metadata.time)
     print('       rows: %s' % getResultResponse.metadata.rows)
-    print('  fieldNames: %s' % list(getResultResponse.fieldNames))
+    print('  fieldNames: %s' % list(getResultResponse.columnNames))
     print('  values:')
-    print('    size: %s' % [value.size for value in getResultResponse.values])
+
+    print("#BEGIN-RESULT_SET:")
+    columns = [value.data for value in getResultResponse.columns]
+    print(len(columns))
+    for column in columns:
+      x_ptr = cuda.IPCMemoryHandle(bytearray(column.reserved))
+      x_gpu = gpuarray.GPUArray((1, column.size), numpy.int8, gpudata=x_ptr)
+      print('gpu:  ', x_gpu.get())
+    print("#END-RESULT_SET:")
+
+    return getResultResponse
+
+
+def create_sample_device_data():
+  a = numpy.random.randn(1, 32)
+  a = a.astype(numpy.int8)
+  print('orig: ', a)
+  a_gpu = cuda.mem_alloc(a.size * a.dtype.itemsize)
+  cuda.memcpy_htod(a_gpu, a)
+  return a_gpu
 
 def main():
 
   client = PyConnector('/tmp/orchestrator.socket', '/tmp/ral.socket')
+
+  cuda.init()
+  dev = cuda.Device(0)
+  ctx_gpu = dev.make_context()
 
   try:
     client.connect()
@@ -146,20 +181,26 @@ def main():
   except Error as err:
     print(err)
 
+  data_gpu = create_sample_device_data()
+  data_handler = bytes(cuda.mem_get_ipc_handle(data_gpu))
+  valid_gpu = create_sample_device_data()
+  valid_handler = bytes(cuda.mem_get_ipc_handle(valid_gpu))
+
   try:
     tableGroup = {
       'name': 'alexdb',
       'tables': [
         {
           'name': 'user',
-          'columns': [{'data': 0, 'valid': 0, 'size': 0, 'dtype': 0, 'dtype_info': 0},
-                      {'data': 0, 'valid': 0, 'size': 20, 'dtype': 1, 'dtype_info': 1}],
+          'columns': [{'data': data_handler, 'valid': valid_handler, 'size': 32, 'dtype': 0, 'dtype_info': 0}],
           'columnNames': ['id', 'age']
         }
       ]
     }
-    client.run_dml_query('select * from Table', tableGroup)
-  except SyntaxError as err:
+    resultSet = client.run_dml_query('select * from Table', tableGroup)
+
+
+  except Error as err:
     print(err)
 
   try:
@@ -168,6 +209,7 @@ def main():
     print(err)
 
   client.close_connection()
+  ctx_gpu.pop()
 
 if __name__ == '__main__':
   main()

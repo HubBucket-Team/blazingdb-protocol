@@ -25,6 +25,15 @@
             <version>1.7.0.1</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.zeromq/czmq-jni -->
+        <!-- https://mvnrepository.com/artifact/org.zeromq/jzmq -->
+        <dependency>
+            <groupId>org.zeromq</groupId>
+            <artifactId>jzmq</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

@@ -6,8 +6,8 @@
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
 
-#include <blazingdb/protocol/calcite/messages.h>
-#include <blazingdb/protocol/orchestrator/messages.h>
+#include <blazingdb/protocol/message/calcite/messages.h>
+#include <blazingdb/protocol/message/orchestrator/messages.h>
 
 namespace blazingdb {
 namespace protocol { 

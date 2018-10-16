@@ -13,6 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.blazingdb.protocol.util.ByteBufferUtil;
+import com.blazingdb.protocol.util.SocketChannelInputStream;
+import com.blazingdb.protocol.util.SocketChannelOutputStream;
 import jnr.enxio.channels.NativeSelectorProvider;
 import jnr.unixsocket.UnixServerSocket;
 import jnr.unixsocket.UnixServerSocketChannel;
@@ -53,13 +55,16 @@ public class UnixService implements Runnable {
 
         public final boolean rxready(IService handler) {
             try {
-                ByteBuffer buf = ByteBuffer.allocate(MAX_BUFFER_SIZE);
-                buf.order(ByteOrder.LITTLE_ENDIAN);
-                int n = channel.read(buf);
+                SocketChannelInputStream receiver = new SocketChannelInputStream(channel);
+                int length = receiver.read();
+                byte [] buffer = new byte[length];
+                int n = receiver.read(buffer);
                 if (n > 0) {
-                    buf.rewind();
-                    ByteBuffer response = handler.process(buf);
-                    channel.write(  ByteBufferUtil.getByteArrayFromByteBuffer(response) );
+                    ByteBuffer response = handler.process(ByteBuffer.wrap(buffer));
+                    SocketChannelOutputStream sender = new SocketChannelOutputStream(channel);
+                    byte [] responseBytes = response.array();
+                    sender.write(responseBytes.length);
+                    sender.write(responseBytes);
                     return true;
                 } else if (n < 0) {
                     return false;
