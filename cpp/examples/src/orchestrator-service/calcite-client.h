@@ -19,7 +19,6 @@ public:
   CalciteClient(blazingdb::protocol::Connection& con) : client { con }
   {}
 
-  //todo: reducir codigo usando MakeRequest & MakeResponse
   std::string getLogicalPlan(std::string query)  {
 
     int64_t sessionToken = 0;

@@ -26,14 +26,14 @@ int main() {
           BlazingTableDTO {
               .name="user",
               .columns = {
-                  ::libgdf::gdf_column {
-                        .data = one.data(),
-                        .valid = one.valid(),
+                  ::gdf_dto::gdf_column {
+                        .data = libgdf::BuildCudaIpcMemHandler(one.data()),
+                        .valid = libgdf::BuildCudaIpcMemHandler(one.valid()),
                         .size = one.size(),
-                        .dtype = (libgdf::gdf_dtype)one.dtype(),
+                        .dtype = (gdf_dto::gdf_dtype)one.dtype(),
                         .null_count = one.null_count(),
-                        .dtype_info = libgdf::gdf_dtype_extra_info {
-                        .time_unit = (libgdf::gdf_time_unit)0,
+                        .dtype_info = gdf_dto::gdf_dtype_extra_info {
+                        .time_unit = (gdf_dto::gdf_time_unit)0,
                       },
                   },
               },
@@ -48,7 +48,8 @@ int main() {
 
     auto resultSet = client.getResult(resultToken, 123456L);
     std::cout << "get result:\n";
-    libgdf::print_column( &resultSet[0] );
+    libgdf::DtoToGdfColumn(resultSet);
+
 
   } catch (std::runtime_error &error) {
     std::cout << error.what() << std::endl;

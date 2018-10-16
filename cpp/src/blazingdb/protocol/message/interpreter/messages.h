@@ -4,7 +4,8 @@
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
 #include "../messages.h"
-#include "dto.cuh"
+#include "utils.h"
+#include "gdf_dto.h"
 
 namespace blazingdb {
 namespace protocol {
@@ -152,7 +153,7 @@ struct BlazingMetadataDTO{
 
 class GetResultResponseMessage : public IMessage {
 public:
-  GetResultResponseMessage (const BlazingMetadataDTO&  metadata, const std::vector<std::string>& columnNames, const std::vector<::libgdf::gdf_column>& columns)
+  GetResultResponseMessage (const BlazingMetadataDTO&  metadata, const std::vector<std::string>& columnNames, const std::vector<::gdf_dto::gdf_column>& columns)
       : IMessage(), metadata{metadata}, columnNames{columnNames}, columns{columns}
   {
 
@@ -196,7 +197,7 @@ public:
     return columnNames;
   }
 
-  std::vector<::libgdf::gdf_column> getColumns()
+  std::vector<::gdf_dto::gdf_column> getColumns()
   {
     return columns;
   }
@@ -204,7 +205,7 @@ public:
 public:
   BlazingMetadataDTO  metadata;
   std::vector<std::string> columnNames;
-  std::vector<::libgdf::gdf_column> columns;
+  std::vector<::gdf_dto::gdf_column> columns;
 };
 
 

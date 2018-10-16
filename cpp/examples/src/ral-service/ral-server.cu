@@ -4,7 +4,7 @@
 #include <blazingdb/protocol/api.h>
 
 #include <blazingdb/protocol/message/messages.h>
-#include <blazingdb/protocol/message/interpreter/messages.cuh>
+#include <blazingdb/protocol/message/interpreter/messages.h>
 #include "../gdf/GDFColumn.cuh"
 
 using namespace blazingdb::protocol;
@@ -40,20 +40,31 @@ static result_pair getResultService(uint64_t accessToken, Buffer&& requestPayloa
     .rows = 1
   }; 
   std::vector<std::string> fieldNames = {"id", "age"};
-  std::vector<::libgdf::gdf_column> values = {
-    ::libgdf::gdf_column {
-                      .data = one.data(),
-                      .valid = one.valid(),
+  std::vector<::gdf_dto::gdf_column> values = {
+    ::gdf_dto::gdf_column {
+                      .data = libgdf::BuildCudaIpcMemHandler(one.data()),
+                      .valid = libgdf::BuildCudaIpcMemHandler(one.valid()),
                       .size = one.size(),
-                      .dtype = (libgdf::gdf_dtype)one.dtype(),
+                      .dtype = (gdf_dto::gdf_dtype)one.dtype(),
                       .null_count = one.null_count(),
-                      .dtype_info = libgdf::gdf_dtype_extra_info {
-                          .time_unit = (libgdf::gdf_time_unit)0,
+                      .dtype_info = gdf_dto::gdf_dtype_extra_info {
+                          .time_unit = (gdf_dto::gdf_time_unit)0,
                       },
                   }, 
   };
   interpreter::GetResultResponseMessage responsePayload(metadata, fieldNames, values);
   return std::make_pair(Status_Success, responsePayload.getBufferData());
+}
+
+
+static result_pair freeResultService(uint64_t accessToken, Buffer&& requestPayloadBuffer) {
+   std::cout << "freeResultService: " << accessToken << std::endl;
+
+  interpreter::GetResultRequestMessage request(requestPayloadBuffer.data());
+  std::cout << "resultToken: " << request.getResultToken() << std::endl;
+  
+  ZeroMessage response{};
+  return std::make_pair(Status_Success, response.getBufferData());
 }
 
 
@@ -65,11 +76,8 @@ static result_pair executePlanService(uint64_t accessToken, Buffer&& requestPayl
   std::cout << "query: " << requestPayload.getLogicalPlan() << std::endl;
   std::cout << "tableGroup: " << requestPayload.getTableGroup().name << std::endl;
 	std::cout << "tableSize: " << requestPayload.getTableGroup().tables.size() << std::endl;
-	std::cout << "FirstColumnSize: "
-			<< requestPayload.getTableGroup().tables[0].columns[0].size
-			<< std::endl;
 
-	libgdf::print_column(&requestPayload.getTableGroup().tables[0].columns[0]);
+  libgdf::ToBlazingFrame(requestPayload.getTableGroup());
 
   uint64_t resultToken = 543210L;
   interpreter::NodeConnectionInformationDTO nodeInfo {
@@ -89,6 +97,7 @@ int main() {
   services.insert(std::make_pair(interpreter::MessageType_ExecutePlan, &executePlanService));
   services.insert(std::make_pair(interpreter::MessageType_CloseConnection, &closeConnectionService));
   services.insert(std::make_pair(interpreter::MessageType_GetResult, &getResultService));
+  services.insert(std::make_pair(interpreter::MessageType_FreeResult, &freeResultService));
 
   auto interpreterServices = [&services](const blazingdb::protocol::Buffer &requestPayloadBuffer) -> blazingdb::protocol::Buffer {
     RequestMessage request{requestPayloadBuffer.data()};

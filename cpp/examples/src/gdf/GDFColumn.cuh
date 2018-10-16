@@ -8,11 +8,26 @@
 #ifndef GDFCOLUMN_H_
 #define GDFCOLUMN_H_
 
+#include <blazingdb/protocol/message/messages.h>
+#include <blazingdb/protocol/message/interpreter/messages.h>
 #include "GDFCounter.cuh"
+#include "libgdf.h"
+#include <cuda_runtime.h>
 
-#include <blazingdb/protocol/message/interpreter/libgdf.cuh>
+#define cudaCheckErrors(msg) \
+    do { \
+        cudaError_t __err = cudaGetLastError(); \
+        if (__err != cudaSuccess) { \
+            fprintf(stderr, "Fatal error: %s (%s at %s:%d)\n", \
+                msg, cudaGetErrorString(__err), \
+                __FILE__, __LINE__); \
+            fprintf(stderr, "*** FAILED - ABORTING\n"); \
+            exit(1); \
+        } \
+    } while (0)
 
 namespace libgdf {
+
 class gdf_column_cpp
 {
 	private:
@@ -178,6 +193,30 @@ void gdf_column_cpp::set_dtype(gdf_dtype dtype){
     column.dtype=dtype;
 }
 
+
+
+static std::basic_string<int8_t> BuildCudaIpcMemHandler (void *data) {
+  cudaIpcMemHandle_t ipc_memhandle;
+  cudaIpcGetMemHandle( &ipc_memhandle, (void*)data );
+  cudaCheckErrors("Build IPC handle fail"); 
+
+  std::basic_string<int8_t> bytes;
+  bytes.resize(sizeof(cudaIpcMemHandle_t));
+  memcpy((void*)bytes.data(), (int8_t*)(&ipc_memhandle), sizeof(cudaIpcMemHandle_t));
+  return bytes;
+}
+
+static void* CudaIpcMemHandlerFrom (const std::basic_string<int8_t>& handler) {
+  void * response = nullptr;
+  cudaIpcMemHandle_t ipc_memhandle;
+
+  memcpy((int8_t*)&ipc_memhandle, handler.data(), sizeof(ipc_memhandle));
+  cudaIpcOpenMemHandle((void **)&response, ipc_memhandle, cudaIpcMemLazyEnablePeerAccess);
+  cudaCheckErrors("From IPC handle fail");
+  return response;
+}
+
+
 #define GDF_VALID_BITSIZE 8
 
 static void create_sample_gdf_column(libgdf::gdf_column_cpp &one) {
@@ -214,6 +253,30 @@ static void print_column(gdf_column * column){
 
 	std::cout<<std::endl<<std::endl;
 }
+
+
+void DtoToGdfColumn(const std::vector<::gdf_dto::gdf_column> &columns) {
+  for (auto &column : columns) {
+      ::libgdf::gdf_column gdf_pointer{
+              .data = libgdf::CudaIpcMemHandlerFrom(column.data),
+              .valid = (unsigned char*)libgdf::CudaIpcMemHandlerFrom(column.valid),
+              .size = column.size,
+              .dtype = (libgdf::gdf_dtype)column.dtype,
+              .null_count = column.null_count,
+              .dtype_info = libgdf::gdf_dtype_extra_info {
+                .time_unit = (libgdf::gdf_time_unit)column.dtype_info.time_unit,
+              },
+          };
+      libgdf::print_column( &gdf_pointer );
+    }
+}
+
+void ToBlazingFrame(const ::blazingdb::protocol::TableGroupDTO& tableGroup) {
+  for (auto& table : tableGroup.tables) { 
+      DtoToGdfColumn(table.columns);
+  }
+}
+
 
 }
 #endif /* GDFCOLUMN_H_ */

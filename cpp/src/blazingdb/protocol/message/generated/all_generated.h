@@ -297,15 +297,17 @@ namespace interpreter {
 enum MessageType {
   MessageType_ExecutePlan = 0,
   MessageType_GetResult = 1,
-  MessageType_CloseConnection = 2,
+  MessageType_FreeResult = 2,
+  MessageType_CloseConnection = 3,
   MessageType_MIN = MessageType_ExecutePlan,
   MessageType_MAX = MessageType_CloseConnection
 };
 
-inline const MessageType (&EnumValuesMessageType())[3] {
+inline const MessageType (&EnumValuesMessageType())[4] {
   static const MessageType values[] = {
     MessageType_ExecutePlan,
     MessageType_GetResult,
+    MessageType_FreeResult,
     MessageType_CloseConnection
   };
   return values;
@@ -315,6 +317,7 @@ inline const char * const *EnumNamesMessageType() {
   static const char * const names[] = {
     "ExecutePlan",
     "GetResult",
+    "FreeResult",
     "CloseConnection",
     nullptr
   };
