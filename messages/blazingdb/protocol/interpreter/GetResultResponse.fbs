@@ -12,8 +12,8 @@ table BlazingMetadata {
 
 table GetResultResponse {
   metadata: BlazingMetadata;
-  fieldNames: [string];
-  values: [blazingdb.protocol.gdf.gdf_column_handler];
+  columns: [blazingdb.protocol.gdf.gdf_column_handler];
+  columnNames: [string];
 }
 
 root_type GetResultResponse;

@@ -32,12 +32,9 @@ public class CalciteServiceExample {
                     ResponseMessage response = null;
                     System.out.println("DML: " + requestPayload.getQuery());
                     if (requestPayload.getQuery().contains("select")) {
-                        String logicalPlan = logicalPlan = "LogicalUnion(all=[false])\n" +
-                                "  LogicalUnion(all=[false])\n" +
-                                "    LogicalProject(EXPR$0=[$1], join_x=[$0])\n" +
-                                "      LogicalAggregate(group=[{0}], EXPR$0=[SUM($1)])\n" +
-                                "        LogicalProject(join_x=[$4], join_x0=[$7])\n" +
-                                "          LogicalJoin(condition=[=($7, $0)], joinType=[inner])\n";
+                        String logicalPlan = ""+
+                            "LogicalProject(EXPR$0=[>($0, 5)])\n"+
+                            "EnumerableTableScan(table=[[hr, emps]])";
                         DMLResponseMessage responsePayload = new DMLResponseMessage(logicalPlan);
                         response = new ResponseMessage(Status.Success, responsePayload.getBufferData());
                     } else {
