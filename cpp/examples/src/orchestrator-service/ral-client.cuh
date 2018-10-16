@@ -7,7 +7,7 @@
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
 
-#include <blazingdb/protocol/message/interpreter/messages.cuh>
+#include <blazingdb/protocol/message/interpreter/messages.h>
 
 namespace blazingdb {
 namespace protocol { 
@@ -51,7 +51,7 @@ public:
     return responsePayload.getResultToken();
   }
 
-  std::vector<::libgdf::gdf_column> getResult(uint64_t resultToken, int64_t access_token){
+  std::vector<::gdf_dto::gdf_column> getResult(uint64_t resultToken, int64_t access_token){
     auto bufferedData = MakeRequest(interpreter::MessageType_GetResult,
                                      access_token,
                                      interpreter::GetResultRequestMessage {resultToken});

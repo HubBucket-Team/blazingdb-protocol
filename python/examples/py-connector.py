@@ -9,6 +9,7 @@ from blazingdb.protocol.interpreter import InterpreterMessage
 from blazingdb.protocol.orchestrator import OrchestratorMessageType
 
 from blazingdb.protocol.gdf import gdf_columnSchema
+import pycuda.gpuarray as gpuarray
 import pycuda.driver as cuda
 import numpy
 
@@ -71,7 +72,8 @@ class PyConnector:
       raise Error(errorResponse.errors)
     dmlResponseDTO = blazingdb.protocol.orchestrator.DMLResponseSchema.From(response.payload)
     print(dmlResponseDTO.resultToken)
-    self._get_result(dmlResponseDTO.resultToken)
+    return self._get_result(dmlResponseDTO.resultToken)
+
 
   def run_ddl_create_table(self, tableName, columnNames, columnTypes, dbName):
     print(tableName)
@@ -113,6 +115,23 @@ class PyConnector:
       print(errorResponse.errors)
     print(response.status)
 
+  def free_result(self, result_token):
+
+    getResultRequest = blazingdb.protocol.interpreter.GetResultRequestSchema(
+      resultToken=result_token)
+
+    requestBuffer = blazingdb.protocol.transport.channel.MakeRequestBuffer(
+      InterpreterMessage.FreeResult, self.accessToken, getResultRequest)
+
+    responseBuffer = self._send_request(self._interpreter_path, requestBuffer)
+
+    response = blazingdb.protocol.transport.channel.ResponseSchema.From(
+      responseBuffer)
+
+    if response.status == Status.Error:
+      raise ValueError('Error status')
+    print ('free result OK!')
+
   def _get_result(self, result_token):
 
     getResultRequest = blazingdb.protocol.interpreter.GetResultRequestSchema(
@@ -139,13 +158,22 @@ class PyConnector:
     print('    message: %s' % getResultResponse.metadata.message)
     print('       time: %s' % getResultResponse.metadata.time)
     print('       rows: %s' % getResultResponse.metadata.rows)
-    print('  fieldNames: %s' % list(getResultResponse.columnNames))
-    print('  values:')
-    print('    size: %s' % [value.size for value in getResultResponse.columns])
-    # x_ptr = drv.IPCMemoryHandle(bytearray(bytes(h)))
-    # x_gpu = gpuarray.GPUArray((1, 32), numpy.int8, gpudata=x_ptr)
-    # print('gpu:  ', x_gpu.get())
+    print('  columnNames: %s' % list(getResultResponse.columnNames))
+    # print('  values: %s', [value.size for value in list(getResultResponse.columns)])
 
+    # print("#BEGIN-RESULT_SET:")
+    # print(getResultResponse.columns)
+    # 
+    # print(list(getResultResponse.columns))
+    # columns = [value.data for value in getResultResponse.columns]
+    # print(len(columns))
+    # for column in columns:
+    #   x_ptr = cuda.IPCMemoryHandle(bytearray(column.reserved))
+    #   x_gpu = gpuarray.GPUArray((1, column.size), numpy.int8, gpudata=x_ptr)
+    #   print('gpu:  ', x_gpu.get())
+    # print("#END-RESULT_SET:")
+
+    return getResultResponse
 
 
 def create_sample_device_data():
@@ -190,7 +218,9 @@ def main():
         }
       ]
     }
-    client.run_dml_query('select * from Table', tableGroup)
+    resultSet = client.run_dml_query('select * from Table', tableGroup)
+    resultSet = client.free_result(123456)
+
   except Error as err:
     print(err)
 

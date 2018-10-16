@@ -11,9 +11,10 @@
 #include <map>
 #include <mutex>
 
-#include <blazingdb/protocol/message/interpreter/libgdf.cuh>
+#include "libgdf.h"
 
 namespace libgdf{
+
 typedef std::pair<void*, gdf_valid_type*> rc_key_t; // std::pair<void* data, gdf_valid_type* valid>
 
 class GDFRefCounter

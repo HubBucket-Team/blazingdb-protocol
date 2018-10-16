@@ -25,30 +25,21 @@ make -j8 install
 ## Build and test blazingdb-protocol library
 
 ```
-bash build_libraries.sh
-bash test_libraries.sh
-```
-
-## Build Integration Tests
-Before to build integration test you must build the blazingdb-protocol library
-
-```
-cd integration
-bash build.sh
+./build_libraries.sh
 ```
 
 ## Initialize Services
 
 Initialize blazingsql services
-```
-cd integration
-bash run.sh
-```
-
-Use blazingsql python client 
 
 ```
-cd integration/clients/python-connector
+./ test_libraries.sh
+```
+
+## Use blazingsql python client 
+
+```
+cd python/examples/
 python3 py-connector.py
 
 ```
