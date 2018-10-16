@@ -9,6 +9,7 @@ from blazingdb.protocol.interpreter import InterpreterMessage
 from blazingdb.protocol.orchestrator import OrchestratorMessageType
 
 from blazingdb.protocol.gdf import gdf_columnSchema
+import pycuda.gpuarray as gpuarray
 import pycuda.driver as cuda
 import numpy
 
@@ -71,7 +72,7 @@ class PyConnector:
       raise Error(errorResponse.errors)
     dmlResponseDTO = blazingdb.protocol.orchestrator.DMLResponseSchema.From(response.payload)
     print(dmlResponseDTO.resultToken)
-    self._get_result(dmlResponseDTO.resultToken)
+    return self._get_result(dmlResponseDTO.resultToken)
 
   def run_ddl_create_table(self, tableName, columnNames, columnTypes, dbName):
     print(tableName)
@@ -141,11 +142,17 @@ class PyConnector:
     print('       rows: %s' % getResultResponse.metadata.rows)
     print('  fieldNames: %s' % list(getResultResponse.columnNames))
     print('  values:')
-    print('    size: %s' % [value.size for value in getResultResponse.columns])
-    # x_ptr = drv.IPCMemoryHandle(bytearray(bytes(h)))
-    # x_gpu = gpuarray.GPUArray((1, 32), numpy.int8, gpudata=x_ptr)
-    # print('gpu:  ', x_gpu.get())
 
+    print("#BEGIN-RESULT_SET:")
+    columns = [value.data for value in getResultResponse.columns]
+    print(len(columns))
+    for column in columns:
+      x_ptr = cuda.IPCMemoryHandle(bytearray(column.reserved))
+      x_gpu = gpuarray.GPUArray((1, column.size), numpy.int8, gpudata=x_ptr)
+      print('gpu:  ', x_gpu.get())
+    print("#END-RESULT_SET:")
+
+    return getResultResponse
 
 
 def create_sample_device_data():
@@ -190,7 +197,9 @@ def main():
         }
       ]
     }
-    client.run_dml_query('select * from Table', tableGroup)
+    resultSet = client.run_dml_query('select * from Table', tableGroup)
+
+
   except Error as err:
     print(err)
 
