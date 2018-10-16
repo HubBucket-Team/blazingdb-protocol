@@ -6,6 +6,7 @@ message(STATUS "Using C++ standard: c++${CMAKE_CXX_STANDARD}")
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
 message(STATUS "CMAKE_MODULE_PATH:" "${CMAKE_MODULE_PATH}")
+find_package(CUDA)
 
 # Include CMake modules
 include(FeatureSummary)

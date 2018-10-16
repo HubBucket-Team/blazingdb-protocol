@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.3)
 project(blazing_protocol_examples)
 include(ConfigureCUDA)
-find_package( Threads )
+find_package(Threads)
 
 set(LIBRARIES blazingdb-protocol  ${CMAKE_THREAD_LIBS_INIT})
 
@@ -23,4 +23,5 @@ target_link_libraries(blazingdb_ral_service ${LIBRARIES} ${CUDA_CUDA_LIBRARY} ${
 
 cuda_add_executable(ipc_server src/ipc_py.cu)
 target_link_libraries(ipc_server ${LIBRARIES} ${CUDA_CUDA_LIBRARY} ${CUDA_NVRTC_LIBRARY})
+
 

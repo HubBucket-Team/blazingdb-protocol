@@ -20,6 +20,7 @@ include(FeatureSummary)
 include(CheckIncludeFiles)
 include(CheckLibraryExists)
 include(CTest)
+find_package(CUDA)
 
 # Output all binaries and libs into a common folder across all libraries.
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

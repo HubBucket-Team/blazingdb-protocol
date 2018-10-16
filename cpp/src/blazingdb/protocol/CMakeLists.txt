@@ -4,7 +4,7 @@ set(SRCS
   server/server.cc
 )
 
-add_library(blazingdb-protocol ${SRCS})
+cuda_add_library(blazingdb-protocol ${SRCS})
 target_link_libraries(blazingdb-protocol Google::Flatbuffers)
 
 add_custom_command(TARGET blazingdb-protocol
