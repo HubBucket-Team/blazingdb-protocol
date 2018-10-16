@@ -11,6 +11,29 @@ namespace protocol {
 
 namespace interpreter {
 
+
+class ExecutePlanDirectRequestMessage  : public IMessage {
+public:
+
+  ExecutePlanDirectRequestMessage(const std::string &logicalPlan, const blazingdb::protocol::TableGroup *tableGroup)
+      : IMessage(), logicalPlan{logicalPlan}, tableGroup{tableGroup}
+  {
+
+  } 
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
+    flatbuffers::FlatBufferBuilder builder;
+    auto logicalPlan_offset = builder.CreateString(logicalPlan);
+    auto tableGroupOffset = ::blazingdb::protocol::BuildDirectTableGroup(builder, tableGroup);
+    builder.Finish(interpreter::CreateDMLRequest(builder, logicalPlan_offset, tableGroupOffset));
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+  }
+
+private:
+  std::string logicalPlan;
+  const blazingdb::protocol::TableGroup * tableGroup;
+};
+
 class ExecutePlanRequestMessage  : public IMessage {
 public:
 
@@ -24,6 +47,7 @@ public:
   {
     auto pointer = flatbuffers::GetRoot<blazingdb::protocol::interpreter::DMLRequest>(buffer);
     logicalPlan = std::string{pointer->logicalPlan()->c_str()};
+    std::cout << "query-stirng-log>>" << logicalPlan << std::endl;
     tableGroup =  ::blazingdb::protocol::TableGroupDTOFrom(pointer->tableGroup());
   }
 

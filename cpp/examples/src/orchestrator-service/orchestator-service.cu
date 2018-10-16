@@ -46,7 +46,7 @@ static result_pair  dmlService(uint64_t accessToken, Buffer&& buffer)  {
     try {
       blazingdb::protocol::UnixSocketConnection ral_client_connection{"/tmp/ral.socket"};
       interpreter::InterpreterClient ral_client{ral_client_connection};
-      resultToken = ral_client.executePlan(logicalPlan, requestPayload.getTableGroup(), accessToken);
+      resultToken = ral_client.executeDirectPlan(logicalPlan, requestPayload.getTableGroup(), accessToken);
       std::cout << "resultToken:" << resultToken << std::endl;
     } catch (std::runtime_error &error) {
       // error with query plan: not resultToken

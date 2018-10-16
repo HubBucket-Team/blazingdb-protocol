@@ -191,6 +191,7 @@ static void create_sample_gdf_column(libgdf::gdf_column_cpp &one) {
   GDFRefCounter::getInstance()->deregister_column(one.get_gdf_column());
 }
 
+//todo: rehacer gdf-cpp- and utils
 static void print_column(gdf_column * column){
 	char * host_data_out = new char[column->size];
 	char * host_valid_out;

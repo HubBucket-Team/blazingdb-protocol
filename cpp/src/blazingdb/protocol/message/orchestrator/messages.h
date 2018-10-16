@@ -19,8 +19,6 @@ public:
     auto pointer = flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DMLRequest>(buffer);
     query = std::string{pointer->query()->c_str()};
     tableGroup =  pointer->tableGroup();
-    // todo: 
-
   }
  
   std::string getQuery () {

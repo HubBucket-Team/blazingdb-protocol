@@ -46,16 +46,21 @@ struct TableGroupDTO {
 
 
 static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildCudaIpcMemHandler (flatbuffers::FlatBufferBuilder &builder, void *data) {
-  flatbuffers::Offset<flatbuffers::Vector<int8_t>> offsets;
+
   cudaIpcMemHandle_t ipc_memhandle;
   cudaIpcGetMemHandle( &ipc_memhandle, (void*)data );
-  cudaCheckErrors("IPC handle fail");
+  cudaCheckErrors("Build IPC handle fail");
 
   int8_t* bytes = new int8_t[sizeof(cudaIpcMemHandle_t)];
   memcpy(bytes, (int8_t*)(&ipc_memhandle), sizeof(cudaIpcMemHandle_t));
 
   return builder.CreateVector(bytes, sizeof(cudaIpcMemHandle_t));
 }
+
+static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildDirectCudaIpcMemHandler (flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<int8_t> * data) {
+  return builder.CreateVector(data->data(), sizeof(cudaIpcMemHandle_t));
+}
+
 
 static void* CudaIpcMemHandlerFrom (const gdf::cudaIpcMemHandle_t *handler) {
   void * response = nullptr;
@@ -64,7 +69,7 @@ static void* CudaIpcMemHandlerFrom (const gdf::cudaIpcMemHandle_t *handler) {
   auto bytes = handler->reserved();
   memcpy((int8_t*)&ipc_memhandle, bytes->data(), sizeof(ipc_memhandle));
   cudaIpcOpenMemHandle((void **)&response, ipc_memhandle, cudaIpcMemLazyEnablePeerAccess);
-  cudaCheckErrors("IPC handle fail");
+  cudaCheckErrors("From IPC handle fail");
 
   return response;
 }
@@ -137,6 +142,27 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildFlatColumnNames(flat
   return offsets;
 };
 
+
+std::vector<flatbuffers::Offset<gdf::gdf_column_handler>>  BuildDirectFlatColumns(flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *rawColumns) {
+  std::vector<flatbuffers::Offset<gdf::gdf_column_handler>> offsets;
+  for (const auto & c: *rawColumns) {
+    auto dtype_extra_info = gdf::Creategdf_dtype_extra_info (builder, (gdf::gdf_time_unit)c->dtype_info()->time_unit() );
+     auto data_offset =  gdf::CreatecudaIpcMemHandle_t(builder, BuildDirectCudaIpcMemHandler(builder, c->data()->reserved()) );
+     auto valid_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildDirectCudaIpcMemHandler(builder, c->valid()->reserved()) );
+    auto column_offset = ::blazingdb::protocol::gdf::Creategdf_column_handler(builder, data_offset, valid_offset, c->size(), (gdf::gdf_dtype)c->dtype(), dtype_extra_info);
+    offsets.push_back(column_offset);
+  }
+  return offsets;
+};
+
+std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildDirectFlatColumnNames(flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *rawNames) {
+  std::vector<flatbuffers::Offset<flatbuffers::String>> offsets;
+  for (const auto & name: *rawNames) {
+    offsets.push_back( builder.CreateString(name->c_str()));
+  }
+  return offsets;
+};
+
 static flatbuffers::Offset<TableGroup> BuildTableGroup(flatbuffers::FlatBufferBuilder &builder,
                                                        const TableGroupDTO &tableGroup) {
   auto tableNameOffset = builder.CreateString(tableGroup.name);
@@ -146,6 +172,25 @@ static flatbuffers::Offset<TableGroup> BuildTableGroup(flatbuffers::FlatBufferBu
     auto columns = BuildFlatColumns(builder, table.columns);
     auto columnNames = BuildFlatColumnNames(builder, table.columnNames);
     tablesOffset.push_back( CreateBlazingTable(builder, builder.CreateString(table.name), builder.CreateVector(columns), builder.CreateVector(columnNames)));
+  }
+
+  auto tables = builder.CreateVector(tablesOffset);
+  return CreateTableGroup(builder, tables, tableNameOffset);
+}
+
+
+static flatbuffers::Offset<TableGroup> BuildDirectTableGroup(flatbuffers::FlatBufferBuilder &builder,
+                                                       const blazingdb::protocol::TableGroup *tableGroup) { 
+  auto tableNameOffset = builder.CreateString(tableGroup->name()->c_str());
+  std::vector<flatbuffers::Offset<BlazingTable>> tablesOffset;
+  auto rawTables = tableGroup->tables();
+  for (const auto &table : *rawTables) {
+    auto columns = BuildDirectFlatColumns(builder, table->columns());
+    auto columnNames = BuildDirectFlatColumnNames(builder, table->columnNames());
+    tablesOffset.push_back( CreateBlazingTable(builder, 
+                            builder.CreateString(table->name()->c_str()),
+                            builder.CreateVector(columns), 
+                            builder.CreateVector(columnNames)));
   }
 
   auto tables = builder.CreateVector(tablesOffset);
