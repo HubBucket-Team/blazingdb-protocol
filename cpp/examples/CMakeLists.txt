@@ -25,3 +25,5 @@ cuda_add_executable(ipc_server src/ipc_py.cu)
 target_link_libraries(ipc_server ${LIBRARIES} ${CUDA_CUDA_LIBRARY} ${CUDA_NVRTC_LIBRARY})
 
 
+cuda_add_executable(ipc_numba src/ipc_numba.cu)
+target_link_libraries(ipc_numba ${LIBRARIES} ${CUDA_CUDA_LIBRARY} ${CUDA_NVRTC_LIBRARY})
