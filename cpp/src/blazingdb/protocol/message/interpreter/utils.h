@@ -45,9 +45,10 @@ static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildDirectCudaIpcMemHan
 static std::vector<::gdf_dto::gdf_column>  GdfColumnsFrom(const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *rawColumns) {
   std::vector<::gdf_dto::gdf_column>  columns;
   for (const auto& c : *rawColumns){
+    bool valid_valid = (c->valid()->reserved()->size() == 64);
     ::gdf_dto::gdf_column column = {
         .data = CudaIpcMemHandlerFrom(c->data()),
-        .valid = CudaIpcMemHandlerFrom(c->valid()),
+        .valid = valid_valid ? CudaIpcMemHandlerFrom(c->valid()) : std::basic_string<int8_t>{},
         .size = c->size(),
         .dtype = (gdf_dto::gdf_dtype)c->dtype(),
         .null_count = c->null_count(),
@@ -88,7 +89,7 @@ static TableGroupDTO TableGroupDTOFrom(const blazingdb::protocol::TableGroup * t
       .tables = tables,
       .name = name,
   };
-}
+} 
 
 std::vector<flatbuffers::Offset<gdf::gdf_column_handler>>  BuildFlatColumns(flatbuffers::FlatBufferBuilder &builder, const std::vector<::gdf_dto::gdf_column> &columns) {
   std::vector<flatbuffers::Offset<gdf::gdf_column_handler>> offsets;
@@ -96,7 +97,7 @@ std::vector<flatbuffers::Offset<gdf::gdf_column_handler>>  BuildFlatColumns(flat
     auto dtype_extra_info = gdf::Creategdf_dtype_extra_info (builder, (gdf::gdf_time_unit)c.dtype_info.time_unit );
     auto data_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildCudaIpcMemHandler (builder, c.data) );
     auto valid_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildCudaIpcMemHandler(builder, c.valid) );
-    auto column_offset = ::blazingdb::protocol::gdf::Creategdf_column_handler(builder, data_offset, valid_offset, c.size, (gdf::gdf_dtype)c.dtype, dtype_extra_info);
+    auto column_offset = ::blazingdb::protocol::gdf::Creategdf_column_handler(builder, data_offset, valid_offset, c.size, (gdf::gdf_dtype)c.dtype, dtype_extra_info, c.null_count);
     offsets.push_back(column_offset);
   }
   return offsets;

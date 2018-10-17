@@ -2,7 +2,7 @@
 
 #include <blazingdb/protocol/api.h>
 
-#include "ral-client.cuh"
+#include "ral-client.h"
 
 #include "../gdf/GDFColumn.cuh"
 

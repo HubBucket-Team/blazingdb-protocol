@@ -344,6 +344,29 @@ class VectorSchemaSegment(_VectorSegment, Nested):
     }) for _object in super()._from(_object))
 
 
+class VectorGdfColumnSegment(_VectorSegment, Nested):
+
+  def __init__(self, schema):
+    self._schema = schema
+
+  def _bytes(self, builder, schema):
+    items = [self._schema._set_segments(value, builder)
+             for value in schema._values[self._name]]
+
+    getattr(schema._module,
+            '%sStart%sVector' % (schema._module_name(),
+                                 self._object_name()))(builder, len(items))
+    for item in reversed(items):
+      builder.PrependUOffsetTRelative(item)
+
+    return builder.EndVector(len(items))
+
+  def _from(self, _object):
+    nomembers = ('Init', 'GetRootAs' + self._schema._module_name())
+    return (_dto(member, self._name, nomembers)
+            for member in super()._from(_object))
+
+
 class SchemaSegment(Segment, Nested):
 
   def __init__(self, schema):

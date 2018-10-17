@@ -41,15 +41,15 @@ int main() {
     void *pointer = _CudaIpcMemHandlerFrom(buffer.data());
     libgdf::gdf_column column {
         .data = pointer,                       /**< Pointer to the columns data */
-        .valid = (unsigned char *)pointer,            /**< Pointer to the columns validity bit mask where the 'i'th bit indicates if the 'i'th row is NULL */
-        .size = 32,               /**< Number of data elements in the columns data buffer*/
-        .dtype = (libgdf::gdf_dtype)1,                  /**< The datatype of the column's data */
+        .valid = nullptr,            /**< Pointer to the columns validity bit mask where the 'i'th bit indicates if the 'i'th row is NULL */
+        .size = 10,               /**< Number of data elements in the columns data buffer*/
+        .dtype = libgdf::gdf_dtype::GDF_INT32,                  /**< The datatype of the column's data */
         .null_count = 0,         /**< The number of NULL values in the column's data */
         .dtype_info = libgdf::gdf_dtype_extra_info{
             .time_unit = (libgdf::gdf_time_unit)0,
         }
     };
-    libgdf::print_column<int8_t>(&column);
+    libgdf::print_column<int32_t>(&column);
     return blazingdb::protocol::Buffer(
          reinterpret_cast<const std::uint8_t *>("BlazingDB Response"), 18);
    });

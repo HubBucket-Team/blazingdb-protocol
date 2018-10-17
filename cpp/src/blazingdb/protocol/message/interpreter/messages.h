@@ -169,8 +169,7 @@ public:
         .time = pointer->metadata()->time(),
         .rows = pointer->metadata()->rows()
     };
-    std::cout << "metadata: " << metadata.message << std::endl;
- 
+  
     columnNames = ColumnNamesFrom(pointer->columnNames());
     columns = GdfColumnsFrom(pointer->columns());
   }

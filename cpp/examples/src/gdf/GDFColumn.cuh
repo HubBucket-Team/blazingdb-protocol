@@ -7,6 +7,7 @@
 
 #ifndef GDFCOLUMN_H_
 #define GDFCOLUMN_H_
+#include <iostream>
 
 #include <blazingdb/protocol/message/messages.h>
 #include <blazingdb/protocol/message/interpreter/messages.h>
@@ -208,11 +209,13 @@ static std::basic_string<int8_t> BuildCudaIpcMemHandler (void *data) {
 
 static void* CudaIpcMemHandlerFrom (const std::basic_string<int8_t>& handler) {
   void * response = nullptr;
-  cudaIpcMemHandle_t ipc_memhandle;
-
-  memcpy((int8_t*)&ipc_memhandle, handler.data(), sizeof(ipc_memhandle));
-  cudaIpcOpenMemHandle((void **)&response, ipc_memhandle, cudaIpcMemLazyEnablePeerAccess);
-  cudaCheckErrors("From IPC handle fail");
+  std::cout << "handler-content: " <<  handler.size() <<  std::endl;
+  if (handler.size() == 64) {
+    cudaIpcMemHandle_t ipc_memhandle;
+    memcpy((int8_t*)&ipc_memhandle, handler.data(), sizeof(ipc_memhandle));
+    cudaIpcOpenMemHandle((void **)&response, ipc_memhandle, cudaIpcMemLazyEnablePeerAccess);
+    cudaCheckErrors("From IPC handle fail");       
+  }
   return response;
 }
 
@@ -231,20 +234,30 @@ static void create_sample_gdf_column(libgdf::gdf_column_cpp &one) {
 }
 
 //todo: rehacer gdf-cpp- and utils
-static void print_column(gdf_column * column){
-	char * host_data_out = new char[column->size];
+//@todo: 
+template <typename HostDataType = int8_t>
+void print_column(gdf_column * column){
+
+	HostDataType * host_data_out = new HostDataType[column->size];
 	char * host_valid_out;
-	if(column->size % 8 != 0){
-		host_valid_out = new char[(column->size + (8 - (column->size % 8)))/8];
+
+	if(column->size % GDF_VALID_BITSIZE != 0){
+		host_valid_out = new char[(column->size + (GDF_VALID_BITSIZE - (column->size % GDF_VALID_BITSIZE)))/GDF_VALID_BITSIZE];
 	}else{
-		host_valid_out = new char[column->size / 8];
+		host_valid_out = new char[column->size / GDF_VALID_BITSIZE];
 	}
-	cudaMemcpy(host_data_out,column->data,sizeof(int8_t) * column->size, cudaMemcpyDeviceToHost);
-	cudaMemcpy(host_valid_out,column->valid,sizeof(int8_t) * (column->size + GDF_VALID_BITSIZE - 1) / GDF_VALID_BITSIZE, cudaMemcpyDeviceToHost);
-	std::cout<<"Printing Column address ptr: "<<column<<", Size: "<<column->size<<", Type: "<<column->dtype<<"\n"<<std::flush;
+
+	cudaMemcpy(host_data_out,column->data, sizeof(HostDataType) * column->size, cudaMemcpyDeviceToHost);
+	if (column->valid != nullptr)
+		cudaMemcpy(host_valid_out,column->valid,sizeof(gdf_valid_type) * (column->size + GDF_VALID_BITSIZE - 1) / GDF_VALID_BITSIZE, cudaMemcpyDeviceToHost);
+	else
+		std::cout<<"Valid is null\n";
+
+	std::cout<<"Printing Column address ptr: "<<column<<", Size: "<<column->size<<"\n"<<std::flush;
+
 	for(int i = 0; i < column->size; i++){
-		int col_position = i / 8;
-		int bit_offset = 8 - (i % 8);
+		int col_position = i / GDF_VALID_BITSIZE;
+		int bit_offset = GDF_VALID_BITSIZE - (i % GDF_VALID_BITSIZE);
 		std::cout<<"host_data_out["<<i<<"] = "<<((int)host_data_out[i])<<" valid="<<((host_valid_out[col_position] >> bit_offset ) & 1)<<std::endl;
 	}
 
@@ -267,7 +280,8 @@ void DtoToGdfColumn(const std::vector<::gdf_dto::gdf_column> &columns) {
                 .time_unit = (libgdf::gdf_time_unit)column.dtype_info.time_unit,
               },
           };
-      libgdf::print_column( &gdf_pointer );
+    //@todo: replace this function
+      //libgdf::print_column( &gdf_pointer );
     }
 }
 
