@@ -45,9 +45,10 @@ static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildDirectCudaIpcMemHan
 static std::vector<::gdf_dto::gdf_column>  GdfColumnsFrom(const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *rawColumns) {
   std::vector<::gdf_dto::gdf_column>  columns;
   for (const auto& c : *rawColumns){
+    bool valid_valid = (c->valid()->reserved()->size() == 64);
     ::gdf_dto::gdf_column column = {
         .data = CudaIpcMemHandlerFrom(c->data()),
-        .valid = CudaIpcMemHandlerFrom(c->valid()),
+        .valid = valid_valid ? CudaIpcMemHandlerFrom(c->valid()) : std::basic_string<int8_t>{},
         .size = c->size(),
         .dtype = (gdf_dto::gdf_dtype)c->dtype(),
         .null_count = c->null_count(),
