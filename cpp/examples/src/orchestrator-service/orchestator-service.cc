@@ -3,7 +3,7 @@
 #include <tuple>
 #include <blazingdb/protocol/api.h>
 
-#include "ral-client.cuh"
+#include "ral-client.h"
 #include "calcite-client.h"
 #include <blazingdb/protocol/message/orchestrator/messages.h>
 

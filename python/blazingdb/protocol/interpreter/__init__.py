@@ -32,5 +32,5 @@ class BlazingMetadataSchema(transport.schema(BlazingMetadata)):
 
 class GetResultResponseSchema(transport.schema(GetResultResponse)):
   metadata = transport.SchemaSegment(BlazingMetadataSchema)
-  columns = transport.VectorSchemaSegment(gdf_columnSchema)
-  columnNames = transport.VectorSegment(transport.StringSegment)
+  columns = transport.VectorGdfColumnSegment(gdf_columnSchema)
+  columnNames = transport.VectorStringSegment(transport.StringSegment)

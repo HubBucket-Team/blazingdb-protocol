@@ -159,11 +159,16 @@ class PyConnector:
     print('       time: %s' % getResultResponse.metadata.time)
     print('       rows: %s' % getResultResponse.metadata.rows)
     print('  columnNames: %s' % list(getResultResponse.columnNames))
+    from pprint import pprint
+    data_values = list(c.data for c in getResultResponse.columns)
+    for objIpcMemHandle_t in data_values:
+      for i in range(objIpcMemHandle_t.ReservedLength()):
+        pprint(objIpcMemHandle_t.Reserved(i))
+
     # print('  values: %s', [value.size for value in list(getResultResponse.columns)])
 
     # print("#BEGIN-RESULT_SET:")
-    # print(getResultResponse.columns)
-    # 
+    #
     # print(list(getResultResponse.columns))
     # columns = [value.data for value in getResultResponse.columns]
     # print(len(columns))
@@ -177,12 +182,13 @@ class PyConnector:
 
 
 def create_sample_device_data():
-  a = numpy.random.randn(1, 32)
+  a = numpy.random.randn(1, 32) + 6
   a = a.astype(numpy.int8)
   print('orig: ', a)
   a_gpu = cuda.mem_alloc(a.size * a.dtype.itemsize)
   cuda.memcpy_htod(a_gpu, a)
-  return a_gpu
+  print("size: " + str(a.size))
+  return a_gpu, a.size
 
 def main():
 
@@ -198,13 +204,13 @@ def main():
     print(err)
 
   try:
-    client.run_ddl_create_table('user', ['name', 'surname', 'age'], ['string', 'string', 'int'], 'alexdb')
+    client.run_ddl_create_table('emps', ['id'], ['GDF_INT8'], 'hr')
   except Error as err:
     print(err)
 
-  data_gpu = create_sample_device_data()
+  data_gpu, data_sz = create_sample_device_data()
   data_handler = bytes(cuda.mem_get_ipc_handle(data_gpu))
-  valid_gpu = create_sample_device_data()
+  valid_gpu, data_sz = create_sample_device_data()
   valid_handler = bytes(cuda.mem_get_ipc_handle(valid_gpu))
 
   try:
@@ -212,13 +218,13 @@ def main():
       'name': 'alexdb',
       'tables': [
         {
-          'name': 'user',
-          'columns': [{'data': data_handler, 'valid': valid_handler, 'size': 32, 'dtype': 0, 'dtype_info': 0}],
-          'columnNames': ['id', 'age']
+          'name': 'emps',
+          'columns': [{'data': data_handler, 'valid': valid_handler, 'size': data_sz, 'dtype': 1, 'dtype_info': 0}],
+          'columnNames': ['id']
         }
       ]
     }
-    resultSet = client.run_dml_query('select * from Table', tableGroup)
+    resultSet = client.run_dml_query('select id > 5 from hr.emps', tableGroup)
     resultSet = client.free_result(123456)
 
   except Error as err:

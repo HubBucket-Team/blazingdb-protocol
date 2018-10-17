@@ -1,3 +1,4 @@
+#!/bin/sh
 CWD="$(pwd)"
 
 echo "Build cpp library"

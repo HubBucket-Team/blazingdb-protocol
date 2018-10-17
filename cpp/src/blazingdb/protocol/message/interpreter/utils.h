@@ -88,7 +88,7 @@ static TableGroupDTO TableGroupDTOFrom(const blazingdb::protocol::TableGroup * t
       .tables = tables,
       .name = name,
   };
-}
+} 
 
 std::vector<flatbuffers::Offset<gdf::gdf_column_handler>>  BuildFlatColumns(flatbuffers::FlatBufferBuilder &builder, const std::vector<::gdf_dto::gdf_column> &columns) {
   std::vector<flatbuffers::Offset<gdf::gdf_column_handler>> offsets;
@@ -96,7 +96,7 @@ std::vector<flatbuffers::Offset<gdf::gdf_column_handler>>  BuildFlatColumns(flat
     auto dtype_extra_info = gdf::Creategdf_dtype_extra_info (builder, (gdf::gdf_time_unit)c.dtype_info.time_unit );
     auto data_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildCudaIpcMemHandler (builder, c.data) );
     auto valid_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildCudaIpcMemHandler(builder, c.valid) );
-    auto column_offset = ::blazingdb::protocol::gdf::Creategdf_column_handler(builder, data_offset, valid_offset, c.size, (gdf::gdf_dtype)c.dtype, dtype_extra_info);
+    auto column_offset = ::blazingdb::protocol::gdf::Creategdf_column_handler(builder, data_offset, valid_offset, c.size, (gdf::gdf_dtype)c.dtype, dtype_extra_info, c.null_count);
     offsets.push_back(column_offset);
   }
   return offsets;

@@ -29,6 +29,7 @@ def client():
   sock = blazingdb.protocol.Client(connection)
 
   x_gpu = create_sample_device_data()
+  print (type(x_gpu))
   h = drv.mem_get_ipc_handle(x_gpu)
 
   print('send handler')
@@ -65,7 +66,7 @@ import time
 if __name__ == '__main__':
   p1 = mp.Process(target=client)
   p2 = mp.Process(target=server)
-  # p2.start()
-  # time.sleep(0.5)
+  p2.start()
+  time.sleep(0.5)
   p1.start()
 

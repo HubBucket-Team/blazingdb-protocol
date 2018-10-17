@@ -12,8 +12,8 @@ add_executable(api_server src/api/server-test.cpp)
 target_link_libraries(api_server ${LIBRARIES})
 
 
-cuda_add_executable(blazingdb_orchestator_service src/orchestrator-service/orchestator-service.cu)
-target_link_libraries(blazingdb_orchestator_service ${LIBRARIES} ${CUDA_CUDA_LIBRARY} ${CUDA_NVRTC_LIBRARY})
+cuda_add_executable(blazingdb_orchestator_service src/orchestrator-service/orchestator-service.cc)
+target_link_libraries(blazingdb_orchestator_service ${LIBRARIES})
 
 cuda_add_executable(blazingdb_ral_client src/orchestrator-service/ral-client.cu)
 target_link_libraries(blazingdb_ral_client ${LIBRARIES} ${CUDA_CUDA_LIBRARY} ${CUDA_NVRTC_LIBRARY})
