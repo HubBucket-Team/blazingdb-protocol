@@ -1,8 +1,7 @@
 import flatbuffers
-
+import copy
 import blazingdb.protocol.transport as transport
-import blazingdb.protocol.transport
-
+import numpy
 from blazingdb.messages.blazingdb.protocol.interpreter \
   import (DMLRequest, DMLResponse, GetResultRequest, GetResultResponse,
            BlazingMetadata)
@@ -34,3 +33,25 @@ class GetResultResponseSchema(transport.schema(GetResultResponse)):
   metadata = transport.SchemaSegment(BlazingMetadataSchema)
   columns = transport.VectorGdfColumnSegment(gdf_columnSchema)
   columnNames = transport.VectorStringSegment(transport.StringSegment)
+
+def _get_bytearray(ipch):
+  nr_of_bytes = ipch.ReservedLength()
+  np_buffer = numpy.empty([nr_of_bytes, ], dtype=numpy.uint8)
+  for i in range(nr_of_bytes):
+    np_buffer[i] = ipch.Reserved(i)
+  return bytearray(np_buffer)
+
+def GetQueryResultFrom(payloadBuffer):
+  result = GetResultResponseSchema.From(payloadBuffer)
+  columns = []
+  column_list = list(item for item in result.columns)
+  for item in column_list:
+    column = copy.deepcopy(item)
+    column.data = _get_bytearray(item.data)
+    column.valid = _get_bytearray(item.valid)
+    columns.append(column)
+  return type('obj', (object,), {
+    'metadata': result.metadata,
+    'columnNames': list(result.columnNames),
+    'columns': columns
+  })
