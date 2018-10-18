@@ -5,6 +5,8 @@ find_package(Threads)
 
 set(LIBRARIES blazingdb-protocol  ${CMAKE_THREAD_LIBS_INIT})
 
+include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 add_executable(api_client src/api/client-test.cpp)
 target_link_libraries(api_client ${LIBRARIES})
 

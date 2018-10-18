@@ -5,7 +5,9 @@
 
 #include <blazingdb/protocol/message/messages.h>
 #include <blazingdb/protocol/message/interpreter/messages.h>
-#include "../gdf/GDFColumn.cuh"
+
+#include "gdf/container/gdf_vector.cuh"
+#include "gdf/util/gdf_utils.cuh"
 
 using namespace blazingdb::protocol;
 
@@ -29,9 +31,9 @@ static result_pair getResultService(uint64_t accessToken, Buffer&& requestPayloa
   std::cout << "resultToken: " << request.getResultToken() << std::endl;
 
 
-  libgdf::gdf_column_cpp one;
-  libgdf::create_sample_gdf_column(one); 
-  libgdf::print_column(one.get_gdf_column());
+  ::gdf::container::GdfVector one;
+  ::gdf::util::create_sample_gdf_column(one); 
+  ::gdf::util::print_gdf_column(one.get_gdf_column());
 
   interpreter::BlazingMetadataDTO  metadata = {
     .status = "OK",
@@ -42,8 +44,8 @@ static result_pair getResultService(uint64_t accessToken, Buffer&& requestPayloa
   std::vector<std::string> fieldNames = {"id", "age"};
   std::vector<::gdf_dto::gdf_column> values = {
     ::gdf_dto::gdf_column {
-                      .data = libgdf::BuildCudaIpcMemHandler(one.data()),
-                      .valid = libgdf::BuildCudaIpcMemHandler(one.valid()),
+                      .data = ::gdf::util::BuildCudaIpcMemHandler(one.data()),
+                      .valid = ::gdf::util::BuildCudaIpcMemHandler(one.valid()),
                       .size = one.size(),
                       .dtype = (gdf_dto::gdf_dtype)one.dtype(),
                       .null_count = one.null_count(),
@@ -77,7 +79,7 @@ static result_pair executePlanService(uint64_t accessToken, Buffer&& requestPayl
   std::cout << "tableGroup: " << requestPayload.getTableGroup().name << std::endl;
 	std::cout << "tableSize: " << requestPayload.getTableGroup().tables.size() << std::endl;
 
-  libgdf::ToBlazingFrame(requestPayload.getTableGroup());
+  ::gdf::util::ToBlazingFrame(requestPayload.getTableGroup());
 
   uint64_t resultToken = 543210L;
   interpreter::NodeConnectionInformationDTO nodeInfo {
