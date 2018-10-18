@@ -2,7 +2,8 @@
 
 #include <typeinfo>
 
-namespace libgdf {
+namespace gdf {
+  
   typedef size_t gdf_size_type;
   typedef gdf_size_type gdf_index_type;
   typedef unsigned char gdf_valid_type;
@@ -208,4 +209,5 @@ namespace libgdf {
     GDF_WINDOW_STDDEV,
     GDF_WINDOW_VAR //variance
   } window_reduction_type;
-}
+
+}//gdf

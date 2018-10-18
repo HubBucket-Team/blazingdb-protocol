@@ -4,7 +4,9 @@
 
 #include "ral-client.h"
 
-#include "../gdf/GDFColumn.cuh"
+#include "gdf/gdf.h"
+#include "gdf/container/gdf_vector.cuh"
+#include "gdf/util/gdf_utils.cuh"
 
 using namespace blazingdb::protocol;
  
@@ -16,9 +18,9 @@ int main() {
     LogicalProject(EXPR$0=[>($0, 5)])\n\
       EnumerableTableScan(table=[[hr, emps]])";
 
-  libgdf::gdf_column_cpp one;
-  libgdf::create_sample_gdf_column(one); 
-  libgdf::print_column(one.get_gdf_column());
+  ::gdf::container::GdfVector  one;
+  ::gdf::util::create_sample_gdf_column(one); 
+  ::gdf::util::print_gdf_column(one.get_gdf_column());
 
   try {
     auto tableGroup = ::blazingdb::protocol::TableGroupDTO{
@@ -27,8 +29,8 @@ int main() {
               .name="user",
               .columns = {
                   ::gdf_dto::gdf_column {
-                        .data = libgdf::BuildCudaIpcMemHandler(one.data()),
-                        .valid = libgdf::BuildCudaIpcMemHandler(one.valid()),
+                        .data = ::gdf::util::BuildCudaIpcMemHandler(one.data()),
+                        .valid = ::gdf::util::BuildCudaIpcMemHandler(one.valid()),
                         .size = one.size(),
                         .dtype = (gdf_dto::gdf_dtype)one.dtype(),
                         .null_count = one.null_count(),
@@ -48,7 +50,7 @@ int main() {
 
     auto resultSet = client.getResult(resultToken, 123456L);
     std::cout << "get result:\n";
-    libgdf::DtoToGdfColumn(resultSet);
+    ::gdf::util::DtoToGdfColumn(resultSet);
 
 
   } catch (std::runtime_error &error) {

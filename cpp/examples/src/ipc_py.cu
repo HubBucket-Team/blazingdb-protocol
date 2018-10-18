@@ -2,7 +2,11 @@
 
 #include <blazingdb/protocol/api.h>
 #include <cuda_runtime.h>
-#include "gdf/GDFColumn.cuh"
+
+
+#include "gdf/gdf.h"
+#include "gdf/container/gdf_vector.cuh"
+#include "gdf/util/gdf_utils.cuh"
 
 #define cudaCheckErrors(msg) \
     do { \
@@ -39,17 +43,17 @@ int main() {
      std::cout << buffer.data() << std::endl;
     
     void *pointer = _CudaIpcMemHandlerFrom(buffer.data());
-    libgdf::gdf_column column {
+    gdf::gdf_column column {
         .data = pointer,                       /**< Pointer to the columns data */
         .valid = (unsigned char *)pointer,            /**< Pointer to the columns validity bit mask where the 'i'th bit indicates if the 'i'th row is NULL */
         .size = 32,               /**< Number of data elements in the columns data buffer*/
-        .dtype = (libgdf::gdf_dtype)1,                  /**< The datatype of the column's data */
+        .dtype = (gdf::gdf_dtype)1,                  /**< The datatype of the column's data */
         .null_count = 0,         /**< The number of NULL values in the column's data */
-        .dtype_info = libgdf::gdf_dtype_extra_info{
-            .time_unit = (libgdf::gdf_time_unit)0,
+        .dtype_info = gdf::gdf_dtype_extra_info{
+            .time_unit = (gdf::gdf_time_unit)0,
         }
     };
-    libgdf::print_column<int8_t>(&column);
+    gdf::util::print_gdf_column(&column);
     return blazingdb::protocol::Buffer(
          reinterpret_cast<const std::uint8_t *>("BlazingDB Response"), 18);
    });
