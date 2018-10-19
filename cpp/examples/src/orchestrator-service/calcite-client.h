@@ -40,6 +40,7 @@ public:
 
     Buffer responseBuffer = client.send(bufferedData);
     ResponseMessage response{responseBuffer.data()};
+    std::cout << "response createTable: " << response.getStatus() << std::endl; 
     if (response.getStatus() == Status_Error) {
       ResponseErrorMessage errorMessage{response.getPayloadBuffer()};
       throw std::runtime_error(errorMessage.getMessage());

@@ -30,10 +30,17 @@ make -j8 install
 
 ## Initialize Services
 
-Initialize blazingsql services
+Initialize blazingsql mock services
 
 ```
-./ test_libraries.sh
+./run_all_mock_services.sh
+```
+
+Initialize blazingsql mock services individually
+```
+./run_calcite_mock.sh
+./run_ral_mock.sh
+./run_orchestrator_mock.sh
 ```
 
 ## Use blazingsql python client 

@@ -157,7 +157,7 @@ def main():
     print(err)
 
   try:
-    client.run_ddl_create_table('emps', ['id'], ['GDF_INT8'], 'hr')
+    client.run_ddl_create_table('nation', ['id'], ['GDF_INT8'], 'main')
   except Error as err:
     print(err)
 
@@ -168,16 +168,16 @@ def main():
 
   try:
     tableGroup = {
-      'name': 'alexdb',
       'tables': [
         {
-          'name': 'emps',
+          'name': 'main.nation',
           'columns': [{'data': data_handler, 'valid': valid_handler, 'size': data_sz, 'dtype': 1, 'null_count': 0, 'dtype_info': 0}],
           'columnNames': ['id']
         }
-      ]
+      ],
+      'name': 'main',
     }
-    resultSet = client.run_dml_query('select id > 5 from hr.emps', tableGroup)
+    resultSet = client.run_dml_query('select id > 5 from main.nation', tableGroup)
 
     print("#RESULT_SET:")
     print('GetResult Response')
@@ -198,10 +198,10 @@ def main():
   except Error as err:
     print(err)
 
-  try:
-    client.run_ddl_drop_table('user', 'alexdb')
-  except Error as err:
-    print(err)
+  # try:
+  #   client.run_ddl_drop_table('User', 'main')
+  # except Error as err:
+  #   print(err)
 
   client.close_connection()
   ctx_gpu.pop()

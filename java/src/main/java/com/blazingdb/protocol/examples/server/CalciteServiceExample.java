@@ -34,7 +34,7 @@ public class CalciteServiceExample {
                     if (requestPayload.getQuery().contains("select")) {
                         String logicalPlan = ""+
                             "LogicalProject(EXPR$0=[>($0, 5)])\n"+
-                            "EnumerableTableScan(table=[[hr, emps]])";
+                            "EnumerableTableScan(table=[[main, nation]])";
                         DMLResponseMessage responsePayload = new DMLResponseMessage(logicalPlan);
                         response = new ResponseMessage(Status.Success, responsePayload.getBufferData());
                     } else {
@@ -52,7 +52,7 @@ public class CalciteServiceExample {
                     System.out.println("\tColumnNames: " + requestPayload.getColumnNames());
                     System.out.println("\tColumnTypes: " + requestPayload.getColumnTypes());
 
-                    if (requestPayload.getDbName().contains("alexdb") ){
+                    if (requestPayload.getDbName().contains("main") ){
                         DDLResponseMessage responsePayload = new DDLResponseMessage();
                         response = new ResponseMessage(Status.Success, responsePayload.getBufferData());
                     } else {
@@ -68,7 +68,7 @@ public class CalciteServiceExample {
                     System.out.println("DDL Drop Table: " + requestPayload.getName());
                     System.out.println("\tdbName: " + requestPayload.getDbName());
 
-                    if (requestPayload.getDbName().contains("alexdb") ){
+                    if (requestPayload.getDbName().contains("main") ){
                         DDLResponseMessage responsePayload = new DDLResponseMessage();
                         response = new ResponseMessage(Status.Success, responsePayload.getBufferData());
                     } else {

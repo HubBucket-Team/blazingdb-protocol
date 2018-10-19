@@ -41,7 +41,7 @@ static result_pair getResultService(uint64_t accessToken, Buffer&& requestPayloa
     .time = 0.1f,
     .rows = 1
   }; 
-  std::vector<std::string> fieldNames = {"id", "age"};
+  std::vector<std::string> fieldNames = {"id_column"};
   std::vector<::gdf_dto::gdf_column> values = {
     ::gdf_dto::gdf_column {
                       .data = ::gdf::util::BuildCudaIpcMemHandler(one.data()),

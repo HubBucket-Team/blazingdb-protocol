@@ -53,7 +53,7 @@ static void* CudaIpcMemHandlerFrom (const std::basic_string<int8_t>& handler) {
 static void create_sample_gdf_column(::gdf::container::GdfVector &one) {
   char * input1;
   size_t num_values = 32;
-  input1 = new char[num_values];
+  input1 = new char[num_values]; // @todo, error
   for(int i = 0; i < num_values; i++){
     input1[i] = i;
   }
@@ -93,23 +93,12 @@ void print_typed_column(col_type * col_data,
       else
         std::cout << h_data[i] << " ";
     }
-  } else {
+  } 
+  else {
     for(size_t i = 0; i < num_rows; ++i)
-      {
-        // If the element is valid, print it's value
-        if(true == get_bit(h_mask.data(), i))
-        {
-          if (sizeof(col_type) == 1)
-            std::cout << (int)h_data[i] << " ";
-          else
-            std::cout << h_data[i] << " ";
-        }
-        // Otherwise, print an @ to represent a null value
-        else
-        {
-          std::cout << "@" << " ";
-        }
-      }
+    {
+        std::cout << "(" << std::to_string(h_data[i]) << "|" << get_bit(h_mask.data(), i) << "), ";
+    }
   }
   std::cout << std::endl;
 }

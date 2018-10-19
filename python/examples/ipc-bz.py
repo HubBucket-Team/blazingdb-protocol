@@ -29,7 +29,8 @@ def client():
   sock = blazingdb.protocol.Client(connection)
 
   x_gpu = create_sample_device_data()
-  print (type(x_gpu))
+  print('gpu type: ')
+  print(type(x_gpu))
   h = drv.mem_get_ipc_handle(x_gpu)
 
   print('send handler')
@@ -54,6 +55,8 @@ def server():
     print('receive handler')
     print(bytearray(bytes(h)))
     x_ptr = drv.IPCMemoryHandle(bytearray(bytes(h)))
+    print('server gpu type: ')
+    print(type(x_ptr))
     x_gpu = gpuarray.GPUArray((1, 32), numpy.int8, gpudata=x_ptr)
     print('gpu:  ', x_gpu.get())
     ctx_gpu.pop()
