@@ -123,7 +123,10 @@ GDFRefCounter* GDFRefCounter::getInstance()
         Instance=new GDFRefCounter();
     return Instance;
 }
- 
+
+class GdfConcurrentDeviceVector;
+class GdfDeviceVector;
+class GdfHostVector;
 
 class GdfVector
 {

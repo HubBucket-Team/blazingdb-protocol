@@ -16,7 +16,7 @@ int main() {
 
   std::string logicalPlan = "\
     LogicalProject(EXPR$0=[>($0, 5)])\n\
-      EnumerableTableScan(table=[[hr, emps]])";
+      EnumerableTableScan(table=[[main, nation]])";
 
   ::gdf::container::GdfVector  one;
   ::gdf::util::create_sample_gdf_column(one); 
@@ -26,7 +26,7 @@ int main() {
     auto tableGroup = ::blazingdb::protocol::TableGroupDTO{
       .tables = {
           BlazingTableDTO {
-              .name="user",
+              .name="main.nation",
               .columns = {
                   ::gdf_dto::gdf_column {
                         .data = ::gdf::util::BuildCudaIpcMemHandler(one.data()),
@@ -39,10 +39,10 @@ int main() {
                       },
                   },
               },
-              .columnNames = {"id", "name"}
+              .columnNames = {"id"}
           }
       },
-      .name = "alexdb",
+      .name = "main",
     };
     auto resultToken = client.executePlan(logicalPlan, tableGroup, 123456L);
     std::cout << "executePlan:\n";
