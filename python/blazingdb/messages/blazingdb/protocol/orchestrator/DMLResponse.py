@@ -25,6 +25,18 @@ class DMLResponse(object):
             return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
         return 0
 
-def DMLResponseStart(builder): builder.StartObject(1)
+    # DMLResponse
+    def NodeConnection(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from .NodeConnection import NodeConnection
+            obj = NodeConnection()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+def DMLResponseStart(builder): builder.StartObject(2)
 def DMLResponseAddResultToken(builder, resultToken): builder.PrependUint64Slot(0, resultToken, 0)
+def DMLResponseAddNodeConnection(builder, nodeConnection): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(nodeConnection), 0)
 def DMLResponseEnd(builder): return builder.EndObject()
