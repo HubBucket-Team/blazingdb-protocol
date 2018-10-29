@@ -7,6 +7,7 @@ def main():
     gdfA = read_csv("data/nation.psv", delimiter='|', dtype=column_types, names=column_names)
     print(gdfA)
     with blazingsql.open_connection('/tmp/orchestrator.socket') as connection:
+        print(connection.accessToken)
         db = connection.Database('main')
         tableA = db.Table('nation', gdfA)
         token, unix_path = db.run_query('select id from main.nation', [tableA])
