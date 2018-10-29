@@ -20,7 +20,7 @@ public:
     query = std::string{pointer->query()->c_str()};
     tableGroup =  pointer->tableGroup();
   }
- 
+
   std::string getQuery () {
     return query;
   }
@@ -38,27 +38,6 @@ private:
 };
 
 
-class DMLResponseMessage : public TypedMessage<uint64_t, orchestrator::DMLResponse> {
-public:  
-  
-  DMLResponseMessage(const std::uint64_t& value)
-    : TypedMessage<uint64_t, orchestrator::DMLResponse>(value)
-  {
-  }
-  
-  DMLResponseMessage (const uint8_t* buffer) 
-    :  TypedMessage<uint64_t, orchestrator::DMLResponse>(buffer, &orchestrator::DMLResponse::resultToken)
-  {
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(orchestrator::CreateDMLResponse);
-  }
-
-  uint64_t  getToken () {
-    return value_;
-  }
-};
 
 
 class DDLRequestMessage : public StringTypeMessage<orchestrator::DDLRequest> {
@@ -117,8 +96,8 @@ private:
 
 class DDLCreateTableRequestMessage : public IMessage {
 public:
-  
-  DDLCreateTableRequestMessage() 
+
+  DDLCreateTableRequestMessage()
     : IMessage()
   {
 
@@ -155,7 +134,7 @@ private:
   std::vector<std::string> columnNames;
   std::vector<std::string> columnTypes;
   std::string dbName;
-  
+
 };
 
 // authorization

@@ -20,7 +20,7 @@ public:
       : IMessage(), logicalPlan{logicalPlan}, tableGroup{tableGroup}
   {
 
-  } 
+  }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
     flatbuffers::FlatBufferBuilder builder;
@@ -90,7 +90,7 @@ class  GetResultRequestMessage :  public TypedMessage<uint64_t, interpreter::Get
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(orchestrator::CreateDMLResponse);
+    return this->getBufferDataUsing(interpreter::CreateGetResultRequest);
   }
 
   uint64_t  getResultToken () {
@@ -99,14 +99,14 @@ class  GetResultRequestMessage :  public TypedMessage<uint64_t, interpreter::Get
 };
 
 
-struct NodeConnectionInformationDTO {
+struct NodeConnectionDTO {
   std::string path;
   NodeConnectionType type;
 };
 
 class  ExecutePlanResponseMessage : public IMessage {
 public:
-  ExecutePlanResponseMessage (uint64_t resultToken, const NodeConnectionInformationDTO &nodeInfo)
+  ExecutePlanResponseMessage (uint64_t resultToken, const NodeConnectionDTO &nodeInfo)
     : IMessage(), resultToken{resultToken}, nodeInfo{nodeInfo}
   {
 
@@ -117,14 +117,14 @@ public:
   {
     auto pointer = flatbuffers::GetRoot<blazingdb::protocol::interpreter::ExecutePlanResponse>(buffer);
     resultToken = pointer->resultToken();
-    nodeInfo = NodeConnectionInformationDTO {
-      .path = std::string{pointer->connectionInfo()->path()->c_str()},
-      .type = pointer->connectionInfo()->type()
+    nodeInfo = NodeConnectionDTO {
+      .path = std::string{pointer->nodeConnection()->path()->c_str()},
+      .type = pointer->nodeConnection()->type()
     };
   };
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
     flatbuffers::FlatBufferBuilder builder{0};
-    auto nodeInfo_offset = CreateNodeConnectionInformationDirect(builder, nodeInfo.path.data(), nodeInfo.type);
+    auto nodeInfo_offset = CreateNodeConnectionDirect(builder, nodeInfo.path.data(), nodeInfo.type);
     auto root = interpreter::CreateExecutePlanResponse(builder, resultToken, nodeInfo_offset);
     builder.Finish(root);
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
@@ -134,12 +134,12 @@ public:
     return resultToken;
   }
 
-  NodeConnectionInformationDTO getNodeInfo() {
+  NodeConnectionDTO getNodeInfo() {
     return nodeInfo;
   }
 public:
   uint64_t resultToken;
-  NodeConnectionInformationDTO nodeInfo;
+  NodeConnectionDTO nodeInfo;
 };
 
 
@@ -169,7 +169,7 @@ public:
         .time = pointer->metadata()->time(),
         .rows = pointer->metadata()->rows()
     };
-  
+
     columnNames = ColumnNamesFrom(pointer->columnNames());
     columns = GdfColumnsFrom(pointer->columns());
   }
@@ -177,7 +177,7 @@ public:
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
     flatbuffers::FlatBufferBuilder builder{0};
     auto metadata_offset = blazingdb::protocol::interpreter::CreateBlazingMetadataDirect(builder, metadata.status.data(), metadata.message.data(), metadata.time, metadata.rows);
- 
+
     auto names_offset = BuildFlatColumnNames(builder, columnNames);
     auto values_offset = BuildFlatColumns(builder, columns);
 

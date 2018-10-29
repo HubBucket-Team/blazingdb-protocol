@@ -33,15 +33,15 @@ static result_pair getResultService(uint64_t accessToken, Buffer&& requestPayloa
 
 
   ::gdf::library::GdfColumn  one;
-  ::gdf::util::create_sample_gdf_column(one); 
+  ::gdf::util::create_sample_gdf_column(one);
   ::gdf::util::print_gdf_column(one.get_gdf_column());
 
   ::gdf::library::GdfColumn  two;
-  ::gdf::util::create_sample_gdf_column(two); 
+  ::gdf::util::create_sample_gdf_column(two);
   ::gdf::util::print_gdf_column(two.get_gdf_column());
 
   ::gdf::library::GdfColumn  three;
-  ::gdf::util::create_sample_gdf_column(three); 
+  ::gdf::util::create_sample_gdf_column(three);
   ::gdf::util::print_gdf_column(three.get_gdf_column());
 
   interpreter::BlazingMetadataDTO  metadata = {
@@ -49,7 +49,7 @@ static result_pair getResultService(uint64_t accessToken, Buffer&& requestPayloa
     .message = "metadata message",
     .time = 0.1f,
     .rows = 1
-  }; 
+  };
 
   std::vector<std::string> fieldNames = {"col1", "col2", "col3"};
   std::vector<::gdf_dto::gdf_column> values = {
@@ -82,7 +82,7 @@ static result_pair getResultService(uint64_t accessToken, Buffer&& requestPayloa
           .dtype_info = gdf_dto::gdf_dtype_extra_info {
           .time_unit = (gdf_dto::gdf_time_unit)0,
         },
-    }, 
+    },
   };
   interpreter::GetResultResponseMessage responsePayload(metadata, fieldNames, values);
   return std::make_pair(Status_Success, responsePayload.getBufferData());
@@ -94,7 +94,7 @@ static result_pair freeResultService(uint64_t accessToken, Buffer&& requestPaylo
 
   interpreter::GetResultRequestMessage request(requestPayloadBuffer.data());
   std::cout << "resultToken: " << request.getResultToken() << std::endl;
-  
+
   ZeroMessage response{};
   return std::make_pair(Status_Success, response.getBufferData());
 }
@@ -112,9 +112,9 @@ static result_pair executePlanService(uint64_t accessToken, Buffer&& requestPayl
   ::gdf::util::ToBlazingFrame(requestPayload.getTableGroup());
 
   uint64_t resultToken = 543210L;
-  interpreter::NodeConnectionInformationDTO nodeInfo {
+  interpreter::NodeConnectionDTO nodeInfo {
       .path = "/tmp/ral.socket",
-      .type = interpreter::NodeConnectionType {interpreter::NodeConnectionType_IPC}
+      .type = NodeConnectionType {NodeConnectionType_IPC}
   };
   interpreter::ExecutePlanResponseMessage responsePayload{resultToken, nodeInfo};
   return std::make_pair(Status_Success, responsePayload.getBufferData());

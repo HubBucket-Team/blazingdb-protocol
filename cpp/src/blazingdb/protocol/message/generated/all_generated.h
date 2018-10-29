@@ -76,6 +76,12 @@ namespace orchestrator {
 
 struct AuthResponse;
 
+}  // namespace orchestrator
+
+struct NodeConnection;
+
+namespace orchestrator {
+
 struct DMLResponse;
 
 struct DDLResponse;
@@ -83,8 +89,6 @@ struct DDLResponse;
 }  // namespace orchestrator
 
 namespace interpreter {
-
-struct NodeConnectionInformation;
 
 struct ExecutePlanResponse;
 
@@ -329,6 +333,8 @@ inline const char *EnumNameMessageType(MessageType e) {
   return EnumNamesMessageType()[index];
 }
 
+}  // namespace interpreter
+
 enum NodeConnectionType {
   NodeConnectionType_TPC = 0,
   NodeConnectionType_IPC = 1,
@@ -357,8 +363,6 @@ inline const char *EnumNameNodeConnectionType(NodeConnectionType e) {
   const size_t index = static_cast<int>(e);
   return EnumNamesNodeConnectionType()[index];
 }
-
-}  // namespace interpreter
 
 enum Status {
   Status_Error = 0,
@@ -1585,16 +1589,87 @@ inline flatbuffers::Offset<AuthResponse> CreateAuthResponse(
   return builder_.Finish();
 }
 
+}  // namespace orchestrator
+
+struct NodeConnection FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_PATH = 4,
+    VT_TYPE = 6
+  };
+  const flatbuffers::String *path() const {
+    return GetPointer<const flatbuffers::String *>(VT_PATH);
+  }
+  NodeConnectionType type() const {
+    return static_cast<NodeConnectionType>(GetField<int8_t>(VT_TYPE, 0));
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_PATH) &&
+           verifier.Verify(path()) &&
+           VerifyField<int8_t>(verifier, VT_TYPE) &&
+           verifier.EndTable();
+  }
+};
+
+struct NodeConnectionBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_path(flatbuffers::Offset<flatbuffers::String> path) {
+    fbb_.AddOffset(NodeConnection::VT_PATH, path);
+  }
+  void add_type(NodeConnectionType type) {
+    fbb_.AddElement<int8_t>(NodeConnection::VT_TYPE, static_cast<int8_t>(type), 0);
+  }
+  explicit NodeConnectionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  NodeConnectionBuilder &operator=(const NodeConnectionBuilder &);
+  flatbuffers::Offset<NodeConnection> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<NodeConnection>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<NodeConnection> CreateNodeConnection(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> path = 0,
+    NodeConnectionType type = NodeConnectionType_TPC) {
+  NodeConnectionBuilder builder_(_fbb);
+  builder_.add_path(path);
+  builder_.add_type(type);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<NodeConnection> CreateNodeConnectionDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *path = nullptr,
+    NodeConnectionType type = NodeConnectionType_TPC) {
+  return blazingdb::protocol::CreateNodeConnection(
+      _fbb,
+      path ? _fbb.CreateString(path) : 0,
+      type);
+}
+
+namespace orchestrator {
+
 struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_RESULTTOKEN = 4
+    VT_RESULTTOKEN = 4,
+    VT_NODECONNECTION = 6
   };
   uint64_t resultToken() const {
     return GetField<uint64_t>(VT_RESULTTOKEN, 0);
   }
+  const blazingdb::protocol::NodeConnection *nodeConnection() const {
+    return GetPointer<const blazingdb::protocol::NodeConnection *>(VT_NODECONNECTION);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_RESULTTOKEN) &&
+           VerifyOffset(verifier, VT_NODECONNECTION) &&
+           verifier.VerifyTable(nodeConnection()) &&
            verifier.EndTable();
   }
 };
@@ -1604,6 +1679,9 @@ struct DMLResponseBuilder {
   flatbuffers::uoffset_t start_;
   void add_resultToken(uint64_t resultToken) {
     fbb_.AddElement<uint64_t>(DMLResponse::VT_RESULTTOKEN, resultToken, 0);
+  }
+  void add_nodeConnection(flatbuffers::Offset<blazingdb::protocol::NodeConnection> nodeConnection) {
+    fbb_.AddOffset(DMLResponse::VT_NODECONNECTION, nodeConnection);
   }
   explicit DMLResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -1619,9 +1697,11 @@ struct DMLResponseBuilder {
 
 inline flatbuffers::Offset<DMLResponse> CreateDMLResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint64_t resultToken = 0) {
+    uint64_t resultToken = 0,
+    flatbuffers::Offset<blazingdb::protocol::NodeConnection> nodeConnection = 0) {
   DMLResponseBuilder builder_(_fbb);
   builder_.add_resultToken(resultToken);
+  builder_.add_nodeConnection(nodeConnection);
   return builder_.Finish();
 }
 
@@ -1657,83 +1737,22 @@ inline flatbuffers::Offset<DDLResponse> CreateDDLResponse(
 
 namespace interpreter {
 
-struct NodeConnectionInformation FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_PATH = 4,
-    VT_TYPE = 6
-  };
-  const flatbuffers::String *path() const {
-    return GetPointer<const flatbuffers::String *>(VT_PATH);
-  }
-  NodeConnectionType type() const {
-    return static_cast<NodeConnectionType>(GetField<int8_t>(VT_TYPE, 0));
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_PATH) &&
-           verifier.Verify(path()) &&
-           VerifyField<int8_t>(verifier, VT_TYPE) &&
-           verifier.EndTable();
-  }
-};
-
-struct NodeConnectionInformationBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_path(flatbuffers::Offset<flatbuffers::String> path) {
-    fbb_.AddOffset(NodeConnectionInformation::VT_PATH, path);
-  }
-  void add_type(NodeConnectionType type) {
-    fbb_.AddElement<int8_t>(NodeConnectionInformation::VT_TYPE, static_cast<int8_t>(type), 0);
-  }
-  explicit NodeConnectionInformationBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  NodeConnectionInformationBuilder &operator=(const NodeConnectionInformationBuilder &);
-  flatbuffers::Offset<NodeConnectionInformation> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<NodeConnectionInformation>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<NodeConnectionInformation> CreateNodeConnectionInformation(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> path = 0,
-    NodeConnectionType type = NodeConnectionType_TPC) {
-  NodeConnectionInformationBuilder builder_(_fbb);
-  builder_.add_path(path);
-  builder_.add_type(type);
-  return builder_.Finish();
-}
-
-inline flatbuffers::Offset<NodeConnectionInformation> CreateNodeConnectionInformationDirect(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    const char *path = nullptr,
-    NodeConnectionType type = NodeConnectionType_TPC) {
-  return blazingdb::protocol::interpreter::CreateNodeConnectionInformation(
-      _fbb,
-      path ? _fbb.CreateString(path) : 0,
-      type);
-}
-
 struct ExecutePlanResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_RESULTTOKEN = 4,
-    VT_CONNECTIONINFO = 6
+    VT_NODECONNECTION = 6
   };
   uint64_t resultToken() const {
     return GetField<uint64_t>(VT_RESULTTOKEN, 0);
   }
-  const NodeConnectionInformation *connectionInfo() const {
-    return GetPointer<const NodeConnectionInformation *>(VT_CONNECTIONINFO);
+  const blazingdb::protocol::NodeConnection *nodeConnection() const {
+    return GetPointer<const blazingdb::protocol::NodeConnection *>(VT_NODECONNECTION);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_RESULTTOKEN) &&
-           VerifyOffset(verifier, VT_CONNECTIONINFO) &&
-           verifier.VerifyTable(connectionInfo()) &&
+           VerifyOffset(verifier, VT_NODECONNECTION) &&
+           verifier.VerifyTable(nodeConnection()) &&
            verifier.EndTable();
   }
 };
@@ -1744,8 +1763,8 @@ struct ExecutePlanResponseBuilder {
   void add_resultToken(uint64_t resultToken) {
     fbb_.AddElement<uint64_t>(ExecutePlanResponse::VT_RESULTTOKEN, resultToken, 0);
   }
-  void add_connectionInfo(flatbuffers::Offset<NodeConnectionInformation> connectionInfo) {
-    fbb_.AddOffset(ExecutePlanResponse::VT_CONNECTIONINFO, connectionInfo);
+  void add_nodeConnection(flatbuffers::Offset<blazingdb::protocol::NodeConnection> nodeConnection) {
+    fbb_.AddOffset(ExecutePlanResponse::VT_NODECONNECTION, nodeConnection);
   }
   explicit ExecutePlanResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -1762,10 +1781,10 @@ struct ExecutePlanResponseBuilder {
 inline flatbuffers::Offset<ExecutePlanResponse> CreateExecutePlanResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t resultToken = 0,
-    flatbuffers::Offset<NodeConnectionInformation> connectionInfo = 0) {
+    flatbuffers::Offset<blazingdb::protocol::NodeConnection> nodeConnection = 0) {
   ExecutePlanResponseBuilder builder_(_fbb);
   builder_.add_resultToken(resultToken);
-  builder_.add_connectionInfo(connectionInfo);
+  builder_.add_nodeConnection(nodeConnection);
   return builder_.Finish();
 }
 
@@ -2067,6 +2086,10 @@ namespace interpreter {
 namespace calcite {
 
 }  // namespace calcite
+
+namespace orchestrator {
+
+}  // namespace orchestrator
 
 namespace orchestrator {
 
