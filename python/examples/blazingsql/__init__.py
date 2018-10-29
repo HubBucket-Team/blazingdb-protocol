@@ -187,8 +187,10 @@ class Database:
         response = ResponseSchema.From(responseBuffer)
         if response.status == Status.Error:
             raise Error(ResponseErrorSchema.From(response.payload).errors)
-        return DMLResponseSchema.From(response.payload).resultToken
 
+        result = DMLResponseSchema.From(response.payload)
+
+        return (result.resultToken, result.nodeConnection.path)
 
 
     def _send_request(self, unix_path, requestBuffer):
@@ -196,15 +198,15 @@ class Database:
         client = Client(connection)
         return client.send(requestBuffer)
 
+
     @contextlib.contextmanager
-    def get_result(self, result_token):
+    def get_result(self, result_token, connection_info):
         getResultRequest = GetResultRequestSchema(resultToken=result_token)
 
         requestBuffer = MakeRequestBuffer(InterpreterMessage.GetResult,
                                           self._connection.accessToken,
                                           getResultRequest)
 
-        connection_info = '/tmp/ral.socket'
         responseBuffer = self._send_request(connection_info, requestBuffer)
 
         response = ResponseSchema.From(responseBuffer)
@@ -216,9 +218,9 @@ class Database:
 
         def cffi_view_to_column_mem(cffi_view):
             data = _gdf._as_numba_devarray(intaddr=int(ffi.cast("uintptr_t",
-                                                           cffi_view.data)),
-                                      nelem=cffi_view.size,
-                                      dtype=_gdf.gdf_to_np_dtype(cffi_view.dtype))
+                                                                cffi_view.data)),
+                                           nelem=cffi_view.size,
+                                           dtype=_gdf.gdf_to_np_dtype(cffi_view.dtype))
             mask = None
             return data, mask
 
@@ -255,7 +257,7 @@ class Database:
         # use *IpcHandle* to open the IPC memory
         ipchandle = driver.IpcHandle(None, handle, size, offset=offset)
         return ipchandle, ipchandle.open_array(current_context(), shape=shape,
-                                   strides=strides, dtype=dtype)
+                                               strides=strides, dtype=dtype)
 
 
     def drop(self):

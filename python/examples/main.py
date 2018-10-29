@@ -9,8 +9,8 @@ def main():
     with blazingsql.open_connection('/tmp/orchestrator.socket') as connection:
         db = connection.Database('main')
         tableA = db.Table('nation', gdfA)
-        token = db.run_query('select id from main.nation', [tableA])
-        with db.get_result(token) as gdfB:
+        token, unix_path = db.run_query('select id from main.nation', [tableA])
+        with db.get_result(token, unix_path) as gdfB:
             print(gdfB)
 
 if __name__ == '__main__':
