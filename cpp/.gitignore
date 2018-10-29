@@ -62,6 +62,9 @@ build/
 thirdparty/
 /testing-libgdf
 gtests/
+lib/
+bin/
+src/blazingdb/protocol/all_generated.h
 
 # Eclipse generated files by cmake
 .cproject
