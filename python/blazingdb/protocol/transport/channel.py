@@ -1,7 +1,7 @@
 import flatbuffers
 
 import blazingdb.protocol.transport as transport
-
+from blazingdb.protocol.orchestrator import AuthRequestSchema
 from blazingdb.messages.blazingdb.protocol.Status import Status
 from blazingdb.messages.blazingdb.protocol \
   import Header, Request, Response, ResponseError
@@ -12,9 +12,8 @@ class RequestSchema(transport.schema(Request)):
   payload = transport.BytesSegment()
 
 
-def MakeAuthRequestBuffer(messageType, schema, builderInitialSize=0):
+def MakeAuthRequestBuffer(messageType, schema = AuthRequestSchema(), builderInitialSize=0):
   return MakeRequestBuffer(messageType, 0, schema, builderInitialSize)
-
 
 class ResponseSchema(transport.schema(Response)):
   status = transport.NumberSegment()  # todo(gcca): [Enum,Choice]Segment

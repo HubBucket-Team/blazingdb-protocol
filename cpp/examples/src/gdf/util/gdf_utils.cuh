@@ -7,7 +7,7 @@
 #include <cuda_runtime.h>
 
 #include "gdf/gdf.h"
-#include "../container/gdf_vector.cuh"
+#include "gdf/library/gdf_column.h"
 
 namespace gdf {
 namespace util {
@@ -50,7 +50,7 @@ static void* CudaIpcMemHandlerFrom (const std::basic_string<int8_t>& handler) {
 }
 
 
-static void create_sample_gdf_column(::gdf::container::GdfVector &one) {
+static void create_sample_gdf_column(::gdf::library::GdfColumn &one) {
   char * input1;
   size_t num_values = 32;
   input1 = new char[num_values]; // @todo, error
@@ -59,7 +59,7 @@ static void create_sample_gdf_column(::gdf::container::GdfVector &one) {
   }
   one.create_gdf_column(gdf::GDF_INT8, num_values, (void *) input1, sizeof(int8_t));
   //@todo: smart pointer, really smart?
-  gdf::container::GDFRefCounter::getInstance()->deregister_column(one.get_gdf_column());
+  gdf::library::GDFRefCounter::getInstance()->deregister_column(one.get_gdf_column());
 }
   
 // Type for a unique_ptr to a gdf_column with a custom deleter
