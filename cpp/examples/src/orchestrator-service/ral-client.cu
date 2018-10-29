@@ -9,7 +9,7 @@
 #include "gdf/util/gdf_utils.cuh"
 
 using namespace blazingdb::protocol;
- 
+
 int main() {
   blazingdb::protocol::UnixSocketConnection connection("/tmp/ral.socket");
   interpreter::InterpreterClient client{connection};
@@ -19,15 +19,15 @@ int main() {
       EnumerableTableScan(table=[[main, nation]])";
 
   ::gdf::library::GdfColumn  one;
-  ::gdf::util::create_sample_gdf_column(one); 
+  ::gdf::util::create_sample_gdf_column(one);
   ::gdf::util::print_gdf_column(one.get_gdf_column());
 
   ::gdf::library::GdfColumn  two;
-  ::gdf::util::create_sample_gdf_column(two); 
+  ::gdf::util::create_sample_gdf_column(two);
   ::gdf::util::print_gdf_column(two.get_gdf_column());
 
   ::gdf::library::GdfColumn  three;
-  ::gdf::util::create_sample_gdf_column(three); 
+  ::gdf::util::create_sample_gdf_column(three);
   ::gdf::util::print_gdf_column(three.get_gdf_column());
 
 
@@ -73,10 +73,8 @@ int main() {
       },
       .name = "main",
     };
-    auto resultToken = client.executePlan(logicalPlan, tableGroup, 123456L);
-    std::cout << "executePlan:\n";
-    std::cout << resultToken << std::endl;
-
+    auto resultBuffer = client.executePlan(logicalPlan, tableGroup, 123456L);
+    auto resultToken = 1234L;
     auto resultSet = client.getResult(resultToken, 123456L);
     std::cout << "get result:\n";
     ::gdf::util::DtoToGdfColumn(resultSet);
