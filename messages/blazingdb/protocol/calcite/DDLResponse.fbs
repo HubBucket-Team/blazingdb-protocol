@@ -1,7 +1,7 @@
 namespace blazingdb.protocol.calcite;
 
 table DDLResponse {
-
+	time: long;
 }
 
 root_type DDLResponse;
