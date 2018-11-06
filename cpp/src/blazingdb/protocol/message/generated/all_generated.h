@@ -1470,15 +1470,20 @@ namespace calcite {
 
 struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_LOGICALPLAN = 4
+    VT_LOGICALPLAN = 4,
+    VT_TIME = 6
   };
   const flatbuffers::String *logicalPlan() const {
     return GetPointer<const flatbuffers::String *>(VT_LOGICALPLAN);
+  }
+  int64_t time() const {
+    return GetField<int64_t>(VT_TIME, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_LOGICALPLAN) &&
            verifier.Verify(logicalPlan()) &&
+           VerifyField<int64_t>(verifier, VT_TIME) &&
            verifier.EndTable();
   }
 };
@@ -1488,6 +1493,9 @@ struct DMLResponseBuilder {
   flatbuffers::uoffset_t start_;
   void add_logicalPlan(flatbuffers::Offset<flatbuffers::String> logicalPlan) {
     fbb_.AddOffset(DMLResponse::VT_LOGICALPLAN, logicalPlan);
+  }
+  void add_time(int64_t time) {
+    fbb_.AddElement<int64_t>(DMLResponse::VT_TIME, time, 0);
   }
   explicit DMLResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -1503,23 +1511,34 @@ struct DMLResponseBuilder {
 
 inline flatbuffers::Offset<DMLResponse> CreateDMLResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> logicalPlan = 0) {
+    flatbuffers::Offset<flatbuffers::String> logicalPlan = 0,
+    int64_t time = 0) {
   DMLResponseBuilder builder_(_fbb);
+  builder_.add_time(time);
   builder_.add_logicalPlan(logicalPlan);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<DMLResponse> CreateDMLResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const char *logicalPlan = nullptr) {
+    const char *logicalPlan = nullptr,
+    int64_t time = 0) {
   return blazingdb::protocol::calcite::CreateDMLResponse(
       _fbb,
-      logicalPlan ? _fbb.CreateString(logicalPlan) : 0);
+      logicalPlan ? _fbb.CreateString(logicalPlan) : 0,
+      time);
 }
 
 struct DDLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_TIME = 4
+  };
+  int64_t time() const {
+    return GetField<int64_t>(VT_TIME, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<int64_t>(verifier, VT_TIME) &&
            verifier.EndTable();
   }
 };
@@ -1527,6 +1546,9 @@ struct DDLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct DDLResponseBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_time(int64_t time) {
+    fbb_.AddElement<int64_t>(DDLResponse::VT_TIME, time, 0);
+  }
   explicit DDLResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1540,8 +1562,10 @@ struct DDLResponseBuilder {
 };
 
 inline flatbuffers::Offset<DDLResponse> CreateDDLResponse(
-    flatbuffers::FlatBufferBuilder &_fbb) {
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int64_t time = 0) {
   DDLResponseBuilder builder_(_fbb);
+  builder_.add_time(time);
   return builder_.Finish();
 }
 
