@@ -1681,7 +1681,8 @@ namespace orchestrator {
 struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_RESULTTOKEN = 4,
-    VT_NODECONNECTION = 6
+    VT_NODECONNECTION = 6,
+    VT_CALCITETIME = 8
   };
   uint64_t resultToken() const {
     return GetField<uint64_t>(VT_RESULTTOKEN, 0);
@@ -1689,11 +1690,15 @@ struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const blazingdb::protocol::NodeConnection *nodeConnection() const {
     return GetPointer<const blazingdb::protocol::NodeConnection *>(VT_NODECONNECTION);
   }
+  int64_t calciteTime() const {
+    return GetField<int64_t>(VT_CALCITETIME, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_RESULTTOKEN) &&
            VerifyOffset(verifier, VT_NODECONNECTION) &&
            verifier.VerifyTable(nodeConnection()) &&
+           VerifyField<int64_t>(verifier, VT_CALCITETIME) &&
            verifier.EndTable();
   }
 };
@@ -1706,6 +1711,9 @@ struct DMLResponseBuilder {
   }
   void add_nodeConnection(flatbuffers::Offset<blazingdb::protocol::NodeConnection> nodeConnection) {
     fbb_.AddOffset(DMLResponse::VT_NODECONNECTION, nodeConnection);
+  }
+  void add_calciteTime(int64_t calciteTime) {
+    fbb_.AddElement<int64_t>(DMLResponse::VT_CALCITETIME, calciteTime, 0);
   }
   explicit DMLResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -1722,8 +1730,10 @@ struct DMLResponseBuilder {
 inline flatbuffers::Offset<DMLResponse> CreateDMLResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t resultToken = 0,
-    flatbuffers::Offset<blazingdb::protocol::NodeConnection> nodeConnection = 0) {
+    flatbuffers::Offset<blazingdb::protocol::NodeConnection> nodeConnection = 0,
+    int64_t calciteTime = 0) {
   DMLResponseBuilder builder_(_fbb);
+  builder_.add_calciteTime(calciteTime);
   builder_.add_resultToken(resultToken);
   builder_.add_nodeConnection(nodeConnection);
   return builder_.Finish();
