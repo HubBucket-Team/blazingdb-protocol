@@ -56,6 +56,7 @@ class NodeConnectionSchema(transport.schema(NodeConnection)):
 class DMLResponseSchema(transport.schema(DMLResponse)):
   resultToken = transport.NumberSegment()
   nodeConnection = transport.SchemaSegment(NodeConnectionSchema)
+  calciteTime = transport.NumberSegment()
 
 class AuthResponseSchema(transport.schema(AuthResponse)):
   accessToken = transport.NumberSegment()
