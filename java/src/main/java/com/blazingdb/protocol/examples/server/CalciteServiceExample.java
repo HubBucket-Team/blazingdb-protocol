@@ -35,7 +35,7 @@ public class CalciteServiceExample {
                         String logicalPlan = ""+
                             "LogicalProject(EXPR$0=[>($0, 5)])\n"+
                             "EnumerableTableScan(table=[[main, nation]])";
-                        DMLResponseMessage responsePayload = new DMLResponseMessage(logicalPlan);
+                        DMLResponseMessage responsePayload = new DMLResponseMessage(logicalPlan, 98765);
                         response = new ResponseMessage(Status.Success, responsePayload.getBufferData());
                     } else {
                         ResponseErrorMessage error = new ResponseErrorMessage("error: it is not a DML query");
@@ -53,7 +53,7 @@ public class CalciteServiceExample {
                     System.out.println("\tColumnTypes: " + requestPayload.getColumnTypes());
 
                     if (requestPayload.getDbName().contains("main") ){
-                        DDLResponseMessage responsePayload = new DDLResponseMessage();
+                        DDLResponseMessage responsePayload = new DDLResponseMessage(98765);
                         response = new ResponseMessage(Status.Success, responsePayload.getBufferData());
                     } else {
                         ResponseErrorMessage error = new ResponseErrorMessage("error: it is not a valid DDL Create Table Request");
@@ -69,7 +69,7 @@ public class CalciteServiceExample {
                     System.out.println("\tdbName: " + requestPayload.getDbName());
 
                     if (requestPayload.getDbName().contains("main") ){
-                        DDLResponseMessage responsePayload = new DDLResponseMessage();
+                        DDLResponseMessage responsePayload = new DDLResponseMessage(98765);
                         response = new ResponseMessage(Status.Success, responsePayload.getBufferData());
                     } else {
                         ResponseErrorMessage error = new ResponseErrorMessage("error: it is not a valid DDL Drop Table Request");

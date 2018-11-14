@@ -27,7 +27,7 @@ public class CalciteServerExample {
                         "        LogicalProject(join_x=[$4], join_x0=[$7])\n" +
                         "          LogicalJoin(condition=[=($7, $0)], joinType=[inner])\n";
 
-                DMLResponseMessage response = new DMLResponseMessage(logicalPlan);
+                DMLResponseMessage response = new DMLResponseMessage(logicalPlan, 98765);
                 return response.getBufferData();
             }
         };

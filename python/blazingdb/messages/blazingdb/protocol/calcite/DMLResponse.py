@@ -25,6 +25,14 @@ class DMLResponse(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def DMLResponseStart(builder): builder.StartObject(1)
+    # DMLResponse
+    def Time(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int64Flags, o + self._tab.Pos)
+        return 0
+
+def DMLResponseStart(builder): builder.StartObject(2)
 def DMLResponseAddLogicalPlan(builder, logicalPlan): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(logicalPlan), 0)
+def DMLResponseAddTime(builder, time): builder.PrependInt64Slot(1, time, 0)
 def DMLResponseEnd(builder): return builder.EndObject()

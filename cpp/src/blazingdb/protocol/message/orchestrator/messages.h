@@ -3,7 +3,9 @@
 #include <string>
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
+
 #include "../messages.h"
+#include "../interpreter/messages.h"
 
 namespace blazingdb {
 namespace protocol {
@@ -37,8 +39,48 @@ private:
   const blazingdb::protocol::TableGroup * tableGroup;
 };
 
+class DMLResponseMessage : public IMessage {
+public:
+  using NodeConnectionDTO = blazingdb::protocol::interpreter::NodeConnectionDTO;
 
+  DMLResponseMessage(const std::uint64_t resultToken,
+                     NodeConnectionDTO & nodeInfo,
+                     const std::int64_t  calciteTime)
+      : IMessage(), resultToken{resultToken}, nodeInfo{nodeInfo},
+        calciteTime_{calciteTime} {}
 
+  DMLResponseMessage(const uint8_t *buffer) : IMessage() {
+    auto pointer =
+        flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DMLResponse>(
+            buffer);
+    resultToken = pointer->resultToken();
+    nodeInfo    = NodeConnectionDTO{
+        .path = std::string{pointer->nodeConnection()->path()->c_str()},
+        .type = pointer->nodeConnection()->type()};
+    calciteTime_ = pointer->calciteTime();
+  };
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
+    flatbuffers::FlatBufferBuilder builder{0};
+    auto                           nodeInfo_offset = CreateNodeConnectionDirect(
+        builder, nodeInfo.path.data(), nodeInfo.type);
+    auto root = orchestrator::CreateDMLResponse(
+      builder, resultToken, nodeInfo_offset, calciteTime_);
+    builder.Finish(root);
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+  }
+
+  std::uint64_t getResultToken() const noexcept { return resultToken; }
+
+  NodeConnectionDTO getNodeInfo() const noexcept { return nodeInfo; }
+
+  std::int64_t getCalciteTime() const noexcept { return calciteTime_; }
+
+public:
+  std::uint64_t     resultToken;
+  NodeConnectionDTO nodeInfo;
+  std::int64_t      calciteTime_;
+};
 
 class DDLRequestMessage : public StringTypeMessage<orchestrator::DDLRequest> {
 public:
