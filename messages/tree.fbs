@@ -1,0 +1,42 @@
+namespace plan.tree;
+
+enum NodeType : ushort {
+    Project,
+    Filter,
+    TableScan,
+    Aggregate,
+    Union
+}
+
+table Child {
+    type: NodeType;
+    data: [ubyte];
+}
+
+table TableScanNode {
+    tablePath: [string];
+}
+
+table ProjectNode {
+    columnNames: [string];
+    columnValues: [string];
+    children: [Child];
+}
+
+table AggregateNode {
+    groups: [int64];
+    children: [Child];
+}
+
+table UnionNode {
+    all: bool;
+    children: [Child];
+}
+
+// TODO ...
+
+table RootNode {
+    children: [Child];
+}
+
+root_type RootNode;
