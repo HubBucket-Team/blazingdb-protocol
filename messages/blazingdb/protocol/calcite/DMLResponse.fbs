@@ -1,3 +1,5 @@
+include "blazingdb/protocol/calcite/LogicalPlan.fbs";
+
 namespace blazingdb.protocol.calcite;
 
 table DMLResponse {

@@ -1,0 +1,35 @@
+/*
+ * Copyright 2018 BlazingDB, Inc.
+ *     Copyright 2018 Percy Camilo Triveño Aucahuasi <percy@blazingdb.com>
+ */
+
+namespace blazingdb.protocol.calcite;
+
+enum NodeType : byte {
+    Root = 0,
+    Project,
+    Filter,
+    TableScan,
+    Aggregate
+}
+
+table TableScanNode {
+    tablePath: [string];
+}
+
+table ProjectNode {
+    columnNames: [string];
+    columnValues: [string];
+}
+
+table AggregateNode {
+    groups: [int64];
+}
+
+table Node {
+    type: NodeType;
+    children: [Node];
+    value: [byte];
+}
+
+root_type Node;
