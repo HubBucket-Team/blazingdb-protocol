@@ -88,3 +88,6 @@ cmake_install.cmake
 #generated folders (in source)
 googletest_ep-prefix
 google-flatbuffers_ep-prefix
+
+#Qt Creator files
+CMakeLists.txt.user
