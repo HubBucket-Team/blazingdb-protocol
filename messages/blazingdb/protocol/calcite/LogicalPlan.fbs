@@ -3,7 +3,7 @@
  *     Copyright 2018 Percy Camilo Triveño Aucahuasi <percy@blazingdb.com>
  */
 
-namespace blazingdb.protocol.calcite;
+namespace com.blazingdb.protocol.calcite.plan.messages;
 
 enum NodeType : byte {
     Root = 0,
@@ -13,23 +13,23 @@ enum NodeType : byte {
     Aggregate
 }
 
-table TableScanNode {
-    tablePath: [string];
+table TableScanData {
+    qualifiedName: [string];
 }
 
-table ProjectNode {
+table ProjectData {
     columnNames: [string];
     columnValues: [string];
 }
 
-table AggregateNode {
-    groups: [int64];
+table AggregateData {
+    groups: [ulong];
 }
 
 table Node {
     type: NodeType;
+    data: [byte];
     children: [Node];
-    value: [byte];
 }
 
 root_type Node;
