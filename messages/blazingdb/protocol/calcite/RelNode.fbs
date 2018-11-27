@@ -5,7 +5,7 @@
 
 namespace com.blazingdb.protocol.calcite.plan.messages;
 
-enum NodeType : byte {
+enum RelNodeType : short {
     Root = 0,
     Project,
     Filter,
@@ -14,27 +14,27 @@ enum NodeType : byte {
     Union
 }
 
-table TableScanData {
+table TableScan {
     qualifiedName: [string];
 }
 
-table ProjectData {
+table LogicalProject {
     columnNames: [string];
     columnValues: [string];
 }
 
-table AggregateData {
+table LogicalAggregate {
     groups: [ulong];
 }
 
-table UnionData {
+table LogicalUnion {
     all: bool = false;
 }
 
-table Node {
-    type: NodeType;
+table RelNode {
+    type: RelNodeType;
     data: [byte];
-    children: [Node];
+    inputs: [RelNode];
 }
 
-root_type Node;
+root_type RelNode;
