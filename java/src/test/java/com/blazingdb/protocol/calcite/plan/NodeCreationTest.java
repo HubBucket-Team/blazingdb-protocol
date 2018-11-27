@@ -6,6 +6,6 @@ public final class NodeCreationTest {
 
   @Test
   public void testCreation() {
-    NodeBuilder builder = new NodeBuilder();
+    NodeFactory builder = new NodeFactory();
   }
 }

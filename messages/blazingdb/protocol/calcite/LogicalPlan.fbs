@@ -10,7 +10,8 @@ enum NodeType : byte {
     Project,
     Filter,
     TableScan,
-    Aggregate
+    Aggregate,
+    Union
 }
 
 table TableScanData {
@@ -24,6 +25,10 @@ table ProjectData {
 
 table AggregateData {
     groups: [ulong];
+}
+
+table UnionData {
+    all: bool = false;
 }
 
 table Node {
