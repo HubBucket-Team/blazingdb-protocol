@@ -7,11 +7,11 @@ namespace com.blazingdb.protocol.calcite.plan.messages;
 
 enum RelNodeType : short {
     Root = 0,
-    Project,
-    Filter,
+    LogicalProject,
+    LogicalFilter,
     TableScan,
-    Aggregate,
-    Union
+    LogicalAggregate,
+    LogicalUnion
 }
 
 table TableScan {

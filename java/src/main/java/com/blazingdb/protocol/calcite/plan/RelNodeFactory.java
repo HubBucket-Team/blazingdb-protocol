@@ -1,5 +1,6 @@
 package com.blazingdb.protocol.calcite.plan;
 
+import com.blazingdb.protocol.calcite.plan.messages.LogicalUnion;
 import com.blazingdb.protocol.calcite.plan.messages.RelNode;
 import com.blazingdb.protocol.calcite.plan.messages.RelNodeType;
 import com.blazingdb.protocol.calcite.plan.messages.TableScan;
@@ -12,6 +13,7 @@ import org.apache.commons.lang3.Validate;
 import java.nio.ByteBuffer;
 
 import java.util.Collection;
+import java.util.List;
 
 final class RelNodeFactory {
 
@@ -52,15 +54,16 @@ final class RelNodeFactory {
     return RelNode.endRelNode(flatBufferBuilder);
   }
 
-  public Integer createTableScanNodeOffset() {
+  public Integer
+  createTableScanRelNodeOffset(final List<String> qualifiedName) {
     FlatBufferBuilder localFlatBufferBuilder = new FlatBufferBuilder(0);
+    final int[] qualifiedNameData =
+        qualifiedName.stream()
+            .mapToInt(localFlatBufferBuilder::createString)
+            .toArray();
 
-    int[] ss = new int[2];
-    ss[0]    = localFlatBufferBuilder.createString("LOCAL");
-    ss[1]    = localFlatBufferBuilder.createString("THREAD");
-
-    final Integer qualifiedNameOffset =
-        TableScan.createQualifiedNameVector(localFlatBufferBuilder, ss);
+    final Integer qualifiedNameOffset = TableScan.createQualifiedNameVector(
+        localFlatBufferBuilder, qualifiedNameData);
 
     final Integer tableScanOffset =
         TableScan.createTableScan(localFlatBufferBuilder, qualifiedNameOffset);
@@ -72,38 +75,42 @@ final class RelNodeFactory {
     return createRelNodeOffset(RelNodeType.TableScan, tableScanBytes);
   }
 
+  public Integer
+  createLogicalUnionRelNodeOffset(final Boolean all,
+                                  final Integer leftRelNodeOffset,
+                                  final Integer rightRelNodeOffset) {
+    FlatBufferBuilder localFlatBufferBuilder = new FlatBufferBuilder(0);
+    final Integer logicalUnionOffset =
+        LogicalUnion.createLogicalUnion(localFlatBufferBuilder, all);
+    localFlatBufferBuilder.finish(logicalUnionOffset);
+    final byte[] logicalUnionBytes = localFlatBufferBuilder.sizedByteArray();
+    localFlatBufferBuilder         = null;
+    return createRelNodeOffset(RelNodeType.LogicalUnion,
+                               logicalUnionBytes,
+                               leftRelNodeOffset,
+                               rightRelNodeOffset);
+  }
+
   protected Integer createRelNodeOffset(final short relNodeType,
                                         final       byte[] data,
                                         final int... inputOffsets) {
-    final FlatBufferBuilder localFlatBufferBuilder = new FlatBufferBuilder(0);
-    final int               dataOffset =
-        RelNode.createDataVector(localFlatBufferBuilder, data);
-    return createRelNodeOffset(
-        localFlatBufferBuilder, relNodeType, dataOffset, inputOffsets);
+    final int dataOffset = RelNode.createDataVector(flatBufferBuilder, data);
+    return createRelNodeOffset(relNodeType, dataOffset, inputOffsets);
   }
 
-  protected Integer
-  createRelNodeOffset(final FlatBufferBuilder localFlatBufferBuilder,
-                      final short             relNodeType,
-                      final Integer dataOffset,
-                      final int... inputOffsets) {
-    Integer relNodeOffset;
-
+  protected Integer createRelNodeOffset(final short relNodeType,
+                                        final Integer dataOffset,
+                                        final int... inputOffsets) {
     if (0 == inputOffsets.length) {
-      RelNode.startRelNode(localFlatBufferBuilder);
-      RelNode.addData(localFlatBufferBuilder, dataOffset);
-      RelNode.addType(localFlatBufferBuilder, relNodeType);
-      relNodeOffset = RelNode.endRelNode(localFlatBufferBuilder);
+      RelNode.startRelNode(flatBufferBuilder);
+      RelNode.addData(flatBufferBuilder, dataOffset);
+      RelNode.addType(flatBufferBuilder, relNodeType);
+      return RelNode.endRelNode(flatBufferBuilder);
     } else {
       final Integer inputsOffset =
-          RelNode.createInputsVector(localFlatBufferBuilder, inputOffsets);
-      relNodeOffset = RelNode.createRelNode(
-          localFlatBufferBuilder, relNodeType, dataOffset, inputsOffset);
+          RelNode.createInputsVector(flatBufferBuilder, inputOffsets);
+      return RelNode.createRelNode(
+          flatBufferBuilder, relNodeType, dataOffset, inputsOffset);
     }
-
-    localFlatBufferBuilder.finish(relNodeOffset);
-    final byte[] relNodeBytes = localFlatBufferBuilder.sizedByteArray();
-
-    return flatBufferBuilder.createByteVector(relNodeBytes);
   }
 }
