@@ -5,10 +5,10 @@ import com.blazingdb.protocol.calcite.plan.messages.RelNode;
 import com.blazingdb.protocol.calcite.plan.messages.RelNodeType;
 import com.blazingdb.protocol.calcite.plan.messages.TableScan;
 
-import com.google.flatbuffers.FlatBufferBuilder;
-
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.Validate;
+
+import com.google.flatbuffers.FlatBufferBuilder;
 
 import java.nio.ByteBuffer;
 
@@ -88,7 +88,8 @@ final class RelNodeFactory {
   protected Integer createRelNodeOffset(final short relNodeType,
                                         final       byte[] data,
                                         final int... inputOffsets) {
-    final int dataOffset = RelNode.createDataVector(flatBufferBuilder, data);
+    final Integer dataOffset =
+        RelNode.createDataVector(flatBufferBuilder, data);
     return createRelNodeOffset(relNodeType, dataOffset, inputOffsets);
   }
 

@@ -20,7 +20,7 @@ import java.util.List;
 public final class NodeCreationTest {
 
   @Test
-  public void testCreation() {
+  public void testSimpleNested() {
     RelNodeFactory relNodeFactory = new RelNodeFactory();
 
     final List<String> leftQualifiedName  = Arrays.asList("left", "table");
