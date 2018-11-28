@@ -12,12 +12,13 @@ import com.google.flatbuffers.FlatBufferBuilder;
 
 import java.nio.ByteBuffer;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
 final class RexNodeFactory {
 
-  private final FlatBufferBuilder flatBufferBuilder;
+  public final FlatBufferBuilder flatBufferBuilder;
 
   public RexNodeFactory() { flatBufferBuilder = new FlatBufferBuilder(0); }
 
@@ -43,13 +44,19 @@ final class RexNodeFactory {
   public Integer createRexCallNodeOffset(final SqlKind sqlKind,
                                          final SqlTypeName sqlTypeName,
                                          final int... operandOffsets) {
-    // Validate.notEmpty(operandOffsets, "Call operands are required");
+    Validate.notEmpty(Arrays.asList(operandOffsets),
+                      "Call operands are required");
     final Integer operandsOffset =
         RexCall.createOperandsVector(flatBufferBuilder, operandOffsets);
     return createRexNodeOffset(RexNodeType.Call,
                                (short) sqlKind.ordinal(),
                                (short) sqlTypeName.ordinal(),
                                operandsOffset);
+  }
+
+  public Integer createRexLiteralNodeOffset(final SqlTypeName sqlTypeName,
+                                            final ByteBuffer byteBuffer) {
+    return createRexLiteralNodeOffset(sqlTypeName, byteBuffer.array());
   }
 
   public Integer createRexLiteralNodeOffset(final SqlTypeName sqlTypeName,
