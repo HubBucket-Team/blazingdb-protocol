@@ -102,6 +102,18 @@ struct Response;
 
 struct ResponseError;
 
+namespace io {
+
+struct POSIX;
+
+struct HDFS;
+
+struct S3;
+
+struct FileSystemRegisterRequest;
+
+}  // namespace io
+
 namespace calcite {
 
 enum MessageType {
@@ -392,6 +404,163 @@ inline const char *EnumNameStatus(Status e) {
   const size_t index = static_cast<int>(e);
   return EnumNamesStatus()[index];
 }
+
+namespace io {
+
+enum FileSystemType {
+  FileSystemType_LOCAL = 0,
+  FileSystemType_HDFS = 1,
+  FileSystemType_S3 = 2,
+  FileSystemType_MIN = FileSystemType_LOCAL,
+  FileSystemType_MAX = FileSystemType_S3
+};
+
+inline const FileSystemType (&EnumValuesFileSystemType())[3] {
+  static const FileSystemType values[] = {
+    FileSystemType_LOCAL,
+    FileSystemType_HDFS,
+    FileSystemType_S3
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesFileSystemType() {
+  static const char * const names[] = {
+    "LOCAL",
+    "HDFS",
+    "S3",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameFileSystemType(FileSystemType e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesFileSystemType()[index];
+}
+
+enum DriverType {
+  DriverType_UNDEFINED = 0,
+  DriverType_LIBHDFS = 1,
+  DriverType_LIBHDFS3 = 2,
+  DriverType_MIN = DriverType_UNDEFINED,
+  DriverType_MAX = DriverType_LIBHDFS3
+};
+
+inline const DriverType (&EnumValuesDriverType())[3] {
+  static const DriverType values[] = {
+    DriverType_UNDEFINED,
+    DriverType_LIBHDFS,
+    DriverType_LIBHDFS3
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesDriverType() {
+  static const char * const names[] = {
+    "UNDEFINED",
+    "LIBHDFS",
+    "LIBHDFS3",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameDriverType(DriverType e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesDriverType()[index];
+}
+
+enum EncryptionType {
+  EncryptionType_UNDEFINED = 0,
+  EncryptionType_NONE = 1,
+  EncryptionType_AES_256 = 2,
+  EncryptionType_AWS_KMS = 3,
+  EncryptionType_MIN = EncryptionType_UNDEFINED,
+  EncryptionType_MAX = EncryptionType_AWS_KMS
+};
+
+inline const EncryptionType (&EnumValuesEncryptionType())[4] {
+  static const EncryptionType values[] = {
+    EncryptionType_UNDEFINED,
+    EncryptionType_NONE,
+    EncryptionType_AES_256,
+    EncryptionType_AWS_KMS
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesEncryptionType() {
+  static const char * const names[] = {
+    "UNDEFINED",
+    "NONE",
+    "AES_256",
+    "AWS_KMS",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameEncryptionType(EncryptionType e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesEncryptionType()[index];
+}
+
+enum FileSystemParams {
+  FileSystemParams_NONE = 0,
+  FileSystemParams_POSIX = 1,
+  FileSystemParams_HDFS = 2,
+  FileSystemParams_S3 = 3,
+  FileSystemParams_MIN = FileSystemParams_NONE,
+  FileSystemParams_MAX = FileSystemParams_S3
+};
+
+inline const FileSystemParams (&EnumValuesFileSystemParams())[4] {
+  static const FileSystemParams values[] = {
+    FileSystemParams_NONE,
+    FileSystemParams_POSIX,
+    FileSystemParams_HDFS,
+    FileSystemParams_S3
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesFileSystemParams() {
+  static const char * const names[] = {
+    "NONE",
+    "POSIX",
+    "HDFS",
+    "S3",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameFileSystemParams(FileSystemParams e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesFileSystemParams()[index];
+}
+
+template<typename T> struct FileSystemParamsTraits {
+  static const FileSystemParams enum_value = FileSystemParams_NONE;
+};
+
+template<> struct FileSystemParamsTraits<POSIX> {
+  static const FileSystemParams enum_value = FileSystemParams_POSIX;
+};
+
+template<> struct FileSystemParamsTraits<HDFS> {
+  static const FileSystemParams enum_value = FileSystemParams_HDFS;
+};
+
+template<> struct FileSystemParamsTraits<S3> {
+  static const FileSystemParams enum_value = FileSystemParams_S3;
+};
+
+bool VerifyFileSystemParams(flatbuffers::Verifier &verifier, const void *obj, FileSystemParams type);
+bool VerifyFileSystemParamsVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
+
+}  // namespace io
 
 MANUALLY_ALIGNED_STRUCT(8) Header FLATBUFFERS_FINAL_CLASS {
  private:
@@ -2097,6 +2266,358 @@ inline flatbuffers::Offset<ResponseError> CreateResponseErrorDirect(
       errors ? _fbb.CreateString(errors) : 0);
 }
 
+namespace io {
+
+struct POSIX FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct POSIXBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit POSIXBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  POSIXBuilder &operator=(const POSIXBuilder &);
+  flatbuffers::Offset<POSIX> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<POSIX>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<POSIX> CreatePOSIX(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  POSIXBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct HDFS FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_HOST = 4,
+    VT_PORT = 6,
+    VT_USER = 8,
+    VT_DRIVERTYPE = 10,
+    VT_KERBEROSTICKET = 12
+  };
+  const flatbuffers::String *host() const {
+    return GetPointer<const flatbuffers::String *>(VT_HOST);
+  }
+  int32_t port() const {
+    return GetField<int32_t>(VT_PORT, 0);
+  }
+  const flatbuffers::String *user() const {
+    return GetPointer<const flatbuffers::String *>(VT_USER);
+  }
+  DriverType driverType() const {
+    return static_cast<DriverType>(GetField<int8_t>(VT_DRIVERTYPE, 0));
+  }
+  const flatbuffers::String *kerberosTicket() const {
+    return GetPointer<const flatbuffers::String *>(VT_KERBEROSTICKET);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_HOST) &&
+           verifier.Verify(host()) &&
+           VerifyField<int32_t>(verifier, VT_PORT) &&
+           VerifyOffset(verifier, VT_USER) &&
+           verifier.Verify(user()) &&
+           VerifyField<int8_t>(verifier, VT_DRIVERTYPE) &&
+           VerifyOffset(verifier, VT_KERBEROSTICKET) &&
+           verifier.Verify(kerberosTicket()) &&
+           verifier.EndTable();
+  }
+};
+
+struct HDFSBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_host(flatbuffers::Offset<flatbuffers::String> host) {
+    fbb_.AddOffset(HDFS::VT_HOST, host);
+  }
+  void add_port(int32_t port) {
+    fbb_.AddElement<int32_t>(HDFS::VT_PORT, port, 0);
+  }
+  void add_user(flatbuffers::Offset<flatbuffers::String> user) {
+    fbb_.AddOffset(HDFS::VT_USER, user);
+  }
+  void add_driverType(DriverType driverType) {
+    fbb_.AddElement<int8_t>(HDFS::VT_DRIVERTYPE, static_cast<int8_t>(driverType), 0);
+  }
+  void add_kerberosTicket(flatbuffers::Offset<flatbuffers::String> kerberosTicket) {
+    fbb_.AddOffset(HDFS::VT_KERBEROSTICKET, kerberosTicket);
+  }
+  explicit HDFSBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  HDFSBuilder &operator=(const HDFSBuilder &);
+  flatbuffers::Offset<HDFS> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<HDFS>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<HDFS> CreateHDFS(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> host = 0,
+    int32_t port = 0,
+    flatbuffers::Offset<flatbuffers::String> user = 0,
+    DriverType driverType = DriverType_UNDEFINED,
+    flatbuffers::Offset<flatbuffers::String> kerberosTicket = 0) {
+  HDFSBuilder builder_(_fbb);
+  builder_.add_kerberosTicket(kerberosTicket);
+  builder_.add_user(user);
+  builder_.add_port(port);
+  builder_.add_host(host);
+  builder_.add_driverType(driverType);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<HDFS> CreateHDFSDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *host = nullptr,
+    int32_t port = 0,
+    const char *user = nullptr,
+    DriverType driverType = DriverType_UNDEFINED,
+    const char *kerberosTicket = nullptr) {
+  return blazingdb::protocol::io::CreateHDFS(
+      _fbb,
+      host ? _fbb.CreateString(host) : 0,
+      port,
+      user ? _fbb.CreateString(user) : 0,
+      driverType,
+      kerberosTicket ? _fbb.CreateString(kerberosTicket) : 0);
+}
+
+struct S3 FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BUCKETNAME = 4,
+    VT_ENCRYPTIONTYPE = 6,
+    VT_KMSKEYAMAZONRESOURCENAME = 8,
+    VT_ACCESSKEYID = 10,
+    VT_SECRETKEY = 12,
+    VT_SESSIONTOKEN = 14
+  };
+  const flatbuffers::String *bucketName() const {
+    return GetPointer<const flatbuffers::String *>(VT_BUCKETNAME);
+  }
+  EncryptionType encryptionType() const {
+    return static_cast<EncryptionType>(GetField<int8_t>(VT_ENCRYPTIONTYPE, 0));
+  }
+  const flatbuffers::String *kmsKeyAmazonResourceName() const {
+    return GetPointer<const flatbuffers::String *>(VT_KMSKEYAMAZONRESOURCENAME);
+  }
+  const flatbuffers::String *accessKeyId() const {
+    return GetPointer<const flatbuffers::String *>(VT_ACCESSKEYID);
+  }
+  const flatbuffers::String *secretKey() const {
+    return GetPointer<const flatbuffers::String *>(VT_SECRETKEY);
+  }
+  const flatbuffers::String *sessionToken() const {
+    return GetPointer<const flatbuffers::String *>(VT_SESSIONTOKEN);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_BUCKETNAME) &&
+           verifier.Verify(bucketName()) &&
+           VerifyField<int8_t>(verifier, VT_ENCRYPTIONTYPE) &&
+           VerifyOffset(verifier, VT_KMSKEYAMAZONRESOURCENAME) &&
+           verifier.Verify(kmsKeyAmazonResourceName()) &&
+           VerifyOffset(verifier, VT_ACCESSKEYID) &&
+           verifier.Verify(accessKeyId()) &&
+           VerifyOffset(verifier, VT_SECRETKEY) &&
+           verifier.Verify(secretKey()) &&
+           VerifyOffset(verifier, VT_SESSIONTOKEN) &&
+           verifier.Verify(sessionToken()) &&
+           verifier.EndTable();
+  }
+};
+
+struct S3Builder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_bucketName(flatbuffers::Offset<flatbuffers::String> bucketName) {
+    fbb_.AddOffset(S3::VT_BUCKETNAME, bucketName);
+  }
+  void add_encryptionType(EncryptionType encryptionType) {
+    fbb_.AddElement<int8_t>(S3::VT_ENCRYPTIONTYPE, static_cast<int8_t>(encryptionType), 0);
+  }
+  void add_kmsKeyAmazonResourceName(flatbuffers::Offset<flatbuffers::String> kmsKeyAmazonResourceName) {
+    fbb_.AddOffset(S3::VT_KMSKEYAMAZONRESOURCENAME, kmsKeyAmazonResourceName);
+  }
+  void add_accessKeyId(flatbuffers::Offset<flatbuffers::String> accessKeyId) {
+    fbb_.AddOffset(S3::VT_ACCESSKEYID, accessKeyId);
+  }
+  void add_secretKey(flatbuffers::Offset<flatbuffers::String> secretKey) {
+    fbb_.AddOffset(S3::VT_SECRETKEY, secretKey);
+  }
+  void add_sessionToken(flatbuffers::Offset<flatbuffers::String> sessionToken) {
+    fbb_.AddOffset(S3::VT_SESSIONTOKEN, sessionToken);
+  }
+  explicit S3Builder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  S3Builder &operator=(const S3Builder &);
+  flatbuffers::Offset<S3> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<S3>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<S3> CreateS3(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> bucketName = 0,
+    EncryptionType encryptionType = EncryptionType_UNDEFINED,
+    flatbuffers::Offset<flatbuffers::String> kmsKeyAmazonResourceName = 0,
+    flatbuffers::Offset<flatbuffers::String> accessKeyId = 0,
+    flatbuffers::Offset<flatbuffers::String> secretKey = 0,
+    flatbuffers::Offset<flatbuffers::String> sessionToken = 0) {
+  S3Builder builder_(_fbb);
+  builder_.add_sessionToken(sessionToken);
+  builder_.add_secretKey(secretKey);
+  builder_.add_accessKeyId(accessKeyId);
+  builder_.add_kmsKeyAmazonResourceName(kmsKeyAmazonResourceName);
+  builder_.add_bucketName(bucketName);
+  builder_.add_encryptionType(encryptionType);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<S3> CreateS3Direct(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *bucketName = nullptr,
+    EncryptionType encryptionType = EncryptionType_UNDEFINED,
+    const char *kmsKeyAmazonResourceName = nullptr,
+    const char *accessKeyId = nullptr,
+    const char *secretKey = nullptr,
+    const char *sessionToken = nullptr) {
+  return blazingdb::protocol::io::CreateS3(
+      _fbb,
+      bucketName ? _fbb.CreateString(bucketName) : 0,
+      encryptionType,
+      kmsKeyAmazonResourceName ? _fbb.CreateString(kmsKeyAmazonResourceName) : 0,
+      accessKeyId ? _fbb.CreateString(accessKeyId) : 0,
+      secretKey ? _fbb.CreateString(secretKey) : 0,
+      sessionToken ? _fbb.CreateString(sessionToken) : 0);
+}
+
+struct FileSystemRegisterRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_TYPE = 4,
+    VT_ROOT = 6,
+    VT_PARAMS_TYPE = 8,
+    VT_PARAMS = 10
+  };
+  FileSystemType type() const {
+    return static_cast<FileSystemType>(GetField<int8_t>(VT_TYPE, 0));
+  }
+  const flatbuffers::String *root() const {
+    return GetPointer<const flatbuffers::String *>(VT_ROOT);
+  }
+  FileSystemParams params_type() const {
+    return static_cast<FileSystemParams>(GetField<uint8_t>(VT_PARAMS_TYPE, 0));
+  }
+  const void *params() const {
+    return GetPointer<const void *>(VT_PARAMS);
+  }
+  template<typename T> const T *params_as() const;
+  const POSIX *params_as_POSIX() const {
+    return params_type() == FileSystemParams_POSIX ? static_cast<const POSIX *>(params()) : nullptr;
+  }
+  const HDFS *params_as_HDFS() const {
+    return params_type() == FileSystemParams_HDFS ? static_cast<const HDFS *>(params()) : nullptr;
+  }
+  const S3 *params_as_S3() const {
+    return params_type() == FileSystemParams_S3 ? static_cast<const S3 *>(params()) : nullptr;
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_TYPE) &&
+           VerifyOffset(verifier, VT_ROOT) &&
+           verifier.Verify(root()) &&
+           VerifyField<uint8_t>(verifier, VT_PARAMS_TYPE) &&
+           VerifyOffset(verifier, VT_PARAMS) &&
+           VerifyFileSystemParams(verifier, params(), params_type()) &&
+           verifier.EndTable();
+  }
+};
+
+template<> inline const POSIX *FileSystemRegisterRequest::params_as<POSIX>() const {
+  return params_as_POSIX();
+}
+
+template<> inline const HDFS *FileSystemRegisterRequest::params_as<HDFS>() const {
+  return params_as_HDFS();
+}
+
+template<> inline const S3 *FileSystemRegisterRequest::params_as<S3>() const {
+  return params_as_S3();
+}
+
+struct FileSystemRegisterRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_type(FileSystemType type) {
+    fbb_.AddElement<int8_t>(FileSystemRegisterRequest::VT_TYPE, static_cast<int8_t>(type), 0);
+  }
+  void add_root(flatbuffers::Offset<flatbuffers::String> root) {
+    fbb_.AddOffset(FileSystemRegisterRequest::VT_ROOT, root);
+  }
+  void add_params_type(FileSystemParams params_type) {
+    fbb_.AddElement<uint8_t>(FileSystemRegisterRequest::VT_PARAMS_TYPE, static_cast<uint8_t>(params_type), 0);
+  }
+  void add_params(flatbuffers::Offset<void> params) {
+    fbb_.AddOffset(FileSystemRegisterRequest::VT_PARAMS, params);
+  }
+  explicit FileSystemRegisterRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  FileSystemRegisterRequestBuilder &operator=(const FileSystemRegisterRequestBuilder &);
+  flatbuffers::Offset<FileSystemRegisterRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<FileSystemRegisterRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FileSystemRegisterRequest> CreateFileSystemRegisterRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    FileSystemType type = FileSystemType_LOCAL,
+    flatbuffers::Offset<flatbuffers::String> root = 0,
+    FileSystemParams params_type = FileSystemParams_NONE,
+    flatbuffers::Offset<void> params = 0) {
+  FileSystemRegisterRequestBuilder builder_(_fbb);
+  builder_.add_params(params);
+  builder_.add_root(root);
+  builder_.add_params_type(params_type);
+  builder_.add_type(type);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FileSystemRegisterRequest> CreateFileSystemRegisterRequestDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    FileSystemType type = FileSystemType_LOCAL,
+    const char *root = nullptr,
+    FileSystemParams params_type = FileSystemParams_NONE,
+    flatbuffers::Offset<void> params = 0) {
+  return blazingdb::protocol::io::CreateFileSystemRegisterRequest(
+      _fbb,
+      type,
+      root ? _fbb.CreateString(root) : 0,
+      params_type,
+      params);
+}
+
+}  // namespace io
+
 namespace calcite {
 
 }  // namespace calcite
@@ -2133,6 +2654,42 @@ namespace interpreter {
 
 }  // namespace interpreter
 
+namespace io {
+
+inline bool VerifyFileSystemParams(flatbuffers::Verifier &verifier, const void *obj, FileSystemParams type) {
+  switch (type) {
+    case FileSystemParams_NONE: {
+      return true;
+    }
+    case FileSystemParams_POSIX: {
+      auto ptr = reinterpret_cast<const POSIX *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case FileSystemParams_HDFS: {
+      auto ptr = reinterpret_cast<const HDFS *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case FileSystemParams_S3: {
+      auto ptr = reinterpret_cast<const S3 *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return false;
+  }
+}
+
+inline bool VerifyFileSystemParamsVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyFileSystemParams(
+        verifier,  values->Get(i), types->GetEnum<FileSystemParams>(i))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+}  // namespace io
 }  // namespace protocol
 }  // namespace blazingdb
 
