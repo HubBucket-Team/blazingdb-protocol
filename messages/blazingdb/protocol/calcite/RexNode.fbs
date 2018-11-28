@@ -1,12 +1,22 @@
-namespace com.blazingdb.protocol.calcite.plan.expressions.messages;
+namespace com.blazingdb.protocol.calcite.plan.messages;
 
 // Calcite version: 1.18.0-SNAPSHOT
 
 enum RexNodeType : short {
     Root = 0,
     Call,
+    CorrelVariable,
+    DynamicParam,
+    FieldAccess,
+    InputRef,
     Literal,
-    InputRef
+    LocalRef,
+    Over,
+    PatternFieldRef,
+    RangeRef,
+    SubQuery,
+    TableInputRef,
+    Variable
 }
 
 enum SqlKind : short {
