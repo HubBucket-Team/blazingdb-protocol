@@ -46,12 +46,18 @@ final class RexNodeFactory {
                                          final int... operandOffsets) {
     Validate.notEmpty(Arrays.asList(operandOffsets),
                       "Call operands are required");
+    FlatBufferBuilder localFlatBufferBuilder = new FlatBufferBuilder(0);
     final Integer operandsOffset =
-        RexCall.createOperandsVector(flatBufferBuilder, operandOffsets);
+        RexCall.createOperandsVector(localFlatBufferBuilder, operandOffsets);
+    final Integer rexCallOffset =
+        RexCall.createRexCall(localFlatBufferBuilder, operandsOffset);
+    localFlatBufferBuilder.finish(rexCallOffset);
+    final byte[] rexCallBytes = localFlatBufferBuilder.sizedByteArray();
+    localFlatBufferBuilder    = null;
     return createRexNodeOffset(RexNodeType.Call,
                                (short) sqlKind.ordinal(),
                                (short) sqlTypeName.ordinal(),
-                               operandsOffset);
+                               rexCallBytes);
   }
 
   public Integer createRexLiteralNodeOffset(final SqlTypeName sqlTypeName,
