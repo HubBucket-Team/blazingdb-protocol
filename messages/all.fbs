@@ -1,2 +1,3 @@
 include "blazingdb/protocol/request.fbs";
 include "blazingdb/protocol/response.fbs";
+include "blazingdb/protocol/io/messages.fbs";

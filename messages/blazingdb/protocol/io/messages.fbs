@@ -1,0 +1,52 @@
+namespace blazingdb.protocol.io;
+
+enum FileSystemType : byte{
+    LOCAL = 0,
+    HDFS,
+    S3,
+}
+
+table POSIX{
+
+}
+
+enum DriverType :byte {
+    UNDEFINED,
+    LIBHDFS, // LIBHDFS requires Java CLASSPATH and native HDFS in LD_LIBRARY_PATH
+    LIBHDFS3 // LIBHDFS3 requires C++ pivotalrd-libhdfs3 library in LD_LIBRARY_PATH
+}
+
+table HDFS {
+    host:string;
+    port:int;
+    user:string;
+    driverType:DriverType;
+    kerberosTicket:string;
+}
+
+enum EncryptionType :byte {
+    UNDEFINED,
+    NONE,
+    AES_256,
+    AWS_KMS // AWS Key Management Service
+}
+
+table S3 {
+    bucketName:string;
+    encryptionType:EncryptionType;
+    kmsKeyAmazonResourceName:string;
+    accessKeyId:string;
+    secretKey:string;
+    sessionToken:string;
+}
+
+union FileSystemParams {
+    POSIX, HDFS, S3 
+}
+
+table FileSystemRegisterRequest {
+    type: FileSystemType;
+    root: string;
+    params: FileSystemParams;
+} 
+root_type FileSystemRegisterRequest;
