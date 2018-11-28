@@ -37,7 +37,7 @@ final class RelNodeFactory {
     throw new NotImplementedException("Build from messages");
   }
 
-  public ByteBuffer createRootRelNodeOffset(final int... inputOffsets) {
+  public ByteBuffer createRootRelNodeByteBuffer(final int... inputOffsets) {
     final Integer inputsOffset =
         RelNode.createInputsVector(flatBufferBuilder, inputOffsets);
     RelNode.startRelNode(flatBufferBuilder);

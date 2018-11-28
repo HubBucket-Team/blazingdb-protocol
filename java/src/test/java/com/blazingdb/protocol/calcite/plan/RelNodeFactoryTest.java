@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.blazingdb.protocol.calcite.plan.RelNodeFactory;
 import com.blazingdb.protocol.calcite.plan.messages.LogicalUnion;
 import com.blazingdb.protocol.calcite.plan.messages.RelNode;
 import com.blazingdb.protocol.calcite.plan.messages.RelNodeType;
@@ -17,7 +16,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
-public final class NodeCreationTest {
+public final class RelNodeFactoryTest {
 
   @Test
   public void testSimpleNested() {
@@ -36,7 +35,7 @@ public final class NodeCreationTest {
             true, leftTableScanRelNodeOffset, rightTableScanRelNodeOffset);
 
     final ByteBuffer rootRelNodeByteBuffer =
-        relNodeFactory.createRootRelNodeOffset(unionRelNodeOffset);
+        relNodeFactory.createRootRelNodeByteBuffer(unionRelNodeOffset);
 
     final RelNode rootRelNode = RelNode.getRootAsRelNode(rootRelNodeByteBuffer);
 

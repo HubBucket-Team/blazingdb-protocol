@@ -8,6 +8,8 @@ import org.apache.commons.lang3.Validate;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 
+import java.nio.ByteBuffer;
+
 import java.util.Collection;
 import java.util.Optional;
 
@@ -17,9 +19,28 @@ final class RexNodeFactory {
 
   public RexNodeFactory() { flatBufferBuilder = new FlatBufferBuilder(0); }
 
+  public ByteBuffer createRootRexNodeByteBuffer(final Integer dataOffset) {
+    RexNode.startRexNode(flatBufferBuilder);
+    RexNode.addData(flatBufferBuilder, dataOffset);
+    RexNode.addType(flatBufferBuilder, RexNodeType.Root);
+    final Integer rootRexNodeOffset = RexNode.endRexNode(flatBufferBuilder);
+    flatBufferBuilder.finish(rootRexNodeOffset);
+    return flatBufferBuilder.dataBuffer();
+  }
+
   public Integer createRexCallNodeOffset(final SqlKind sqlKind,
                                          final SqlTypeName sqlTypeName,
                                          final Collection<Integer> operands) {
+    Validate.notEmpty(operands, "Call operands are required");
+    return createRexNodeOffset(RexNodeType.Call,
+                               (short) sqlKind.ordinal(),
+                               (short) sqlTypeName.ordinal(),
+                               0);
+  }
+
+  public Integer createRexCallNodeOffset(final SqlKind sqlKind,
+                                         final SqlTypeName sqlTypeName,
+                                         final Integer... operands) {
     Validate.notEmpty(operands, "Call operands are required");
     return createRexNodeOffset(RexNodeType.Call,
                                (short) sqlKind.ordinal(),
