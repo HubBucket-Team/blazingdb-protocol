@@ -14,6 +14,6 @@ public final class RexNodeFactoryTest {
     final List<Integer> indices = Arrays.asList(1, 2, 3);
 
     final Integer rexInputRefNodeOffset =
-        rexNodeFactory.createRexInputRefNodeOffset(SqlKind.INPUT_REF, indices);
+        rexNodeFactory.createRexInputRefNodeOffset(indices);
   }
 }
