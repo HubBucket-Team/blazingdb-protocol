@@ -37,21 +37,15 @@ final class RelNodeFactory {
     throw new NotImplementedException("Build from messages");
   }
 
-  public void finish(final Integer rootNodeOffset) {
-    flatBufferBuilder.finish(rootNodeOffset);
-  }
-
-  public ByteBuffer getDataBuffer() { return flatBufferBuilder.dataBuffer(); }
-
-  public byte[] makeDataBuffer() { return flatBufferBuilder.sizedByteArray(); }
-
-  public Integer createRootRelNodeOffset(final int... inputOffsets) {
+  public ByteBuffer createRootRelNodeOffset(final int... inputOffsets) {
     final Integer inputsOffset =
         RelNode.createInputsVector(flatBufferBuilder, inputOffsets);
     RelNode.startRelNode(flatBufferBuilder);
     RelNode.addInputs(flatBufferBuilder, inputsOffset);
     RelNode.addType(flatBufferBuilder, RelNodeType.Root);
-    return RelNode.endRelNode(flatBufferBuilder);
+    final Integer rootRelNodeOffset = RelNode.endRelNode(flatBufferBuilder);
+    flatBufferBuilder.finish(rootRelNodeOffset);
+    return flatBufferBuilder.dataBuffer();
   }
 
   public Integer

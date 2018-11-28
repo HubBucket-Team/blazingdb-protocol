@@ -12,6 +12,8 @@ import com.blazingdb.protocol.calcite.plan.messages.TableScan;
 
 import org.junit.Test;
 
+import java.nio.ByteBuffer;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,12 +35,10 @@ public final class NodeCreationTest {
         relNodeFactory.createLogicalUnionRelNodeOffset(
             true, leftTableScanRelNodeOffset, rightTableScanRelNodeOffset);
 
-    final Integer rootRelNodeOffset =
+    final ByteBuffer rootRelNodeByteBuffer =
         relNodeFactory.createRootRelNodeOffset(unionRelNodeOffset);
 
-    relNodeFactory.finish(rootRelNodeOffset);
-    final RelNode rootRelNode =
-        RelNode.getRootAsRelNode(relNodeFactory.getDataBuffer());
+    final RelNode rootRelNode = RelNode.getRootAsRelNode(rootRelNodeByteBuffer);
 
     assertEquals(RelNodeType.Root, rootRelNode.type());
     assertEquals(0, rootRelNode.dataLength());
