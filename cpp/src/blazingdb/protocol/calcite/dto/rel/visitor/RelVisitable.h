@@ -8,6 +8,10 @@ class RelVisitor;
 
 class RelVisitable {
 public:
+    virtual ~RelVisitable()
+    { }
+
+public:
     virtual void accept(RelVisitor* visitor) = 0;
 };
 

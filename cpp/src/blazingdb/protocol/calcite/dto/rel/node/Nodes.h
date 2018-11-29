@@ -5,4 +5,3 @@
 #include "rel/node/LogicalProject.h"
 #include "rel/node/LogicalUnion.h"
 #include "rel/node/TableScan.h"
-#include "rel/node/RelFactory.h"

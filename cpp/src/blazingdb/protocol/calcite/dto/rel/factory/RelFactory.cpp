@@ -1,3 +1,4 @@
+#include "rel/factory/RelFactory.h"
 #include "rel/node/Nodes.h"
 
 namespace blazingdb {

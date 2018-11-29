@@ -12,6 +12,10 @@ class TableScan;
 
 class RelVisitor {
 public:
+    virtual ~RelVisitor()
+    { }
+
+public:
     virtual void visit(LogicalAggregate* node) = 0;
 
     virtual void visit(LogicalFilter* node) = 0;
