@@ -52,6 +52,32 @@ public final class RexNodeFactoryTest {
     final RexCall rexCall =
         RexCall.getRootAsRexCall(rexCallNode.dataAsByteBuffer());
     assertEquals(2, rexCall.operandsLength());
+
+    final RexNode rexInputRefNode = rexCall.operands(0);
+    assertEquals(RexNodeType.InputRef, rexInputRefNode.type());
+    assertEquals(SqlKind.INPUT_REF.ordinal(), rexInputRefNode.sqlKind());
+    assertEquals(-1, rexInputRefNode.sqlTypeName());
+
+    final RexInputRef rexInputRef =
+        RexInputRef.getRootAsRexInputRef(rexInputRefNode.dataAsByteBuffer());
+    assertEquals(3, rexInputRef.indexLength());
+    assertEquals(1, rexInputRef.index(0));
+    assertEquals(2, rexInputRef.index(1));
+    assertEquals(3, rexInputRef.index(2));
+
+    final RexNode rexLiteralNode = rexCall.operands(1);
+    assertEquals(RexNodeType.Literal, rexLiteralNode.type());
+    assertEquals(SqlKind.LITERAL.ordinal(), rexLiteralNode.sqlKind());
+    assertEquals(SqlTypeName.INTEGER.ordinal(), rexLiteralNode.sqlTypeName());
+
+    final RexLiteral rexLiteral =
+        RexLiteral.getRootAsRexLiteral(rexLiteralNode.dataAsByteBuffer());
+    assertEquals(4, rexLiteral.valueLength());
+
+    final byte[] valueBytes = new byte[4];
+    final ByteBuffer valueByteBuffer = rexLiteral.valueAsByteBuffer();
+    valueByteBuffer.get(valueBytes);
+    assertEquals(123, ByteBuffer.wrap(valueBytes).getInt());
   }
 
   @Test
