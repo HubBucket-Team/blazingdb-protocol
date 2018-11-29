@@ -1,5 +1,5 @@
-#include "base/RexFactory.h"
-#include "base/RexCall.h"
+#include "rex/base/RexFactory.h"
+#include "rex/base/RexCall.h"
 
 #include <iostream>
 namespace blazingdb {

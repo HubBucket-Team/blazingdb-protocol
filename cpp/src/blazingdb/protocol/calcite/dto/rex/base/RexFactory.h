@@ -1,6 +1,6 @@
 #pragma once
 
-#include "base/RexNode.h"
+#include "rex/base/RexNode.h"
 
 namespace blazingdb {
 namespace protocol {
