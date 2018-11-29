@@ -1,4 +1,4 @@
-#include "base/RexCall.h"
+#include "rex/base/RexCall.h"
 
 namespace blazingdb {
 namespace protocol {

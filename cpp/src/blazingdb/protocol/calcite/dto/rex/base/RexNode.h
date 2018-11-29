@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include "base/KindName.h"
-#include "base/TypeName.h"
+#include "rex/base/KindName.h"
+#include "rex/base/TypeName.h"
 
 namespace blazingdb {
 namespace protocol {
