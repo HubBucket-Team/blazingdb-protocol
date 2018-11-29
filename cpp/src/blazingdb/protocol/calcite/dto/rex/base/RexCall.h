@@ -1,13 +1,10 @@
 #pragma once
 
-#include <vector>
 #include "rex/base/RexNode.h"
 
 namespace blazingdb {
 namespace protocol {
 namespace dto {
-
-using VectorRexNodePtr = std::vector<RexNodePtr>;
 
 class RexCall : public RexNode {
 public:
@@ -16,7 +13,7 @@ public:
     RexCall(KindName kind, TypeName type);
 
 public:
-    VectorRexNodePtr& getOperands();
+    VectorRexNodePtr& getOperands() override;
 
 private:
     VectorRexNodePtr operands;

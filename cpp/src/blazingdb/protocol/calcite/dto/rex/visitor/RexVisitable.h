@@ -1,17 +1,19 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-
 namespace blazingdb {
 namespace protocol {
 namespace dto {
 
-class RexNode;
+class RexVisitor;
 
-using RexNodePtr = std::shared_ptr<RexNode>;
+class RexVisitable {
+public:
+    virtual ~RexVisitable()
+    { }
 
-using VectorRexNodePtr = std::vector<RexNodePtr>;
+public:
+    virtual void accept(RexVisitor* visitor) = 0;
+};
 
 }  // namespace dto
 }  // namespace protocol

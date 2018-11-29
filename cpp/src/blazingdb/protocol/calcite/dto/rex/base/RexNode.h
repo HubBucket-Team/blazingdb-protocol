@@ -1,17 +1,21 @@
 #pragma once
 
-#include <memory>
+#include "rex/base/RexBase.h"
 #include "rex/base/KindName.h"
 #include "rex/base/TypeName.h"
+#include "rex/visitor/RexVisitable.h"
 
 namespace blazingdb {
 namespace protocol {
 namespace dto {
 
-class RexNode {
+class RexNode : public virtual RexVisitable {
 public:
     RexNode();
 
+    virtual ~RexNode();
+
+public:
     RexNode(KindName kind, TypeName type);
 
 public:
@@ -23,12 +27,13 @@ public:
 
     void setTypeName(TypeName value);
 
+public:
+    virtual VectorRexNodePtr& getOperands() = 0;
+
 private:
     KindName kindName;
     TypeName typeName;
 };
-
-using RexNodePtr = std::shared_ptr<RexNode>;
 
 }  // namespace dto
 }  // namespace protocol

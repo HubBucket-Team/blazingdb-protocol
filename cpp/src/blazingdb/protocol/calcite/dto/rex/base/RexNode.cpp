@@ -7,6 +7,9 @@ namespace dto {
 RexNode::RexNode()
 { }
 
+RexNode::~RexNode()
+{ }
+
 RexNode::RexNode(KindName kind, TypeName type)
  : kindName{kind}, typeName{type}
 { }
