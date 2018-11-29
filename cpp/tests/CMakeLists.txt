@@ -11,7 +11,7 @@ function(configure_test TEST_NAME Tests_SRCS)
     add_executable(${TEST_NAME} ${Tests_SRCS})
 
     # TODO percy do not use libgdf.so here and use gdf (the static lib) instead
-    target_link_libraries(${TEST_NAME} gmock_main gmock GTest::GTest)
+    target_link_libraries(${TEST_NAME} GTest::GTest GTest::Main)
     set_target_properties(${TEST_NAME} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/gtests/")
 
@@ -28,5 +28,6 @@ enable_testing()
 message(STATUS "******** Configuring tests ********")
 
 add_subdirectory(foo-sample)
+add_subdirectory(calcite)
 
 message(STATUS "******** Tests are ready ********")

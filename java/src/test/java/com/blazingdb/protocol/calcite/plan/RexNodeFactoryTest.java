@@ -74,7 +74,7 @@ public final class RexNodeFactoryTest {
         RexLiteral.getRootAsRexLiteral(rexLiteralNode.dataAsByteBuffer());
     assertEquals(4, rexLiteral.valueLength());
 
-    final byte[] valueBytes = new byte[4];
+    final byte[] valueBytes = new byte[Integer.BYTES];
     final ByteBuffer valueByteBuffer = rexLiteral.valueAsByteBuffer();
     valueByteBuffer.get(valueBytes);
     assertEquals(123, ByteBuffer.wrap(valueBytes).getInt());

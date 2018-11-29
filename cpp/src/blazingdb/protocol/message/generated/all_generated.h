@@ -11,96 +11,170 @@ namespace protocol {
 namespace calcite {
 
 struct DMLRequest;
+struct DMLRequestT;
 
 struct DDLRequest;
+struct DDLRequestT;
 
 struct DDLCreateTableRequest;
+struct DDLCreateTableRequestT;
 
 struct DDLDropTableRequest;
+struct DDLDropTableRequestT;
 
 }  // namespace calcite
 
 namespace orchestrator {
 
 struct DDLCreateTableRequest;
+struct DDLCreateTableRequestT;
 
 struct DDLDropTableRequest;
+struct DDLDropTableRequestT;
 
 struct AuthRequest;
+struct AuthRequestT;
 
 }  // namespace orchestrator
 
 namespace gdf {
 
 struct gdf_dtype_extra_info;
+struct gdf_dtype_extra_infoT;
 
 struct cudaIpcMemHandle_t;
+struct cudaIpcMemHandle_tT;
 
 struct gdf_column_handler;
+struct gdf_column_handlerT;
 
 }  // namespace gdf
 
 struct BlazingTable;
+struct BlazingTableT;
 
 struct TableGroup;
+struct TableGroupT;
 
 namespace orchestrator {
 
 struct DMLRequest;
+struct DMLRequestT;
 
 struct DDLRequest;
+struct DDLRequestT;
 
 }  // namespace orchestrator
 
 namespace interpreter {
 
 struct DMLRequest;
+struct DMLRequestT;
 
 struct GetResultRequest;
+struct GetResultRequestT;
 
 }  // namespace interpreter
 
 struct Header;
 
 struct Request;
+struct RequestT;
 
+}  // namespace protocol
+}  // namespace blazingdb
+
+namespace com {
+namespace blazingdb {
+namespace protocol {
+namespace calcite {
+namespace plan {
+namespace messages {
+
+struct TableScan;
+struct TableScanT;
+
+struct LogicalProject;
+struct LogicalProjectT;
+
+struct LogicalAggregate;
+struct LogicalAggregateT;
+
+struct LogicalUnion;
+struct LogicalUnionT;
+
+struct RelNode;
+struct RelNodeT;
+
+struct RexCall;
+struct RexCallT;
+
+struct RexInputRef;
+struct RexInputRefT;
+
+struct RexLiteral;
+struct RexLiteralT;
+
+struct RexNode;
+struct RexNodeT;
+
+}  // namespace messages
+}  // namespace plan
+}  // namespace calcite
+}  // namespace protocol
+}  // namespace blazingdb
+}  // namespace com
+
+namespace blazingdb {
+namespace protocol {
 namespace calcite {
 
 struct DMLResponse;
+struct DMLResponseT;
 
 struct DDLResponse;
+struct DDLResponseT;
 
 }  // namespace calcite
 
 namespace orchestrator {
 
 struct AuthResponse;
+struct AuthResponseT;
 
 }  // namespace orchestrator
 
 struct NodeConnection;
+struct NodeConnectionT;
 
 namespace orchestrator {
 
 struct DMLResponse;
+struct DMLResponseT;
 
 struct DDLResponse;
+struct DDLResponseT;
 
 }  // namespace orchestrator
 
 namespace interpreter {
 
 struct ExecutePlanResponse;
+struct ExecutePlanResponseT;
 
 struct BlazingMetadata;
+struct BlazingMetadataT;
 
 struct GetResultResponse;
+struct GetResultResponseT;
 
 }  // namespace interpreter
 
 struct Response;
+struct ResponseT;
 
 struct ResponseError;
+struct ResponseErrorT;
 
 namespace calcite {
 
@@ -334,6 +408,945 @@ inline const char *EnumNameMessageType(MessageType e) {
 }
 
 }  // namespace interpreter
+}  // namespace protocol
+}  // namespace blazingdb
+
+namespace com {
+namespace blazingdb {
+namespace protocol {
+namespace calcite {
+namespace plan {
+namespace messages {
+
+enum RelNodeType {
+  RelNodeType_Root = 0,
+  RelNodeType_LogicalProject = 1,
+  RelNodeType_LogicalFilter = 2,
+  RelNodeType_TableScan = 3,
+  RelNodeType_LogicalAggregate = 4,
+  RelNodeType_LogicalUnion = 5,
+  RelNodeType_MIN = RelNodeType_Root,
+  RelNodeType_MAX = RelNodeType_LogicalUnion
+};
+
+inline const RelNodeType (&EnumValuesRelNodeType())[6] {
+  static const RelNodeType values[] = {
+    RelNodeType_Root,
+    RelNodeType_LogicalProject,
+    RelNodeType_LogicalFilter,
+    RelNodeType_TableScan,
+    RelNodeType_LogicalAggregate,
+    RelNodeType_LogicalUnion
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesRelNodeType() {
+  static const char * const names[] = {
+    "Root",
+    "LogicalProject",
+    "LogicalFilter",
+    "TableScan",
+    "LogicalAggregate",
+    "LogicalUnion",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameRelNodeType(RelNodeType e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesRelNodeType()[index];
+}
+
+enum RexNodeType {
+  RexNodeType_Root = 0,
+  RexNodeType_Call = 1,
+  RexNodeType_CorrelVariable = 2,
+  RexNodeType_DynamicParam = 3,
+  RexNodeType_FieldAccess = 4,
+  RexNodeType_InputRef = 5,
+  RexNodeType_Literal = 6,
+  RexNodeType_LocalRef = 7,
+  RexNodeType_Over = 8,
+  RexNodeType_PatternFieldRef = 9,
+  RexNodeType_RangeRef = 10,
+  RexNodeType_SubQuery = 11,
+  RexNodeType_TableInputRef = 12,
+  RexNodeType_Variable = 13,
+  RexNodeType_MIN = RexNodeType_Root,
+  RexNodeType_MAX = RexNodeType_Variable
+};
+
+inline const RexNodeType (&EnumValuesRexNodeType())[14] {
+  static const RexNodeType values[] = {
+    RexNodeType_Root,
+    RexNodeType_Call,
+    RexNodeType_CorrelVariable,
+    RexNodeType_DynamicParam,
+    RexNodeType_FieldAccess,
+    RexNodeType_InputRef,
+    RexNodeType_Literal,
+    RexNodeType_LocalRef,
+    RexNodeType_Over,
+    RexNodeType_PatternFieldRef,
+    RexNodeType_RangeRef,
+    RexNodeType_SubQuery,
+    RexNodeType_TableInputRef,
+    RexNodeType_Variable
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesRexNodeType() {
+  static const char * const names[] = {
+    "Root",
+    "Call",
+    "CorrelVariable",
+    "DynamicParam",
+    "FieldAccess",
+    "InputRef",
+    "Literal",
+    "LocalRef",
+    "Over",
+    "PatternFieldRef",
+    "RangeRef",
+    "SubQuery",
+    "TableInputRef",
+    "Variable",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameRexNodeType(RexNodeType e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesRexNodeType()[index];
+}
+
+enum SqlKind {
+  SqlKind_OTHER = 0,
+  SqlKind_SELECT = 1,
+  SqlKind_JOIN = 2,
+  SqlKind_IDENTIFIER = 3,
+  SqlKind_LITERAL = 4,
+  SqlKind_OTHER_FUNCTION = 5,
+  SqlKind_EXPLAIN = 6,
+  SqlKind_DESCRIBE_SCHEMA = 7,
+  SqlKind_DESCRIBE_TABLE = 8,
+  SqlKind_INSERT = 9,
+  SqlKind_DELETE = 10,
+  SqlKind_UPDATE = 11,
+  SqlKind_SET_OPTION = 12,
+  SqlKind_DYNAMIC_PARAM = 13,
+  SqlKind_ORDER_BY = 14,
+  SqlKind_WITH = 15,
+  SqlKind_WITH_ITEM = 16,
+  SqlKind_UNION = 17,
+  SqlKind_EXCEPT = 18,
+  SqlKind_INTERSECT = 19,
+  SqlKind_AS = 20,
+  SqlKind_ARGUMENT_ASSIGNMENT = 21,
+  SqlKind_DEFAULT = 22,
+  SqlKind_OVER = 23,
+  SqlKind_FILTER = 24,
+  SqlKind_WINDOW = 25,
+  SqlKind_MERGE = 26,
+  SqlKind_TABLESAMPLE = 27,
+  SqlKind_MATCH_RECOGNIZE = 28,
+  SqlKind_TIMES = 29,
+  SqlKind_DIVIDE = 30,
+  SqlKind_MOD = 31,
+  SqlKind_PLUS = 32,
+  SqlKind_MINUS = 33,
+  SqlKind_PATTERN_ALTER = 34,
+  SqlKind_PATTERN_CONCAT = 35,
+  SqlKind_IN = 36,
+  SqlKind_NOT_IN = 37,
+  SqlKind_LESS_THAN = 38,
+  SqlKind_GREATER_THAN = 39,
+  SqlKind_LESS_THAN_OR_EQUAL = 40,
+  SqlKind_GREATER_THAN_OR_EQUAL = 41,
+  SqlKind_EQUALS = 42,
+  SqlKind_NOT_EQUALS = 43,
+  SqlKind_IS_DISTINCT_FROM = 44,
+  SqlKind_IS_NOT_DISTINCT_FROM = 45,
+  SqlKind_OR = 46,
+  SqlKind_AND = 47,
+  SqlKind_DOT = 48,
+  SqlKind_OVERLAPS = 49,
+  SqlKind_CONTAINS = 50,
+  SqlKind_PRECEDES = 51,
+  SqlKind_IMMEDIATELY_PRECEDES = 52,
+  SqlKind_SUCCEEDS = 53,
+  SqlKind_IMMEDIATELY_SUCCEEDS = 54,
+  SqlKind_PERIOD_EQUALS = 55,
+  SqlKind_LIKE = 56,
+  SqlKind_SIMILAR = 57,
+  SqlKind_BETWEEN = 58,
+  SqlKind_CASE = 59,
+  SqlKind_NULLIF = 60,
+  SqlKind_COALESCE = 61,
+  SqlKind_DECODE = 62,
+  SqlKind_NVL = 63,
+  SqlKind_GREATEST = 64,
+  SqlKind_LEAST = 65,
+  SqlKind_TIMESTAMP_ADD = 66,
+  SqlKind_TIMESTAMP_DIFF = 67,
+  SqlKind_NOT = 68,
+  SqlKind_PLUS_PREFIX = 69,
+  SqlKind_MINUS_PREFIX = 70,
+  SqlKind_EXISTS = 71,
+  SqlKind_SOME = 72,
+  SqlKind_ALL = 73,
+  SqlKind_VALUES = 74,
+  SqlKind_EXPLICIT_TABLE = 75,
+  SqlKind_SCALAR_QUERY = 76,
+  SqlKind_PROCEDURE_CALL = 77,
+  SqlKind_NEW_SPECIFICATION = 78,
+  SqlKind_FINAL = 79,
+  SqlKind_RUNNING = 80,
+  SqlKind_PREV = 81,
+  SqlKind_NEXT = 82,
+  SqlKind_FIRST = 83,
+  SqlKind_LAST = 84,
+  SqlKind_CLASSIFIER = 85,
+  SqlKind_MATCH_NUMBER = 86,
+  SqlKind_SKIP_TO_FIRST = 87,
+  SqlKind_SKIP_TO_LAST = 88,
+  SqlKind_DESCENDING = 89,
+  SqlKind_NULLS_FIRST = 90,
+  SqlKind_NULLS_LAST = 91,
+  SqlKind_IS_TRUE = 92,
+  SqlKind_IS_FALSE = 93,
+  SqlKind_IS_NOT_TRUE = 94,
+  SqlKind_IS_NOT_FALSE = 95,
+  SqlKind_IS_UNKNOWN = 96,
+  SqlKind_IS_NULL = 97,
+  SqlKind_IS_NOT_NULL = 98,
+  SqlKind_PRECEDING = 99,
+  SqlKind_FOLLOWING = 100,
+  SqlKind_FIELD_ACCESS = 101,
+  SqlKind_INPUT_REF = 102,
+  SqlKind_TABLE_INPUT_REF = 103,
+  SqlKind_PATTERN_INPUT_REF = 104,
+  SqlKind_LOCAL_REF = 105,
+  SqlKind_CORREL_VARIABLE = 106,
+  SqlKind_PATTERN_QUANTIFIER = 107,
+  SqlKind_ROW = 108,
+  SqlKind_COLUMN_LIST = 109,
+  SqlKind_CAST = 110,
+  SqlKind_NEXT_VALUE = 111,
+  SqlKind_CURRENT_VALUE = 112,
+  SqlKind_FLOOR = 113,
+  SqlKind_CEIL = 114,
+  SqlKind_TRIM = 115,
+  SqlKind_LTRIM = 116,
+  SqlKind_RTRIM = 117,
+  SqlKind_EXTRACT = 118,
+  SqlKind_JDBC_FN = 119,
+  SqlKind_MULTISET_VALUE_CONSTRUCTOR = 120,
+  SqlKind_MULTISET_QUERY_CONSTRUCTOR = 121,
+  SqlKind_UNNEST = 122,
+  SqlKind_LATERAL = 123,
+  SqlKind_COLLECTION_TABLE = 124,
+  SqlKind_ARRAY_VALUE_CONSTRUCTOR = 125,
+  SqlKind_ARRAY_QUERY_CONSTRUCTOR = 126,
+  SqlKind_MAP_VALUE_CONSTRUCTOR = 127,
+  SqlKind_MAP_QUERY_CONSTRUCTOR = 128,
+  SqlKind_CURSOR = 129,
+  SqlKind_LITERAL_CHAIN = 130,
+  SqlKind_ESCAPE = 131,
+  SqlKind_REINTERPRET = 132,
+  SqlKind_EXTEND = 133,
+  SqlKind_CUBE = 134,
+  SqlKind_ROLLUP = 135,
+  SqlKind_GROUPING_SETS = 136,
+  SqlKind_GROUPING = 137,
+  SqlKind_GROUPING_ID = 138,
+  SqlKind_GROUP_ID = 139,
+  SqlKind_PATTERN_PERMUTE = 140,
+  SqlKind_PATTERN_EXCLUDED = 141,
+  SqlKind_COUNT = 142,
+  SqlKind_SUM = 143,
+  SqlKind_SUM0 = 144,
+  SqlKind_MIN = 145,
+  SqlKind_MAX = 146,
+  SqlKind_LEAD = 147,
+  SqlKind_LAG = 148,
+  SqlKind_FIRST_VALUE = 149,
+  SqlKind_LAST_VALUE = 150,
+  SqlKind_ANY_VALUE = 151,
+  SqlKind_COVAR_POP = 152,
+  SqlKind_COVAR_SAMP = 153,
+  SqlKind_REGR_COUNT = 154,
+  SqlKind_REGR_SXX = 155,
+  SqlKind_REGR_SYY = 156,
+  SqlKind_AVG = 157,
+  SqlKind_STDDEV_POP = 158,
+  SqlKind_STDDEV_SAMP = 159,
+  SqlKind_VAR_POP = 160,
+  SqlKind_VAR_SAMP = 161,
+  SqlKind_NTILE = 162,
+  SqlKind_NTH_VALUE = 163,
+  SqlKind_COLLECT = 164,
+  SqlKind_FUSION = 165,
+  SqlKind_SINGLE_VALUE = 166,
+  SqlKind_ROW_NUMBER = 167,
+  SqlKind_RANK = 168,
+  SqlKind_PERCENT_RANK = 169,
+  SqlKind_DENSE_RANK = 170,
+  SqlKind_CUME_DIST = 171,
+  SqlKind_TUMBLE = 172,
+  SqlKind_TUMBLE_START = 173,
+  SqlKind_TUMBLE_END = 174,
+  SqlKind_HOP = 175,
+  SqlKind_HOP_START = 176,
+  SqlKind_HOP_END = 177,
+  SqlKind_SESSION = 178,
+  SqlKind_SESSION_START = 179,
+  SqlKind_SESSION_END = 180,
+  SqlKind_COLUMN_DECL = 181,
+  SqlKind_ATTRIBUTE_DEF = 182,
+  SqlKind_CHECK = 183,
+  SqlKind_UNIQUE = 184,
+  SqlKind_PRIMARY_KEY = 185,
+  SqlKind_FOREIGN_KEY = 186,
+  SqlKind_COMMIT = 187,
+  SqlKind_ROLLBACK = 188,
+  SqlKind_ALTER_SESSION = 189,
+  SqlKind_CREATE_SCHEMA = 190,
+  SqlKind_CREATE_FOREIGN_SCHEMA = 191,
+  SqlKind_DROP_SCHEMA = 192,
+  SqlKind_CREATE_TABLE = 193,
+  SqlKind_ALTER_TABLE = 194,
+  SqlKind_DROP_TABLE = 195,
+  SqlKind_CREATE_VIEW = 196,
+  SqlKind_ALTER_VIEW = 197,
+  SqlKind_DROP_VIEW = 198,
+  SqlKind_CREATE_MATERIALIZED_VIEW = 199,
+  SqlKind_ALTER_MATERIALIZED_VIEW = 200,
+  SqlKind_DROP_MATERIALIZED_VIEW = 201,
+  SqlKind_CREATE_SEQUENCE = 202,
+  SqlKind_ALTER_SEQUENCE = 203,
+  SqlKind_DROP_SEQUENCE = 204,
+  SqlKind_CREATE_INDEX = 205,
+  SqlKind_ALTER_INDEX = 206,
+  SqlKind_DROP_INDEX = 207,
+  SqlKind_CREATE_TYPE = 208,
+  SqlKind_DROP_TYPE = 209,
+  SqlKind_OTHER_DDL = 210,
+  SqlKind_AMIN = SqlKind_OTHER,
+  SqlKind_AMAX = SqlKind_OTHER_DDL
+};
+
+inline const SqlKind (&EnumValuesSqlKind())[211] {
+  static const SqlKind values[] = {
+    SqlKind_OTHER,
+    SqlKind_SELECT,
+    SqlKind_JOIN,
+    SqlKind_IDENTIFIER,
+    SqlKind_LITERAL,
+    SqlKind_OTHER_FUNCTION,
+    SqlKind_EXPLAIN,
+    SqlKind_DESCRIBE_SCHEMA,
+    SqlKind_DESCRIBE_TABLE,
+    SqlKind_INSERT,
+    SqlKind_DELETE,
+    SqlKind_UPDATE,
+    SqlKind_SET_OPTION,
+    SqlKind_DYNAMIC_PARAM,
+    SqlKind_ORDER_BY,
+    SqlKind_WITH,
+    SqlKind_WITH_ITEM,
+    SqlKind_UNION,
+    SqlKind_EXCEPT,
+    SqlKind_INTERSECT,
+    SqlKind_AS,
+    SqlKind_ARGUMENT_ASSIGNMENT,
+    SqlKind_DEFAULT,
+    SqlKind_OVER,
+    SqlKind_FILTER,
+    SqlKind_WINDOW,
+    SqlKind_MERGE,
+    SqlKind_TABLESAMPLE,
+    SqlKind_MATCH_RECOGNIZE,
+    SqlKind_TIMES,
+    SqlKind_DIVIDE,
+    SqlKind_MOD,
+    SqlKind_PLUS,
+    SqlKind_MINUS,
+    SqlKind_PATTERN_ALTER,
+    SqlKind_PATTERN_CONCAT,
+    SqlKind_IN,
+    SqlKind_NOT_IN,
+    SqlKind_LESS_THAN,
+    SqlKind_GREATER_THAN,
+    SqlKind_LESS_THAN_OR_EQUAL,
+    SqlKind_GREATER_THAN_OR_EQUAL,
+    SqlKind_EQUALS,
+    SqlKind_NOT_EQUALS,
+    SqlKind_IS_DISTINCT_FROM,
+    SqlKind_IS_NOT_DISTINCT_FROM,
+    SqlKind_OR,
+    SqlKind_AND,
+    SqlKind_DOT,
+    SqlKind_OVERLAPS,
+    SqlKind_CONTAINS,
+    SqlKind_PRECEDES,
+    SqlKind_IMMEDIATELY_PRECEDES,
+    SqlKind_SUCCEEDS,
+    SqlKind_IMMEDIATELY_SUCCEEDS,
+    SqlKind_PERIOD_EQUALS,
+    SqlKind_LIKE,
+    SqlKind_SIMILAR,
+    SqlKind_BETWEEN,
+    SqlKind_CASE,
+    SqlKind_NULLIF,
+    SqlKind_COALESCE,
+    SqlKind_DECODE,
+    SqlKind_NVL,
+    SqlKind_GREATEST,
+    SqlKind_LEAST,
+    SqlKind_TIMESTAMP_ADD,
+    SqlKind_TIMESTAMP_DIFF,
+    SqlKind_NOT,
+    SqlKind_PLUS_PREFIX,
+    SqlKind_MINUS_PREFIX,
+    SqlKind_EXISTS,
+    SqlKind_SOME,
+    SqlKind_ALL,
+    SqlKind_VALUES,
+    SqlKind_EXPLICIT_TABLE,
+    SqlKind_SCALAR_QUERY,
+    SqlKind_PROCEDURE_CALL,
+    SqlKind_NEW_SPECIFICATION,
+    SqlKind_FINAL,
+    SqlKind_RUNNING,
+    SqlKind_PREV,
+    SqlKind_NEXT,
+    SqlKind_FIRST,
+    SqlKind_LAST,
+    SqlKind_CLASSIFIER,
+    SqlKind_MATCH_NUMBER,
+    SqlKind_SKIP_TO_FIRST,
+    SqlKind_SKIP_TO_LAST,
+    SqlKind_DESCENDING,
+    SqlKind_NULLS_FIRST,
+    SqlKind_NULLS_LAST,
+    SqlKind_IS_TRUE,
+    SqlKind_IS_FALSE,
+    SqlKind_IS_NOT_TRUE,
+    SqlKind_IS_NOT_FALSE,
+    SqlKind_IS_UNKNOWN,
+    SqlKind_IS_NULL,
+    SqlKind_IS_NOT_NULL,
+    SqlKind_PRECEDING,
+    SqlKind_FOLLOWING,
+    SqlKind_FIELD_ACCESS,
+    SqlKind_INPUT_REF,
+    SqlKind_TABLE_INPUT_REF,
+    SqlKind_PATTERN_INPUT_REF,
+    SqlKind_LOCAL_REF,
+    SqlKind_CORREL_VARIABLE,
+    SqlKind_PATTERN_QUANTIFIER,
+    SqlKind_ROW,
+    SqlKind_COLUMN_LIST,
+    SqlKind_CAST,
+    SqlKind_NEXT_VALUE,
+    SqlKind_CURRENT_VALUE,
+    SqlKind_FLOOR,
+    SqlKind_CEIL,
+    SqlKind_TRIM,
+    SqlKind_LTRIM,
+    SqlKind_RTRIM,
+    SqlKind_EXTRACT,
+    SqlKind_JDBC_FN,
+    SqlKind_MULTISET_VALUE_CONSTRUCTOR,
+    SqlKind_MULTISET_QUERY_CONSTRUCTOR,
+    SqlKind_UNNEST,
+    SqlKind_LATERAL,
+    SqlKind_COLLECTION_TABLE,
+    SqlKind_ARRAY_VALUE_CONSTRUCTOR,
+    SqlKind_ARRAY_QUERY_CONSTRUCTOR,
+    SqlKind_MAP_VALUE_CONSTRUCTOR,
+    SqlKind_MAP_QUERY_CONSTRUCTOR,
+    SqlKind_CURSOR,
+    SqlKind_LITERAL_CHAIN,
+    SqlKind_ESCAPE,
+    SqlKind_REINTERPRET,
+    SqlKind_EXTEND,
+    SqlKind_CUBE,
+    SqlKind_ROLLUP,
+    SqlKind_GROUPING_SETS,
+    SqlKind_GROUPING,
+    SqlKind_GROUPING_ID,
+    SqlKind_GROUP_ID,
+    SqlKind_PATTERN_PERMUTE,
+    SqlKind_PATTERN_EXCLUDED,
+    SqlKind_COUNT,
+    SqlKind_SUM,
+    SqlKind_SUM0,
+    SqlKind_MIN,
+    SqlKind_MAX,
+    SqlKind_LEAD,
+    SqlKind_LAG,
+    SqlKind_FIRST_VALUE,
+    SqlKind_LAST_VALUE,
+    SqlKind_ANY_VALUE,
+    SqlKind_COVAR_POP,
+    SqlKind_COVAR_SAMP,
+    SqlKind_REGR_COUNT,
+    SqlKind_REGR_SXX,
+    SqlKind_REGR_SYY,
+    SqlKind_AVG,
+    SqlKind_STDDEV_POP,
+    SqlKind_STDDEV_SAMP,
+    SqlKind_VAR_POP,
+    SqlKind_VAR_SAMP,
+    SqlKind_NTILE,
+    SqlKind_NTH_VALUE,
+    SqlKind_COLLECT,
+    SqlKind_FUSION,
+    SqlKind_SINGLE_VALUE,
+    SqlKind_ROW_NUMBER,
+    SqlKind_RANK,
+    SqlKind_PERCENT_RANK,
+    SqlKind_DENSE_RANK,
+    SqlKind_CUME_DIST,
+    SqlKind_TUMBLE,
+    SqlKind_TUMBLE_START,
+    SqlKind_TUMBLE_END,
+    SqlKind_HOP,
+    SqlKind_HOP_START,
+    SqlKind_HOP_END,
+    SqlKind_SESSION,
+    SqlKind_SESSION_START,
+    SqlKind_SESSION_END,
+    SqlKind_COLUMN_DECL,
+    SqlKind_ATTRIBUTE_DEF,
+    SqlKind_CHECK,
+    SqlKind_UNIQUE,
+    SqlKind_PRIMARY_KEY,
+    SqlKind_FOREIGN_KEY,
+    SqlKind_COMMIT,
+    SqlKind_ROLLBACK,
+    SqlKind_ALTER_SESSION,
+    SqlKind_CREATE_SCHEMA,
+    SqlKind_CREATE_FOREIGN_SCHEMA,
+    SqlKind_DROP_SCHEMA,
+    SqlKind_CREATE_TABLE,
+    SqlKind_ALTER_TABLE,
+    SqlKind_DROP_TABLE,
+    SqlKind_CREATE_VIEW,
+    SqlKind_ALTER_VIEW,
+    SqlKind_DROP_VIEW,
+    SqlKind_CREATE_MATERIALIZED_VIEW,
+    SqlKind_ALTER_MATERIALIZED_VIEW,
+    SqlKind_DROP_MATERIALIZED_VIEW,
+    SqlKind_CREATE_SEQUENCE,
+    SqlKind_ALTER_SEQUENCE,
+    SqlKind_DROP_SEQUENCE,
+    SqlKind_CREATE_INDEX,
+    SqlKind_ALTER_INDEX,
+    SqlKind_DROP_INDEX,
+    SqlKind_CREATE_TYPE,
+    SqlKind_DROP_TYPE,
+    SqlKind_OTHER_DDL
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesSqlKind() {
+  static const char * const names[] = {
+    "OTHER",
+    "SELECT",
+    "JOIN",
+    "IDENTIFIER",
+    "LITERAL",
+    "OTHER_FUNCTION",
+    "EXPLAIN",
+    "DESCRIBE_SCHEMA",
+    "DESCRIBE_TABLE",
+    "INSERT",
+    "DELETE",
+    "UPDATE",
+    "SET_OPTION",
+    "DYNAMIC_PARAM",
+    "ORDER_BY",
+    "WITH",
+    "WITH_ITEM",
+    "UNION",
+    "EXCEPT",
+    "INTERSECT",
+    "AS",
+    "ARGUMENT_ASSIGNMENT",
+    "DEFAULT",
+    "OVER",
+    "FILTER",
+    "WINDOW",
+    "MERGE",
+    "TABLESAMPLE",
+    "MATCH_RECOGNIZE",
+    "TIMES",
+    "DIVIDE",
+    "MOD",
+    "PLUS",
+    "MINUS",
+    "PATTERN_ALTER",
+    "PATTERN_CONCAT",
+    "IN",
+    "NOT_IN",
+    "LESS_THAN",
+    "GREATER_THAN",
+    "LESS_THAN_OR_EQUAL",
+    "GREATER_THAN_OR_EQUAL",
+    "EQUALS",
+    "NOT_EQUALS",
+    "IS_DISTINCT_FROM",
+    "IS_NOT_DISTINCT_FROM",
+    "OR",
+    "AND",
+    "DOT",
+    "OVERLAPS",
+    "CONTAINS",
+    "PRECEDES",
+    "IMMEDIATELY_PRECEDES",
+    "SUCCEEDS",
+    "IMMEDIATELY_SUCCEEDS",
+    "PERIOD_EQUALS",
+    "LIKE",
+    "SIMILAR",
+    "BETWEEN",
+    "CASE",
+    "NULLIF",
+    "COALESCE",
+    "DECODE",
+    "NVL",
+    "GREATEST",
+    "LEAST",
+    "TIMESTAMP_ADD",
+    "TIMESTAMP_DIFF",
+    "NOT",
+    "PLUS_PREFIX",
+    "MINUS_PREFIX",
+    "EXISTS",
+    "SOME",
+    "ALL",
+    "VALUES",
+    "EXPLICIT_TABLE",
+    "SCALAR_QUERY",
+    "PROCEDURE_CALL",
+    "NEW_SPECIFICATION",
+    "FINAL",
+    "RUNNING",
+    "PREV",
+    "NEXT",
+    "FIRST",
+    "LAST",
+    "CLASSIFIER",
+    "MATCH_NUMBER",
+    "SKIP_TO_FIRST",
+    "SKIP_TO_LAST",
+    "DESCENDING",
+    "NULLS_FIRST",
+    "NULLS_LAST",
+    "IS_TRUE",
+    "IS_FALSE",
+    "IS_NOT_TRUE",
+    "IS_NOT_FALSE",
+    "IS_UNKNOWN",
+    "IS_NULL",
+    "IS_NOT_NULL",
+    "PRECEDING",
+    "FOLLOWING",
+    "FIELD_ACCESS",
+    "INPUT_REF",
+    "TABLE_INPUT_REF",
+    "PATTERN_INPUT_REF",
+    "LOCAL_REF",
+    "CORREL_VARIABLE",
+    "PATTERN_QUANTIFIER",
+    "ROW",
+    "COLUMN_LIST",
+    "CAST",
+    "NEXT_VALUE",
+    "CURRENT_VALUE",
+    "FLOOR",
+    "CEIL",
+    "TRIM",
+    "LTRIM",
+    "RTRIM",
+    "EXTRACT",
+    "JDBC_FN",
+    "MULTISET_VALUE_CONSTRUCTOR",
+    "MULTISET_QUERY_CONSTRUCTOR",
+    "UNNEST",
+    "LATERAL",
+    "COLLECTION_TABLE",
+    "ARRAY_VALUE_CONSTRUCTOR",
+    "ARRAY_QUERY_CONSTRUCTOR",
+    "MAP_VALUE_CONSTRUCTOR",
+    "MAP_QUERY_CONSTRUCTOR",
+    "CURSOR",
+    "LITERAL_CHAIN",
+    "ESCAPE",
+    "REINTERPRET",
+    "EXTEND",
+    "CUBE",
+    "ROLLUP",
+    "GROUPING_SETS",
+    "GROUPING",
+    "GROUPING_ID",
+    "GROUP_ID",
+    "PATTERN_PERMUTE",
+    "PATTERN_EXCLUDED",
+    "COUNT",
+    "SUM",
+    "SUM0",
+    "MIN",
+    "MAX",
+    "LEAD",
+    "LAG",
+    "FIRST_VALUE",
+    "LAST_VALUE",
+    "ANY_VALUE",
+    "COVAR_POP",
+    "COVAR_SAMP",
+    "REGR_COUNT",
+    "REGR_SXX",
+    "REGR_SYY",
+    "AVG",
+    "STDDEV_POP",
+    "STDDEV_SAMP",
+    "VAR_POP",
+    "VAR_SAMP",
+    "NTILE",
+    "NTH_VALUE",
+    "COLLECT",
+    "FUSION",
+    "SINGLE_VALUE",
+    "ROW_NUMBER",
+    "RANK",
+    "PERCENT_RANK",
+    "DENSE_RANK",
+    "CUME_DIST",
+    "TUMBLE",
+    "TUMBLE_START",
+    "TUMBLE_END",
+    "HOP",
+    "HOP_START",
+    "HOP_END",
+    "SESSION",
+    "SESSION_START",
+    "SESSION_END",
+    "COLUMN_DECL",
+    "ATTRIBUTE_DEF",
+    "CHECK",
+    "UNIQUE",
+    "PRIMARY_KEY",
+    "FOREIGN_KEY",
+    "COMMIT",
+    "ROLLBACK",
+    "ALTER_SESSION",
+    "CREATE_SCHEMA",
+    "CREATE_FOREIGN_SCHEMA",
+    "DROP_SCHEMA",
+    "CREATE_TABLE",
+    "ALTER_TABLE",
+    "DROP_TABLE",
+    "CREATE_VIEW",
+    "ALTER_VIEW",
+    "DROP_VIEW",
+    "CREATE_MATERIALIZED_VIEW",
+    "ALTER_MATERIALIZED_VIEW",
+    "DROP_MATERIALIZED_VIEW",
+    "CREATE_SEQUENCE",
+    "ALTER_SEQUENCE",
+    "DROP_SEQUENCE",
+    "CREATE_INDEX",
+    "ALTER_INDEX",
+    "DROP_INDEX",
+    "CREATE_TYPE",
+    "DROP_TYPE",
+    "OTHER_DDL",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameSqlKind(SqlKind e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesSqlKind()[index];
+}
+
+enum SqlTypeName {
+  SqlTypeName_ANY = 0,
+  SqlTypeName_ARRAY = 1,
+  SqlTypeName_BIGINT = 2,
+  SqlTypeName_BINARY = 3,
+  SqlTypeName_BOOLEAN = 4,
+  SqlTypeName_CHAR = 5,
+  SqlTypeName_COLUMN_LIST = 6,
+  SqlTypeName_CURSOR = 7,
+  SqlTypeName_DATE = 8,
+  SqlTypeName_DECIMAL = 9,
+  SqlTypeName_DISTINCT = 10,
+  SqlTypeName_DOUBLE = 11,
+  SqlTypeName_DYNAMIC_STAR = 12,
+  SqlTypeName_FLOAT = 13,
+  SqlTypeName_GEOMETRY = 14,
+  SqlTypeName_INTEGER = 15,
+  SqlTypeName_INTERVAL_DAY = 16,
+  SqlTypeName_INTERVAL_DAY_HOUR = 17,
+  SqlTypeName_INTERVAL_DAY_MINUTE = 18,
+  SqlTypeName_INTERVAL_DAY_SECOND = 19,
+  SqlTypeName_INTERVAL_HOUR = 20,
+  SqlTypeName_INTERVAL_HOUR_MINUTE = 21,
+  SqlTypeName_INTERVAL_HOUR_SECOND = 22,
+  SqlTypeName_INTERVAL_MINUTE = 23,
+  SqlTypeName_INTERVAL_MINUTE_SECOND = 24,
+  SqlTypeName_INTERVAL_MONTH = 25,
+  SqlTypeName_INTERVAL_SECOND = 26,
+  SqlTypeName_INTERVAL_YEAR = 27,
+  SqlTypeName_INTERVAL_YEAR_MONTH = 28,
+  SqlTypeName_MAP = 29,
+  SqlTypeName_MULTISET = 30,
+  SqlTypeName_NULL = 31,
+  SqlTypeName_OTHER = 32,
+  SqlTypeName_REAL = 33,
+  SqlTypeName_ROW = 34,
+  SqlTypeName_SMALLINT = 35,
+  SqlTypeName_STRUCTURED = 36,
+  SqlTypeName_SYMBOL = 37,
+  SqlTypeName_TIME = 38,
+  SqlTypeName_TIME_WITH_LOCAL_TIME_ZONE = 39,
+  SqlTypeName_TIMESTAMP = 40,
+  SqlTypeName_TIMESTAMP_WITH_LOCAL_TIME_ZONE = 41,
+  SqlTypeName_TINYINT = 42,
+  SqlTypeName_VARBINARY = 43,
+  SqlTypeName_VARCHAR = 44,
+  SqlTypeName_MIN = SqlTypeName_ANY,
+  SqlTypeName_MAX = SqlTypeName_VARCHAR
+};
+
+inline const SqlTypeName (&EnumValuesSqlTypeName())[45] {
+  static const SqlTypeName values[] = {
+    SqlTypeName_ANY,
+    SqlTypeName_ARRAY,
+    SqlTypeName_BIGINT,
+    SqlTypeName_BINARY,
+    SqlTypeName_BOOLEAN,
+    SqlTypeName_CHAR,
+    SqlTypeName_COLUMN_LIST,
+    SqlTypeName_CURSOR,
+    SqlTypeName_DATE,
+    SqlTypeName_DECIMAL,
+    SqlTypeName_DISTINCT,
+    SqlTypeName_DOUBLE,
+    SqlTypeName_DYNAMIC_STAR,
+    SqlTypeName_FLOAT,
+    SqlTypeName_GEOMETRY,
+    SqlTypeName_INTEGER,
+    SqlTypeName_INTERVAL_DAY,
+    SqlTypeName_INTERVAL_DAY_HOUR,
+    SqlTypeName_INTERVAL_DAY_MINUTE,
+    SqlTypeName_INTERVAL_DAY_SECOND,
+    SqlTypeName_INTERVAL_HOUR,
+    SqlTypeName_INTERVAL_HOUR_MINUTE,
+    SqlTypeName_INTERVAL_HOUR_SECOND,
+    SqlTypeName_INTERVAL_MINUTE,
+    SqlTypeName_INTERVAL_MINUTE_SECOND,
+    SqlTypeName_INTERVAL_MONTH,
+    SqlTypeName_INTERVAL_SECOND,
+    SqlTypeName_INTERVAL_YEAR,
+    SqlTypeName_INTERVAL_YEAR_MONTH,
+    SqlTypeName_MAP,
+    SqlTypeName_MULTISET,
+    SqlTypeName_NULL,
+    SqlTypeName_OTHER,
+    SqlTypeName_REAL,
+    SqlTypeName_ROW,
+    SqlTypeName_SMALLINT,
+    SqlTypeName_STRUCTURED,
+    SqlTypeName_SYMBOL,
+    SqlTypeName_TIME,
+    SqlTypeName_TIME_WITH_LOCAL_TIME_ZONE,
+    SqlTypeName_TIMESTAMP,
+    SqlTypeName_TIMESTAMP_WITH_LOCAL_TIME_ZONE,
+    SqlTypeName_TINYINT,
+    SqlTypeName_VARBINARY,
+    SqlTypeName_VARCHAR
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesSqlTypeName() {
+  static const char * const names[] = {
+    "ANY",
+    "ARRAY",
+    "BIGINT",
+    "BINARY",
+    "BOOLEAN",
+    "CHAR",
+    "COLUMN_LIST",
+    "CURSOR",
+    "DATE",
+    "DECIMAL",
+    "DISTINCT",
+    "DOUBLE",
+    "DYNAMIC_STAR",
+    "FLOAT",
+    "GEOMETRY",
+    "INTEGER",
+    "INTERVAL_DAY",
+    "INTERVAL_DAY_HOUR",
+    "INTERVAL_DAY_MINUTE",
+    "INTERVAL_DAY_SECOND",
+    "INTERVAL_HOUR",
+    "INTERVAL_HOUR_MINUTE",
+    "INTERVAL_HOUR_SECOND",
+    "INTERVAL_MINUTE",
+    "INTERVAL_MINUTE_SECOND",
+    "INTERVAL_MONTH",
+    "INTERVAL_SECOND",
+    "INTERVAL_YEAR",
+    "INTERVAL_YEAR_MONTH",
+    "MAP",
+    "MULTISET",
+    "NULL",
+    "OTHER",
+    "REAL",
+    "ROW",
+    "SMALLINT",
+    "STRUCTURED",
+    "SYMBOL",
+    "TIME",
+    "TIME_WITH_LOCAL_TIME_ZONE",
+    "TIMESTAMP",
+    "TIMESTAMP_WITH_LOCAL_TIME_ZONE",
+    "TINYINT",
+    "VARBINARY",
+    "VARCHAR",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameSqlTypeName(SqlTypeName e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesSqlTypeName()[index];
+}
+
+}  // namespace messages
+}  // namespace plan
+}  // namespace calcite
+}  // namespace protocol
+}  // namespace blazingdb
+}  // namespace com
+
+namespace blazingdb {
+namespace protocol {
 
 enum NodeConnectionType {
   NodeConnectionType_TPC = 0,
@@ -422,7 +1435,15 @@ STRUCT_END(Header, 16);
 
 namespace calcite {
 
+struct DMLRequestT : public flatbuffers::NativeTable {
+  typedef DMLRequest TableType;
+  std::string query;
+  DMLRequestT() {
+  }
+};
+
 struct DMLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DMLRequestT NativeTableType;
   enum {
     VT_QUERY = 4
   };
@@ -435,6 +1456,9 @@ struct DMLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.Verify(query()) &&
            verifier.EndTable();
   }
+  DMLRequestT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DMLRequestT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DMLRequest> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DMLRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DMLRequestBuilder {
@@ -471,7 +1495,17 @@ inline flatbuffers::Offset<DMLRequest> CreateDMLRequestDirect(
       query ? _fbb.CreateString(query) : 0);
 }
 
+flatbuffers::Offset<DMLRequest> CreateDMLRequest(flatbuffers::FlatBufferBuilder &_fbb, const DMLRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct DDLRequestT : public flatbuffers::NativeTable {
+  typedef DDLRequest TableType;
+  std::string query;
+  DDLRequestT() {
+  }
+};
+
 struct DDLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DDLRequestT NativeTableType;
   enum {
     VT_QUERY = 4
   };
@@ -484,6 +1518,9 @@ struct DDLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.Verify(query()) &&
            verifier.EndTable();
   }
+  DDLRequestT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DDLRequestT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DDLRequest> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DDLRequestBuilder {
@@ -520,7 +1557,20 @@ inline flatbuffers::Offset<DDLRequest> CreateDDLRequestDirect(
       query ? _fbb.CreateString(query) : 0);
 }
 
+flatbuffers::Offset<DDLRequest> CreateDDLRequest(flatbuffers::FlatBufferBuilder &_fbb, const DDLRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct DDLCreateTableRequestT : public flatbuffers::NativeTable {
+  typedef DDLCreateTableRequest TableType;
+  std::string name;
+  std::vector<std::string> columnNames;
+  std::vector<std::string> columnTypes;
+  std::string dbName;
+  DDLCreateTableRequestT() {
+  }
+};
+
 struct DDLCreateTableRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DDLCreateTableRequestT NativeTableType;
   enum {
     VT_NAME = 4,
     VT_COLUMNNAMES = 6,
@@ -553,6 +1603,9 @@ struct DDLCreateTableRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Tabl
            verifier.Verify(dbName()) &&
            verifier.EndTable();
   }
+  DDLCreateTableRequestT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DDLCreateTableRequestT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DDLCreateTableRequest> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLCreateTableRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DDLCreateTableRequestBuilder {
@@ -610,7 +1663,18 @@ inline flatbuffers::Offset<DDLCreateTableRequest> CreateDDLCreateTableRequestDir
       dbName ? _fbb.CreateString(dbName) : 0);
 }
 
+flatbuffers::Offset<DDLCreateTableRequest> CreateDDLCreateTableRequest(flatbuffers::FlatBufferBuilder &_fbb, const DDLCreateTableRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct DDLDropTableRequestT : public flatbuffers::NativeTable {
+  typedef DDLDropTableRequest TableType;
+  std::string name;
+  std::string dbName;
+  DDLDropTableRequestT() {
+  }
+};
+
 struct DDLDropTableRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DDLDropTableRequestT NativeTableType;
   enum {
     VT_NAME = 4,
     VT_DBNAME = 6
@@ -629,6 +1693,9 @@ struct DDLDropTableRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
            verifier.Verify(dbName()) &&
            verifier.EndTable();
   }
+  DDLDropTableRequestT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DDLDropTableRequestT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DDLDropTableRequest> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLDropTableRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DDLDropTableRequestBuilder {
@@ -672,11 +1739,24 @@ inline flatbuffers::Offset<DDLDropTableRequest> CreateDDLDropTableRequestDirect(
       dbName ? _fbb.CreateString(dbName) : 0);
 }
 
+flatbuffers::Offset<DDLDropTableRequest> CreateDDLDropTableRequest(flatbuffers::FlatBufferBuilder &_fbb, const DDLDropTableRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 }  // namespace calcite
 
 namespace orchestrator {
 
+struct DDLCreateTableRequestT : public flatbuffers::NativeTable {
+  typedef DDLCreateTableRequest TableType;
+  std::string name;
+  std::vector<std::string> columnNames;
+  std::vector<std::string> columnTypes;
+  std::string dbName;
+  DDLCreateTableRequestT() {
+  }
+};
+
 struct DDLCreateTableRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DDLCreateTableRequestT NativeTableType;
   enum {
     VT_NAME = 4,
     VT_COLUMNNAMES = 6,
@@ -709,6 +1789,9 @@ struct DDLCreateTableRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Tabl
            verifier.Verify(dbName()) &&
            verifier.EndTable();
   }
+  DDLCreateTableRequestT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DDLCreateTableRequestT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DDLCreateTableRequest> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLCreateTableRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DDLCreateTableRequestBuilder {
@@ -766,7 +1849,18 @@ inline flatbuffers::Offset<DDLCreateTableRequest> CreateDDLCreateTableRequestDir
       dbName ? _fbb.CreateString(dbName) : 0);
 }
 
+flatbuffers::Offset<DDLCreateTableRequest> CreateDDLCreateTableRequest(flatbuffers::FlatBufferBuilder &_fbb, const DDLCreateTableRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct DDLDropTableRequestT : public flatbuffers::NativeTable {
+  typedef DDLDropTableRequest TableType;
+  std::string name;
+  std::string dbName;
+  DDLDropTableRequestT() {
+  }
+};
+
 struct DDLDropTableRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DDLDropTableRequestT NativeTableType;
   enum {
     VT_NAME = 4,
     VT_DBNAME = 6
@@ -785,6 +1879,9 @@ struct DDLDropTableRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
            verifier.Verify(dbName()) &&
            verifier.EndTable();
   }
+  DDLDropTableRequestT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DDLDropTableRequestT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DDLDropTableRequest> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLDropTableRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DDLDropTableRequestBuilder {
@@ -828,11 +1925,23 @@ inline flatbuffers::Offset<DDLDropTableRequest> CreateDDLDropTableRequestDirect(
       dbName ? _fbb.CreateString(dbName) : 0);
 }
 
+flatbuffers::Offset<DDLDropTableRequest> CreateDDLDropTableRequest(flatbuffers::FlatBufferBuilder &_fbb, const DDLDropTableRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct AuthRequestT : public flatbuffers::NativeTable {
+  typedef AuthRequest TableType;
+  AuthRequestT() {
+  }
+};
+
 struct AuthRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef AuthRequestT NativeTableType;
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            verifier.EndTable();
   }
+  AuthRequestT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(AuthRequestT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<AuthRequest> Pack(flatbuffers::FlatBufferBuilder &_fbb, const AuthRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct AuthRequestBuilder {
@@ -856,11 +1965,22 @@ inline flatbuffers::Offset<AuthRequest> CreateAuthRequest(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<AuthRequest> CreateAuthRequest(flatbuffers::FlatBufferBuilder &_fbb, const AuthRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 }  // namespace orchestrator
 
 namespace gdf {
 
+struct gdf_dtype_extra_infoT : public flatbuffers::NativeTable {
+  typedef gdf_dtype_extra_info TableType;
+  gdf_time_unit time_unit;
+  gdf_dtype_extra_infoT()
+      : time_unit(gdf_time_unit_TIME_UNIT_NONE) {
+  }
+};
+
 struct gdf_dtype_extra_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef gdf_dtype_extra_infoT NativeTableType;
   enum {
     VT_TIME_UNIT = 4
   };
@@ -872,6 +1992,9 @@ struct gdf_dtype_extra_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table
            VerifyField<int8_t>(verifier, VT_TIME_UNIT) &&
            verifier.EndTable();
   }
+  gdf_dtype_extra_infoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(gdf_dtype_extra_infoT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<gdf_dtype_extra_info> Pack(flatbuffers::FlatBufferBuilder &_fbb, const gdf_dtype_extra_infoT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct gdf_dtype_extra_infoBuilder {
@@ -900,7 +2023,17 @@ inline flatbuffers::Offset<gdf_dtype_extra_info> Creategdf_dtype_extra_info(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<gdf_dtype_extra_info> Creategdf_dtype_extra_info(flatbuffers::FlatBufferBuilder &_fbb, const gdf_dtype_extra_infoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct cudaIpcMemHandle_tT : public flatbuffers::NativeTable {
+  typedef cudaIpcMemHandle_t TableType;
+  std::vector<int8_t> reserved;
+  cudaIpcMemHandle_tT() {
+  }
+};
+
 struct cudaIpcMemHandle_t FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef cudaIpcMemHandle_tT NativeTableType;
   enum {
     VT_RESERVED = 4
   };
@@ -913,6 +2046,9 @@ struct cudaIpcMemHandle_t FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.Verify(reserved()) &&
            verifier.EndTable();
   }
+  cudaIpcMemHandle_tT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(cudaIpcMemHandle_tT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<cudaIpcMemHandle_t> Pack(flatbuffers::FlatBufferBuilder &_fbb, const cudaIpcMemHandle_tT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct cudaIpcMemHandle_tBuilder {
@@ -949,7 +2085,25 @@ inline flatbuffers::Offset<cudaIpcMemHandle_t> CreatecudaIpcMemHandle_tDirect(
       reserved ? _fbb.CreateVector<int8_t>(*reserved) : 0);
 }
 
+flatbuffers::Offset<cudaIpcMemHandle_t> CreatecudaIpcMemHandle_t(flatbuffers::FlatBufferBuilder &_fbb, const cudaIpcMemHandle_tT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct gdf_column_handlerT : public flatbuffers::NativeTable {
+  typedef gdf_column_handler TableType;
+  std::unique_ptr<cudaIpcMemHandle_tT> data;
+  std::unique_ptr<cudaIpcMemHandle_tT> valid;
+  uint16_t size;
+  gdf_dtype dtype;
+  std::unique_ptr<gdf_dtype_extra_infoT> dtype_info;
+  uint16_t null_count;
+  gdf_column_handlerT()
+      : size(0),
+        dtype(gdf_dtype_GDF_invalid),
+        null_count(0) {
+  }
+};
+
 struct gdf_column_handler FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef gdf_column_handlerT NativeTableType;
   enum {
     VT_DATA = 4,
     VT_VALID = 6,
@@ -989,6 +2143,9 @@ struct gdf_column_handler FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint16_t>(verifier, VT_NULL_COUNT) &&
            verifier.EndTable();
   }
+  gdf_column_handlerT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(gdf_column_handlerT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<gdf_column_handler> Pack(flatbuffers::FlatBufferBuilder &_fbb, const gdf_column_handlerT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct gdf_column_handlerBuilder {
@@ -1042,9 +2199,21 @@ inline flatbuffers::Offset<gdf_column_handler> Creategdf_column_handler(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<gdf_column_handler> Creategdf_column_handler(flatbuffers::FlatBufferBuilder &_fbb, const gdf_column_handlerT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 }  // namespace gdf
 
+struct BlazingTableT : public flatbuffers::NativeTable {
+  typedef BlazingTable TableType;
+  std::string name;
+  std::vector<std::unique_ptr<blazingdb::protocol::gdf::gdf_column_handlerT>> columns;
+  std::vector<std::string> columnNames;
+  BlazingTableT() {
+  }
+};
+
 struct BlazingTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef BlazingTableT NativeTableType;
   enum {
     VT_NAME = 4,
     VT_COLUMNS = 6,
@@ -1071,6 +2240,9 @@ struct BlazingTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVectorOfStrings(columnNames()) &&
            verifier.EndTable();
   }
+  BlazingTableT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(BlazingTableT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<BlazingTable> Pack(flatbuffers::FlatBufferBuilder &_fbb, const BlazingTableT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct BlazingTableBuilder {
@@ -1121,7 +2293,18 @@ inline flatbuffers::Offset<BlazingTable> CreateBlazingTableDirect(
       columnNames ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*columnNames) : 0);
 }
 
+flatbuffers::Offset<BlazingTable> CreateBlazingTable(flatbuffers::FlatBufferBuilder &_fbb, const BlazingTableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct TableGroupT : public flatbuffers::NativeTable {
+  typedef TableGroup TableType;
+  std::vector<std::unique_ptr<BlazingTableT>> tables;
+  std::string name;
+  TableGroupT() {
+  }
+};
+
 struct TableGroup FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef TableGroupT NativeTableType;
   enum {
     VT_TABLES = 4,
     VT_NAME = 6
@@ -1141,6 +2324,9 @@ struct TableGroup FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.Verify(name()) &&
            verifier.EndTable();
   }
+  TableGroupT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(TableGroupT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<TableGroup> Pack(flatbuffers::FlatBufferBuilder &_fbb, const TableGroupT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct TableGroupBuilder {
@@ -1184,9 +2370,20 @@ inline flatbuffers::Offset<TableGroup> CreateTableGroupDirect(
       name ? _fbb.CreateString(name) : 0);
 }
 
+flatbuffers::Offset<TableGroup> CreateTableGroup(flatbuffers::FlatBufferBuilder &_fbb, const TableGroupT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 namespace orchestrator {
 
+struct DMLRequestT : public flatbuffers::NativeTable {
+  typedef DMLRequest TableType;
+  std::string query;
+  std::unique_ptr<blazingdb::protocol::TableGroupT> tableGroup;
+  DMLRequestT() {
+  }
+};
+
 struct DMLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DMLRequestT NativeTableType;
   enum {
     VT_QUERY = 4,
     VT_TABLEGROUP = 6
@@ -1205,6 +2402,9 @@ struct DMLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(tableGroup()) &&
            verifier.EndTable();
   }
+  DMLRequestT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DMLRequestT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DMLRequest> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DMLRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DMLRequestBuilder {
@@ -1248,7 +2448,17 @@ inline flatbuffers::Offset<DMLRequest> CreateDMLRequestDirect(
       tableGroup);
 }
 
+flatbuffers::Offset<DMLRequest> CreateDMLRequest(flatbuffers::FlatBufferBuilder &_fbb, const DMLRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct DDLRequestT : public flatbuffers::NativeTable {
+  typedef DDLRequest TableType;
+  std::string query;
+  DDLRequestT() {
+  }
+};
+
 struct DDLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DDLRequestT NativeTableType;
   enum {
     VT_QUERY = 4
   };
@@ -1261,6 +2471,9 @@ struct DDLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.Verify(query()) &&
            verifier.EndTable();
   }
+  DDLRequestT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DDLRequestT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DDLRequest> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DDLRequestBuilder {
@@ -1297,11 +2510,22 @@ inline flatbuffers::Offset<DDLRequest> CreateDDLRequestDirect(
       query ? _fbb.CreateString(query) : 0);
 }
 
+flatbuffers::Offset<DDLRequest> CreateDDLRequest(flatbuffers::FlatBufferBuilder &_fbb, const DDLRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 }  // namespace orchestrator
 
 namespace interpreter {
 
+struct DMLRequestT : public flatbuffers::NativeTable {
+  typedef DMLRequest TableType;
+  std::string logicalPlan;
+  std::unique_ptr<blazingdb::protocol::TableGroupT> tableGroup;
+  DMLRequestT() {
+  }
+};
+
 struct DMLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DMLRequestT NativeTableType;
   enum {
     VT_LOGICALPLAN = 4,
     VT_TABLEGROUP = 6
@@ -1320,6 +2544,9 @@ struct DMLRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(tableGroup()) &&
            verifier.EndTable();
   }
+  DMLRequestT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DMLRequestT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DMLRequest> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DMLRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DMLRequestBuilder {
@@ -1363,7 +2590,18 @@ inline flatbuffers::Offset<DMLRequest> CreateDMLRequestDirect(
       tableGroup);
 }
 
+flatbuffers::Offset<DMLRequest> CreateDMLRequest(flatbuffers::FlatBufferBuilder &_fbb, const DMLRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct GetResultRequestT : public flatbuffers::NativeTable {
+  typedef GetResultRequest TableType;
+  uint64_t resultToken;
+  GetResultRequestT()
+      : resultToken(0) {
+  }
+};
+
 struct GetResultRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef GetResultRequestT NativeTableType;
   enum {
     VT_RESULTTOKEN = 4
   };
@@ -1375,6 +2613,9 @@ struct GetResultRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint64_t>(verifier, VT_RESULTTOKEN) &&
            verifier.EndTable();
   }
+  GetResultRequestT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(GetResultRequestT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<GetResultRequest> Pack(flatbuffers::FlatBufferBuilder &_fbb, const GetResultRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct GetResultRequestBuilder {
@@ -1403,9 +2644,20 @@ inline flatbuffers::Offset<GetResultRequest> CreateGetResultRequest(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<GetResultRequest> CreateGetResultRequest(flatbuffers::FlatBufferBuilder &_fbb, const GetResultRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 }  // namespace interpreter
 
+struct RequestT : public flatbuffers::NativeTable {
+  typedef Request TableType;
+  std::unique_ptr<Header> header;
+  std::vector<uint8_t> payload;
+  RequestT() {
+  }
+};
+
 struct Request FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RequestT NativeTableType;
   enum {
     VT_HEADER = 4,
     VT_PAYLOAD = 6
@@ -1423,6 +2675,9 @@ struct Request FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.Verify(payload()) &&
            verifier.EndTable();
   }
+  RequestT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RequestT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Request> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RequestT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct RequestBuilder {
@@ -1466,9 +2721,679 @@ inline flatbuffers::Offset<Request> CreateRequestDirect(
       payload ? _fbb.CreateVector<uint8_t>(*payload) : 0);
 }
 
+flatbuffers::Offset<Request> CreateRequest(flatbuffers::FlatBufferBuilder &_fbb, const RequestT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+}  // namespace protocol
+}  // namespace blazingdb
+
+namespace com {
+namespace blazingdb {
+namespace protocol {
+namespace calcite {
+namespace plan {
+namespace messages {
+
+struct TableScanT : public flatbuffers::NativeTable {
+  typedef TableScan TableType;
+  std::vector<std::string> qualifiedName;
+  TableScanT() {
+  }
+};
+
+struct TableScan FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef TableScanT NativeTableType;
+  enum {
+    VT_QUALIFIEDNAME = 4
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *qualifiedName() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_QUALIFIEDNAME);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_QUALIFIEDNAME) &&
+           verifier.Verify(qualifiedName()) &&
+           verifier.VerifyVectorOfStrings(qualifiedName()) &&
+           verifier.EndTable();
+  }
+  TableScanT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(TableScanT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<TableScan> Pack(flatbuffers::FlatBufferBuilder &_fbb, const TableScanT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct TableScanBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_qualifiedName(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> qualifiedName) {
+    fbb_.AddOffset(TableScan::VT_QUALIFIEDNAME, qualifiedName);
+  }
+  explicit TableScanBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  TableScanBuilder &operator=(const TableScanBuilder &);
+  flatbuffers::Offset<TableScan> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<TableScan>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<TableScan> CreateTableScan(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> qualifiedName = 0) {
+  TableScanBuilder builder_(_fbb);
+  builder_.add_qualifiedName(qualifiedName);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<TableScan> CreateTableScanDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *qualifiedName = nullptr) {
+  return com::blazingdb::protocol::calcite::plan::messages::CreateTableScan(
+      _fbb,
+      qualifiedName ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*qualifiedName) : 0);
+}
+
+flatbuffers::Offset<TableScan> CreateTableScan(flatbuffers::FlatBufferBuilder &_fbb, const TableScanT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct LogicalProjectT : public flatbuffers::NativeTable {
+  typedef LogicalProject TableType;
+  std::vector<std::string> columnNames;
+  std::vector<std::string> columnValues;
+  LogicalProjectT() {
+  }
+};
+
+struct LogicalProject FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef LogicalProjectT NativeTableType;
+  enum {
+    VT_COLUMNNAMES = 4,
+    VT_COLUMNVALUES = 6
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *columnNames() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_COLUMNNAMES);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *columnValues() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_COLUMNVALUES);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_COLUMNNAMES) &&
+           verifier.Verify(columnNames()) &&
+           verifier.VerifyVectorOfStrings(columnNames()) &&
+           VerifyOffset(verifier, VT_COLUMNVALUES) &&
+           verifier.Verify(columnValues()) &&
+           verifier.VerifyVectorOfStrings(columnValues()) &&
+           verifier.EndTable();
+  }
+  LogicalProjectT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(LogicalProjectT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<LogicalProject> Pack(flatbuffers::FlatBufferBuilder &_fbb, const LogicalProjectT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct LogicalProjectBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_columnNames(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNames) {
+    fbb_.AddOffset(LogicalProject::VT_COLUMNNAMES, columnNames);
+  }
+  void add_columnValues(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnValues) {
+    fbb_.AddOffset(LogicalProject::VT_COLUMNVALUES, columnValues);
+  }
+  explicit LogicalProjectBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  LogicalProjectBuilder &operator=(const LogicalProjectBuilder &);
+  flatbuffers::Offset<LogicalProject> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<LogicalProject>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<LogicalProject> CreateLogicalProject(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNames = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnValues = 0) {
+  LogicalProjectBuilder builder_(_fbb);
+  builder_.add_columnValues(columnValues);
+  builder_.add_columnNames(columnNames);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<LogicalProject> CreateLogicalProjectDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *columnNames = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *columnValues = nullptr) {
+  return com::blazingdb::protocol::calcite::plan::messages::CreateLogicalProject(
+      _fbb,
+      columnNames ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*columnNames) : 0,
+      columnValues ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*columnValues) : 0);
+}
+
+flatbuffers::Offset<LogicalProject> CreateLogicalProject(flatbuffers::FlatBufferBuilder &_fbb, const LogicalProjectT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct LogicalAggregateT : public flatbuffers::NativeTable {
+  typedef LogicalAggregate TableType;
+  std::vector<uint64_t> groups;
+  LogicalAggregateT() {
+  }
+};
+
+struct LogicalAggregate FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef LogicalAggregateT NativeTableType;
+  enum {
+    VT_GROUPS = 4
+  };
+  const flatbuffers::Vector<uint64_t> *groups() const {
+    return GetPointer<const flatbuffers::Vector<uint64_t> *>(VT_GROUPS);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_GROUPS) &&
+           verifier.Verify(groups()) &&
+           verifier.EndTable();
+  }
+  LogicalAggregateT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(LogicalAggregateT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<LogicalAggregate> Pack(flatbuffers::FlatBufferBuilder &_fbb, const LogicalAggregateT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct LogicalAggregateBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_groups(flatbuffers::Offset<flatbuffers::Vector<uint64_t>> groups) {
+    fbb_.AddOffset(LogicalAggregate::VT_GROUPS, groups);
+  }
+  explicit LogicalAggregateBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  LogicalAggregateBuilder &operator=(const LogicalAggregateBuilder &);
+  flatbuffers::Offset<LogicalAggregate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<LogicalAggregate>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<LogicalAggregate> CreateLogicalAggregate(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<uint64_t>> groups = 0) {
+  LogicalAggregateBuilder builder_(_fbb);
+  builder_.add_groups(groups);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<LogicalAggregate> CreateLogicalAggregateDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<uint64_t> *groups = nullptr) {
+  return com::blazingdb::protocol::calcite::plan::messages::CreateLogicalAggregate(
+      _fbb,
+      groups ? _fbb.CreateVector<uint64_t>(*groups) : 0);
+}
+
+flatbuffers::Offset<LogicalAggregate> CreateLogicalAggregate(flatbuffers::FlatBufferBuilder &_fbb, const LogicalAggregateT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct LogicalUnionT : public flatbuffers::NativeTable {
+  typedef LogicalUnion TableType;
+  bool all;
+  LogicalUnionT()
+      : all(false) {
+  }
+};
+
+struct LogicalUnion FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef LogicalUnionT NativeTableType;
+  enum {
+    VT_ALL = 4
+  };
+  bool all() const {
+    return GetField<uint8_t>(VT_ALL, 0) != 0;
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_ALL) &&
+           verifier.EndTable();
+  }
+  LogicalUnionT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(LogicalUnionT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<LogicalUnion> Pack(flatbuffers::FlatBufferBuilder &_fbb, const LogicalUnionT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct LogicalUnionBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_all(bool all) {
+    fbb_.AddElement<uint8_t>(LogicalUnion::VT_ALL, static_cast<uint8_t>(all), 0);
+  }
+  explicit LogicalUnionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  LogicalUnionBuilder &operator=(const LogicalUnionBuilder &);
+  flatbuffers::Offset<LogicalUnion> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<LogicalUnion>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<LogicalUnion> CreateLogicalUnion(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    bool all = false) {
+  LogicalUnionBuilder builder_(_fbb);
+  builder_.add_all(all);
+  return builder_.Finish();
+}
+
+flatbuffers::Offset<LogicalUnion> CreateLogicalUnion(flatbuffers::FlatBufferBuilder &_fbb, const LogicalUnionT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct RelNodeT : public flatbuffers::NativeTable {
+  typedef RelNode TableType;
+  RelNodeType type;
+  std::vector<int8_t> data;
+  std::vector<std::unique_ptr<RelNodeT>> inputs;
+  RelNodeT()
+      : type(RelNodeType_Root) {
+  }
+};
+
+struct RelNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RelNodeT NativeTableType;
+  enum {
+    VT_TYPE = 4,
+    VT_DATA = 6,
+    VT_INPUTS = 8
+  };
+  RelNodeType type() const {
+    return static_cast<RelNodeType>(GetField<int16_t>(VT_TYPE, 0));
+  }
+  const flatbuffers::Vector<int8_t> *data() const {
+    return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_DATA);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<RelNode>> *inputs() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<RelNode>> *>(VT_INPUTS);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int16_t>(verifier, VT_TYPE) &&
+           VerifyOffset(verifier, VT_DATA) &&
+           verifier.Verify(data()) &&
+           VerifyOffset(verifier, VT_INPUTS) &&
+           verifier.Verify(inputs()) &&
+           verifier.VerifyVectorOfTables(inputs()) &&
+           verifier.EndTable();
+  }
+  RelNodeT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RelNodeT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<RelNode> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RelNodeT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct RelNodeBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_type(RelNodeType type) {
+    fbb_.AddElement<int16_t>(RelNode::VT_TYPE, static_cast<int16_t>(type), 0);
+  }
+  void add_data(flatbuffers::Offset<flatbuffers::Vector<int8_t>> data) {
+    fbb_.AddOffset(RelNode::VT_DATA, data);
+  }
+  void add_inputs(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<RelNode>>> inputs) {
+    fbb_.AddOffset(RelNode::VT_INPUTS, inputs);
+  }
+  explicit RelNodeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  RelNodeBuilder &operator=(const RelNodeBuilder &);
+  flatbuffers::Offset<RelNode> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<RelNode>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<RelNode> CreateRelNode(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    RelNodeType type = RelNodeType_Root,
+    flatbuffers::Offset<flatbuffers::Vector<int8_t>> data = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<RelNode>>> inputs = 0) {
+  RelNodeBuilder builder_(_fbb);
+  builder_.add_inputs(inputs);
+  builder_.add_data(data);
+  builder_.add_type(type);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<RelNode> CreateRelNodeDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    RelNodeType type = RelNodeType_Root,
+    const std::vector<int8_t> *data = nullptr,
+    const std::vector<flatbuffers::Offset<RelNode>> *inputs = nullptr) {
+  return com::blazingdb::protocol::calcite::plan::messages::CreateRelNode(
+      _fbb,
+      type,
+      data ? _fbb.CreateVector<int8_t>(*data) : 0,
+      inputs ? _fbb.CreateVector<flatbuffers::Offset<RelNode>>(*inputs) : 0);
+}
+
+flatbuffers::Offset<RelNode> CreateRelNode(flatbuffers::FlatBufferBuilder &_fbb, const RelNodeT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct RexCallT : public flatbuffers::NativeTable {
+  typedef RexCall TableType;
+  std::vector<std::unique_ptr<RexNodeT>> operands;
+  RexCallT() {
+  }
+};
+
+struct RexCall FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RexCallT NativeTableType;
+  enum {
+    VT_OPERANDS = 4
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<RexNode>> *operands() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<RexNode>> *>(VT_OPERANDS);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_OPERANDS) &&
+           verifier.Verify(operands()) &&
+           verifier.VerifyVectorOfTables(operands()) &&
+           verifier.EndTable();
+  }
+  RexCallT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RexCallT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<RexCall> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RexCallT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct RexCallBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_operands(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<RexNode>>> operands) {
+    fbb_.AddOffset(RexCall::VT_OPERANDS, operands);
+  }
+  explicit RexCallBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  RexCallBuilder &operator=(const RexCallBuilder &);
+  flatbuffers::Offset<RexCall> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<RexCall>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<RexCall> CreateRexCall(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<RexNode>>> operands = 0) {
+  RexCallBuilder builder_(_fbb);
+  builder_.add_operands(operands);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<RexCall> CreateRexCallDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<RexNode>> *operands = nullptr) {
+  return com::blazingdb::protocol::calcite::plan::messages::CreateRexCall(
+      _fbb,
+      operands ? _fbb.CreateVector<flatbuffers::Offset<RexNode>>(*operands) : 0);
+}
+
+flatbuffers::Offset<RexCall> CreateRexCall(flatbuffers::FlatBufferBuilder &_fbb, const RexCallT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct RexInputRefT : public flatbuffers::NativeTable {
+  typedef RexInputRef TableType;
+  std::vector<int32_t> index;
+  RexInputRefT() {
+  }
+};
+
+struct RexInputRef FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RexInputRefT NativeTableType;
+  enum {
+    VT_INDEX = 4
+  };
+  const flatbuffers::Vector<int32_t> *index() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_INDEX);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_INDEX) &&
+           verifier.Verify(index()) &&
+           verifier.EndTable();
+  }
+  RexInputRefT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RexInputRefT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<RexInputRef> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RexInputRefT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct RexInputRefBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_index(flatbuffers::Offset<flatbuffers::Vector<int32_t>> index) {
+    fbb_.AddOffset(RexInputRef::VT_INDEX, index);
+  }
+  explicit RexInputRefBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  RexInputRefBuilder &operator=(const RexInputRefBuilder &);
+  flatbuffers::Offset<RexInputRef> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<RexInputRef>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<RexInputRef> CreateRexInputRef(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> index = 0) {
+  RexInputRefBuilder builder_(_fbb);
+  builder_.add_index(index);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<RexInputRef> CreateRexInputRefDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<int32_t> *index = nullptr) {
+  return com::blazingdb::protocol::calcite::plan::messages::CreateRexInputRef(
+      _fbb,
+      index ? _fbb.CreateVector<int32_t>(*index) : 0);
+}
+
+flatbuffers::Offset<RexInputRef> CreateRexInputRef(flatbuffers::FlatBufferBuilder &_fbb, const RexInputRefT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct RexLiteralT : public flatbuffers::NativeTable {
+  typedef RexLiteral TableType;
+  std::vector<int8_t> value;
+  RexLiteralT() {
+  }
+};
+
+struct RexLiteral FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RexLiteralT NativeTableType;
+  enum {
+    VT_VALUE = 4
+  };
+  const flatbuffers::Vector<int8_t> *value() const {
+    return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_VALUE);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_VALUE) &&
+           verifier.Verify(value()) &&
+           verifier.EndTable();
+  }
+  RexLiteralT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RexLiteralT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<RexLiteral> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RexLiteralT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct RexLiteralBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_value(flatbuffers::Offset<flatbuffers::Vector<int8_t>> value) {
+    fbb_.AddOffset(RexLiteral::VT_VALUE, value);
+  }
+  explicit RexLiteralBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  RexLiteralBuilder &operator=(const RexLiteralBuilder &);
+  flatbuffers::Offset<RexLiteral> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<RexLiteral>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<RexLiteral> CreateRexLiteral(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<int8_t>> value = 0) {
+  RexLiteralBuilder builder_(_fbb);
+  builder_.add_value(value);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<RexLiteral> CreateRexLiteralDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<int8_t> *value = nullptr) {
+  return com::blazingdb::protocol::calcite::plan::messages::CreateRexLiteral(
+      _fbb,
+      value ? _fbb.CreateVector<int8_t>(*value) : 0);
+}
+
+flatbuffers::Offset<RexLiteral> CreateRexLiteral(flatbuffers::FlatBufferBuilder &_fbb, const RexLiteralT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct RexNodeT : public flatbuffers::NativeTable {
+  typedef RexNode TableType;
+  RexNodeType type;
+  SqlKind sqlKind;
+  SqlTypeName sqlTypeName;
+  std::vector<int8_t> data;
+  RexNodeT()
+      : type(RexNodeType_Root),
+        sqlKind(SqlKind_OTHER),
+        sqlTypeName(SqlTypeName_ANY) {
+  }
+};
+
+struct RexNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RexNodeT NativeTableType;
+  enum {
+    VT_TYPE = 4,
+    VT_SQLKIND = 6,
+    VT_SQLTYPENAME = 8,
+    VT_DATA = 10
+  };
+  RexNodeType type() const {
+    return static_cast<RexNodeType>(GetField<int16_t>(VT_TYPE, 0));
+  }
+  SqlKind sqlKind() const {
+    return static_cast<SqlKind>(GetField<int16_t>(VT_SQLKIND, 0));
+  }
+  SqlTypeName sqlTypeName() const {
+    return static_cast<SqlTypeName>(GetField<int16_t>(VT_SQLTYPENAME, 0));
+  }
+  const flatbuffers::Vector<int8_t> *data() const {
+    return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_DATA);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int16_t>(verifier, VT_TYPE) &&
+           VerifyField<int16_t>(verifier, VT_SQLKIND) &&
+           VerifyField<int16_t>(verifier, VT_SQLTYPENAME) &&
+           VerifyOffset(verifier, VT_DATA) &&
+           verifier.Verify(data()) &&
+           verifier.EndTable();
+  }
+  RexNodeT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RexNodeT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<RexNode> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RexNodeT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct RexNodeBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_type(RexNodeType type) {
+    fbb_.AddElement<int16_t>(RexNode::VT_TYPE, static_cast<int16_t>(type), 0);
+  }
+  void add_sqlKind(SqlKind sqlKind) {
+    fbb_.AddElement<int16_t>(RexNode::VT_SQLKIND, static_cast<int16_t>(sqlKind), 0);
+  }
+  void add_sqlTypeName(SqlTypeName sqlTypeName) {
+    fbb_.AddElement<int16_t>(RexNode::VT_SQLTYPENAME, static_cast<int16_t>(sqlTypeName), 0);
+  }
+  void add_data(flatbuffers::Offset<flatbuffers::Vector<int8_t>> data) {
+    fbb_.AddOffset(RexNode::VT_DATA, data);
+  }
+  explicit RexNodeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  RexNodeBuilder &operator=(const RexNodeBuilder &);
+  flatbuffers::Offset<RexNode> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<RexNode>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<RexNode> CreateRexNode(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    RexNodeType type = RexNodeType_Root,
+    SqlKind sqlKind = SqlKind_OTHER,
+    SqlTypeName sqlTypeName = SqlTypeName_ANY,
+    flatbuffers::Offset<flatbuffers::Vector<int8_t>> data = 0) {
+  RexNodeBuilder builder_(_fbb);
+  builder_.add_data(data);
+  builder_.add_sqlTypeName(sqlTypeName);
+  builder_.add_sqlKind(sqlKind);
+  builder_.add_type(type);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<RexNode> CreateRexNodeDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    RexNodeType type = RexNodeType_Root,
+    SqlKind sqlKind = SqlKind_OTHER,
+    SqlTypeName sqlTypeName = SqlTypeName_ANY,
+    const std::vector<int8_t> *data = nullptr) {
+  return com::blazingdb::protocol::calcite::plan::messages::CreateRexNode(
+      _fbb,
+      type,
+      sqlKind,
+      sqlTypeName,
+      data ? _fbb.CreateVector<int8_t>(*data) : 0);
+}
+
+flatbuffers::Offset<RexNode> CreateRexNode(flatbuffers::FlatBufferBuilder &_fbb, const RexNodeT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+}  // namespace messages
+}  // namespace plan
+}  // namespace calcite
+}  // namespace protocol
+}  // namespace blazingdb
+}  // namespace com
+
+namespace blazingdb {
+namespace protocol {
 namespace calcite {
 
+struct DMLResponseT : public flatbuffers::NativeTable {
+  typedef DMLResponse TableType;
+  std::string logicalPlan;
+  int64_t time;
+  DMLResponseT()
+      : time(0) {
+  }
+};
+
 struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DMLResponseT NativeTableType;
   enum {
     VT_LOGICALPLAN = 4,
     VT_TIME = 6
@@ -1486,6 +3411,9 @@ struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int64_t>(verifier, VT_TIME) &&
            verifier.EndTable();
   }
+  DMLResponseT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DMLResponseT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DMLResponse> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DMLResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DMLResponseBuilder {
@@ -1529,7 +3457,18 @@ inline flatbuffers::Offset<DMLResponse> CreateDMLResponseDirect(
       time);
 }
 
+flatbuffers::Offset<DMLResponse> CreateDMLResponse(flatbuffers::FlatBufferBuilder &_fbb, const DMLResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct DDLResponseT : public flatbuffers::NativeTable {
+  typedef DDLResponse TableType;
+  int64_t time;
+  DDLResponseT()
+      : time(0) {
+  }
+};
+
 struct DDLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DDLResponseT NativeTableType;
   enum {
     VT_TIME = 4
   };
@@ -1541,6 +3480,9 @@ struct DDLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int64_t>(verifier, VT_TIME) &&
            verifier.EndTable();
   }
+  DDLResponseT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DDLResponseT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DDLResponse> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DDLResponseBuilder {
@@ -1569,11 +3511,22 @@ inline flatbuffers::Offset<DDLResponse> CreateDDLResponse(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<DDLResponse> CreateDDLResponse(flatbuffers::FlatBufferBuilder &_fbb, const DDLResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 }  // namespace calcite
 
 namespace orchestrator {
 
+struct AuthResponseT : public flatbuffers::NativeTable {
+  typedef AuthResponse TableType;
+  uint64_t accessToken;
+  AuthResponseT()
+      : accessToken(0) {
+  }
+};
+
 struct AuthResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef AuthResponseT NativeTableType;
   enum {
     VT_ACCESSTOKEN = 4
   };
@@ -1585,6 +3538,9 @@ struct AuthResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint64_t>(verifier, VT_ACCESSTOKEN) &&
            verifier.EndTable();
   }
+  AuthResponseT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(AuthResponseT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<AuthResponse> Pack(flatbuffers::FlatBufferBuilder &_fbb, const AuthResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct AuthResponseBuilder {
@@ -1613,9 +3569,21 @@ inline flatbuffers::Offset<AuthResponse> CreateAuthResponse(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<AuthResponse> CreateAuthResponse(flatbuffers::FlatBufferBuilder &_fbb, const AuthResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 }  // namespace orchestrator
 
+struct NodeConnectionT : public flatbuffers::NativeTable {
+  typedef NodeConnection TableType;
+  std::string path;
+  NodeConnectionType type;
+  NodeConnectionT()
+      : type(NodeConnectionType_TPC) {
+  }
+};
+
 struct NodeConnection FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef NodeConnectionT NativeTableType;
   enum {
     VT_PATH = 4,
     VT_TYPE = 6
@@ -1633,6 +3601,9 @@ struct NodeConnection FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int8_t>(verifier, VT_TYPE) &&
            verifier.EndTable();
   }
+  NodeConnectionT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(NodeConnectionT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<NodeConnection> Pack(flatbuffers::FlatBufferBuilder &_fbb, const NodeConnectionT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct NodeConnectionBuilder {
@@ -1676,9 +3647,23 @@ inline flatbuffers::Offset<NodeConnection> CreateNodeConnectionDirect(
       type);
 }
 
+flatbuffers::Offset<NodeConnection> CreateNodeConnection(flatbuffers::FlatBufferBuilder &_fbb, const NodeConnectionT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 namespace orchestrator {
 
+struct DMLResponseT : public flatbuffers::NativeTable {
+  typedef DMLResponse TableType;
+  uint64_t resultToken;
+  std::unique_ptr<blazingdb::protocol::NodeConnectionT> nodeConnection;
+  int64_t calciteTime;
+  DMLResponseT()
+      : resultToken(0),
+        calciteTime(0) {
+  }
+};
+
 struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DMLResponseT NativeTableType;
   enum {
     VT_RESULTTOKEN = 4,
     VT_NODECONNECTION = 6,
@@ -1701,6 +3686,9 @@ struct DMLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int64_t>(verifier, VT_CALCITETIME) &&
            verifier.EndTable();
   }
+  DMLResponseT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DMLResponseT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DMLResponse> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DMLResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DMLResponseBuilder {
@@ -1739,11 +3727,23 @@ inline flatbuffers::Offset<DMLResponse> CreateDMLResponse(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<DMLResponse> CreateDMLResponse(flatbuffers::FlatBufferBuilder &_fbb, const DMLResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct DDLResponseT : public flatbuffers::NativeTable {
+  typedef DDLResponse TableType;
+  DDLResponseT() {
+  }
+};
+
 struct DDLResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef DDLResponseT NativeTableType;
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            verifier.EndTable();
   }
+  DDLResponseT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DDLResponseT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<DDLResponse> Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct DDLResponseBuilder {
@@ -1767,11 +3767,23 @@ inline flatbuffers::Offset<DDLResponse> CreateDDLResponse(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<DDLResponse> CreateDDLResponse(flatbuffers::FlatBufferBuilder &_fbb, const DDLResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 }  // namespace orchestrator
 
 namespace interpreter {
 
+struct ExecutePlanResponseT : public flatbuffers::NativeTable {
+  typedef ExecutePlanResponse TableType;
+  uint64_t resultToken;
+  std::unique_ptr<blazingdb::protocol::NodeConnectionT> nodeConnection;
+  ExecutePlanResponseT()
+      : resultToken(0) {
+  }
+};
+
 struct ExecutePlanResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ExecutePlanResponseT NativeTableType;
   enum {
     VT_RESULTTOKEN = 4,
     VT_NODECONNECTION = 6
@@ -1789,6 +3801,9 @@ struct ExecutePlanResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
            verifier.VerifyTable(nodeConnection()) &&
            verifier.EndTable();
   }
+  ExecutePlanResponseT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ExecutePlanResponseT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<ExecutePlanResponse> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ExecutePlanResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct ExecutePlanResponseBuilder {
@@ -1822,7 +3837,22 @@ inline flatbuffers::Offset<ExecutePlanResponse> CreateExecutePlanResponse(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<ExecutePlanResponse> CreateExecutePlanResponse(flatbuffers::FlatBufferBuilder &_fbb, const ExecutePlanResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct BlazingMetadataT : public flatbuffers::NativeTable {
+  typedef BlazingMetadata TableType;
+  std::string status;
+  std::string message;
+  double time;
+  int32_t rows;
+  BlazingMetadataT()
+      : time(0.0),
+        rows(0) {
+  }
+};
+
 struct BlazingMetadata FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef BlazingMetadataT NativeTableType;
   enum {
     VT_STATUS = 4,
     VT_MESSAGE = 6,
@@ -1851,6 +3881,9 @@ struct BlazingMetadata FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_ROWS) &&
            verifier.EndTable();
   }
+  BlazingMetadataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(BlazingMetadataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<BlazingMetadata> Pack(flatbuffers::FlatBufferBuilder &_fbb, const BlazingMetadataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct BlazingMetadataBuilder {
@@ -1908,7 +3941,19 @@ inline flatbuffers::Offset<BlazingMetadata> CreateBlazingMetadataDirect(
       rows);
 }
 
+flatbuffers::Offset<BlazingMetadata> CreateBlazingMetadata(flatbuffers::FlatBufferBuilder &_fbb, const BlazingMetadataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct GetResultResponseT : public flatbuffers::NativeTable {
+  typedef GetResultResponse TableType;
+  std::unique_ptr<BlazingMetadataT> metadata;
+  std::vector<std::unique_ptr<blazingdb::protocol::gdf::gdf_column_handlerT>> columns;
+  std::vector<std::string> columnNames;
+  GetResultResponseT() {
+  }
+};
+
 struct GetResultResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef GetResultResponseT NativeTableType;
   enum {
     VT_METADATA = 4,
     VT_COLUMNS = 6,
@@ -1935,6 +3980,9 @@ struct GetResultResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVectorOfStrings(columnNames()) &&
            verifier.EndTable();
   }
+  GetResultResponseT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(GetResultResponseT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<GetResultResponse> Pack(flatbuffers::FlatBufferBuilder &_fbb, const GetResultResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct GetResultResponseBuilder {
@@ -1985,9 +4033,21 @@ inline flatbuffers::Offset<GetResultResponse> CreateGetResultResponseDirect(
       columnNames ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*columnNames) : 0);
 }
 
+flatbuffers::Offset<GetResultResponse> CreateGetResultResponse(flatbuffers::FlatBufferBuilder &_fbb, const GetResultResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 }  // namespace interpreter
 
+struct ResponseT : public flatbuffers::NativeTable {
+  typedef Response TableType;
+  Status status;
+  std::vector<uint8_t> payload;
+  ResponseT()
+      : status(Status_Error) {
+  }
+};
+
 struct Response FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ResponseT NativeTableType;
   enum {
     VT_STATUS = 4,
     VT_PAYLOAD = 6
@@ -2005,6 +4065,9 @@ struct Response FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.Verify(payload()) &&
            verifier.EndTable();
   }
+  ResponseT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ResponseT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Response> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct ResponseBuilder {
@@ -2048,7 +4111,17 @@ inline flatbuffers::Offset<Response> CreateResponseDirect(
       payload ? _fbb.CreateVector<uint8_t>(*payload) : 0);
 }
 
+flatbuffers::Offset<Response> CreateResponse(flatbuffers::FlatBufferBuilder &_fbb, const ResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct ResponseErrorT : public flatbuffers::NativeTable {
+  typedef ResponseError TableType;
+  std::string errors;
+  ResponseErrorT() {
+  }
+};
+
 struct ResponseError FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ResponseErrorT NativeTableType;
   enum {
     VT_ERRORS = 4
   };
@@ -2061,6 +4134,9 @@ struct ResponseError FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.Verify(errors()) &&
            verifier.EndTable();
   }
+  ResponseErrorT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ResponseErrorT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<ResponseError> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ResponseErrorT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct ResponseErrorBuilder {
@@ -2097,41 +4173,1126 @@ inline flatbuffers::Offset<ResponseError> CreateResponseErrorDirect(
       errors ? _fbb.CreateString(errors) : 0);
 }
 
+flatbuffers::Offset<ResponseError> CreateResponseError(flatbuffers::FlatBufferBuilder &_fbb, const ResponseErrorT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 namespace calcite {
+
+inline DMLRequestT *DMLRequest::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DMLRequestT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DMLRequest::UnPackTo(DMLRequestT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = query(); if (_e) _o->query = _e->str(); };
+}
+
+inline flatbuffers::Offset<DMLRequest> DMLRequest::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DMLRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDMLRequest(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DMLRequest> CreateDMLRequest(flatbuffers::FlatBufferBuilder &_fbb, const DMLRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DMLRequestT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _query = _o->query.empty() ? 0 : _fbb.CreateString(_o->query);
+  return blazingdb::protocol::calcite::CreateDMLRequest(
+      _fbb,
+      _query);
+}
+
+inline DDLRequestT *DDLRequest::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DDLRequestT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DDLRequest::UnPackTo(DDLRequestT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = query(); if (_e) _o->query = _e->str(); };
+}
+
+inline flatbuffers::Offset<DDLRequest> DDLRequest::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDDLRequest(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DDLRequest> CreateDDLRequest(flatbuffers::FlatBufferBuilder &_fbb, const DDLRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DDLRequestT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _query = _o->query.empty() ? 0 : _fbb.CreateString(_o->query);
+  return blazingdb::protocol::calcite::CreateDDLRequest(
+      _fbb,
+      _query);
+}
+
+inline DDLCreateTableRequestT *DDLCreateTableRequest::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DDLCreateTableRequestT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DDLCreateTableRequest::UnPackTo(DDLCreateTableRequestT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = name(); if (_e) _o->name = _e->str(); };
+  { auto _e = columnNames(); if (_e) { _o->columnNames.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->columnNames[_i] = _e->Get(_i)->str(); } } };
+  { auto _e = columnTypes(); if (_e) { _o->columnTypes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->columnTypes[_i] = _e->Get(_i)->str(); } } };
+  { auto _e = dbName(); if (_e) _o->dbName = _e->str(); };
+}
+
+inline flatbuffers::Offset<DDLCreateTableRequest> DDLCreateTableRequest::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLCreateTableRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDDLCreateTableRequest(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DDLCreateTableRequest> CreateDDLCreateTableRequest(flatbuffers::FlatBufferBuilder &_fbb, const DDLCreateTableRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DDLCreateTableRequestT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _name = _o->name.empty() ? 0 : _fbb.CreateString(_o->name);
+  auto _columnNames = _o->columnNames.size() ? _fbb.CreateVectorOfStrings(_o->columnNames) : 0;
+  auto _columnTypes = _o->columnTypes.size() ? _fbb.CreateVectorOfStrings(_o->columnTypes) : 0;
+  auto _dbName = _o->dbName.empty() ? 0 : _fbb.CreateString(_o->dbName);
+  return blazingdb::protocol::calcite::CreateDDLCreateTableRequest(
+      _fbb,
+      _name,
+      _columnNames,
+      _columnTypes,
+      _dbName);
+}
+
+inline DDLDropTableRequestT *DDLDropTableRequest::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DDLDropTableRequestT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DDLDropTableRequest::UnPackTo(DDLDropTableRequestT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = name(); if (_e) _o->name = _e->str(); };
+  { auto _e = dbName(); if (_e) _o->dbName = _e->str(); };
+}
+
+inline flatbuffers::Offset<DDLDropTableRequest> DDLDropTableRequest::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLDropTableRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDDLDropTableRequest(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DDLDropTableRequest> CreateDDLDropTableRequest(flatbuffers::FlatBufferBuilder &_fbb, const DDLDropTableRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DDLDropTableRequestT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _name = _o->name.empty() ? 0 : _fbb.CreateString(_o->name);
+  auto _dbName = _o->dbName.empty() ? 0 : _fbb.CreateString(_o->dbName);
+  return blazingdb::protocol::calcite::CreateDDLDropTableRequest(
+      _fbb,
+      _name,
+      _dbName);
+}
 
 }  // namespace calcite
 
 namespace orchestrator {
+
+inline DDLCreateTableRequestT *DDLCreateTableRequest::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DDLCreateTableRequestT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DDLCreateTableRequest::UnPackTo(DDLCreateTableRequestT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = name(); if (_e) _o->name = _e->str(); };
+  { auto _e = columnNames(); if (_e) { _o->columnNames.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->columnNames[_i] = _e->Get(_i)->str(); } } };
+  { auto _e = columnTypes(); if (_e) { _o->columnTypes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->columnTypes[_i] = _e->Get(_i)->str(); } } };
+  { auto _e = dbName(); if (_e) _o->dbName = _e->str(); };
+}
+
+inline flatbuffers::Offset<DDLCreateTableRequest> DDLCreateTableRequest::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLCreateTableRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDDLCreateTableRequest(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DDLCreateTableRequest> CreateDDLCreateTableRequest(flatbuffers::FlatBufferBuilder &_fbb, const DDLCreateTableRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DDLCreateTableRequestT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _name = _o->name.empty() ? 0 : _fbb.CreateString(_o->name);
+  auto _columnNames = _o->columnNames.size() ? _fbb.CreateVectorOfStrings(_o->columnNames) : 0;
+  auto _columnTypes = _o->columnTypes.size() ? _fbb.CreateVectorOfStrings(_o->columnTypes) : 0;
+  auto _dbName = _o->dbName.empty() ? 0 : _fbb.CreateString(_o->dbName);
+  return blazingdb::protocol::orchestrator::CreateDDLCreateTableRequest(
+      _fbb,
+      _name,
+      _columnNames,
+      _columnTypes,
+      _dbName);
+}
+
+inline DDLDropTableRequestT *DDLDropTableRequest::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DDLDropTableRequestT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DDLDropTableRequest::UnPackTo(DDLDropTableRequestT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = name(); if (_e) _o->name = _e->str(); };
+  { auto _e = dbName(); if (_e) _o->dbName = _e->str(); };
+}
+
+inline flatbuffers::Offset<DDLDropTableRequest> DDLDropTableRequest::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLDropTableRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDDLDropTableRequest(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DDLDropTableRequest> CreateDDLDropTableRequest(flatbuffers::FlatBufferBuilder &_fbb, const DDLDropTableRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DDLDropTableRequestT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _name = _o->name.empty() ? 0 : _fbb.CreateString(_o->name);
+  auto _dbName = _o->dbName.empty() ? 0 : _fbb.CreateString(_o->dbName);
+  return blazingdb::protocol::orchestrator::CreateDDLDropTableRequest(
+      _fbb,
+      _name,
+      _dbName);
+}
+
+inline AuthRequestT *AuthRequest::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new AuthRequestT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void AuthRequest::UnPackTo(AuthRequestT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+}
+
+inline flatbuffers::Offset<AuthRequest> AuthRequest::Pack(flatbuffers::FlatBufferBuilder &_fbb, const AuthRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateAuthRequest(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<AuthRequest> CreateAuthRequest(flatbuffers::FlatBufferBuilder &_fbb, const AuthRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const AuthRequestT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  return blazingdb::protocol::orchestrator::CreateAuthRequest(
+      _fbb);
+}
 
 }  // namespace orchestrator
 
 namespace gdf {
 
+inline gdf_dtype_extra_infoT *gdf_dtype_extra_info::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new gdf_dtype_extra_infoT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void gdf_dtype_extra_info::UnPackTo(gdf_dtype_extra_infoT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = time_unit(); _o->time_unit = _e; };
+}
+
+inline flatbuffers::Offset<gdf_dtype_extra_info> gdf_dtype_extra_info::Pack(flatbuffers::FlatBufferBuilder &_fbb, const gdf_dtype_extra_infoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return Creategdf_dtype_extra_info(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<gdf_dtype_extra_info> Creategdf_dtype_extra_info(flatbuffers::FlatBufferBuilder &_fbb, const gdf_dtype_extra_infoT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const gdf_dtype_extra_infoT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _time_unit = _o->time_unit;
+  return blazingdb::protocol::gdf::Creategdf_dtype_extra_info(
+      _fbb,
+      _time_unit);
+}
+
+inline cudaIpcMemHandle_tT *cudaIpcMemHandle_t::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new cudaIpcMemHandle_tT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void cudaIpcMemHandle_t::UnPackTo(cudaIpcMemHandle_tT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = reserved(); if (_e) { _o->reserved.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->reserved[_i] = _e->Get(_i); } } };
+}
+
+inline flatbuffers::Offset<cudaIpcMemHandle_t> cudaIpcMemHandle_t::Pack(flatbuffers::FlatBufferBuilder &_fbb, const cudaIpcMemHandle_tT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreatecudaIpcMemHandle_t(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<cudaIpcMemHandle_t> CreatecudaIpcMemHandle_t(flatbuffers::FlatBufferBuilder &_fbb, const cudaIpcMemHandle_tT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const cudaIpcMemHandle_tT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _reserved = _o->reserved.size() ? _fbb.CreateVector(_o->reserved) : 0;
+  return blazingdb::protocol::gdf::CreatecudaIpcMemHandle_t(
+      _fbb,
+      _reserved);
+}
+
+inline gdf_column_handlerT *gdf_column_handler::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new gdf_column_handlerT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void gdf_column_handler::UnPackTo(gdf_column_handlerT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = data(); if (_e) _o->data = std::unique_ptr<cudaIpcMemHandle_tT>(_e->UnPack(_resolver)); };
+  { auto _e = valid(); if (_e) _o->valid = std::unique_ptr<cudaIpcMemHandle_tT>(_e->UnPack(_resolver)); };
+  { auto _e = size(); _o->size = _e; };
+  { auto _e = dtype(); _o->dtype = _e; };
+  { auto _e = dtype_info(); if (_e) _o->dtype_info = std::unique_ptr<gdf_dtype_extra_infoT>(_e->UnPack(_resolver)); };
+  { auto _e = null_count(); _o->null_count = _e; };
+}
+
+inline flatbuffers::Offset<gdf_column_handler> gdf_column_handler::Pack(flatbuffers::FlatBufferBuilder &_fbb, const gdf_column_handlerT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return Creategdf_column_handler(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<gdf_column_handler> Creategdf_column_handler(flatbuffers::FlatBufferBuilder &_fbb, const gdf_column_handlerT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const gdf_column_handlerT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _data = _o->data ? CreatecudaIpcMemHandle_t(_fbb, _o->data.get(), _rehasher) : 0;
+  auto _valid = _o->valid ? CreatecudaIpcMemHandle_t(_fbb, _o->valid.get(), _rehasher) : 0;
+  auto _size = _o->size;
+  auto _dtype = _o->dtype;
+  auto _dtype_info = _o->dtype_info ? Creategdf_dtype_extra_info(_fbb, _o->dtype_info.get(), _rehasher) : 0;
+  auto _null_count = _o->null_count;
+  return blazingdb::protocol::gdf::Creategdf_column_handler(
+      _fbb,
+      _data,
+      _valid,
+      _size,
+      _dtype,
+      _dtype_info,
+      _null_count);
+}
+
 }  // namespace gdf
 
+inline BlazingTableT *BlazingTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new BlazingTableT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void BlazingTable::UnPackTo(BlazingTableT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = name(); if (_e) _o->name = _e->str(); };
+  { auto _e = columns(); if (_e) { _o->columns.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->columns[_i] = std::unique_ptr<blazingdb::protocol::gdf::gdf_column_handlerT>(_e->Get(_i)->UnPack(_resolver)); } } };
+  { auto _e = columnNames(); if (_e) { _o->columnNames.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->columnNames[_i] = _e->Get(_i)->str(); } } };
+}
+
+inline flatbuffers::Offset<BlazingTable> BlazingTable::Pack(flatbuffers::FlatBufferBuilder &_fbb, const BlazingTableT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateBlazingTable(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<BlazingTable> CreateBlazingTable(flatbuffers::FlatBufferBuilder &_fbb, const BlazingTableT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const BlazingTableT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _name = _o->name.empty() ? 0 : _fbb.CreateString(_o->name);
+  auto _columns = _o->columns.size() ? _fbb.CreateVector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> (_o->columns.size(), [](size_t i, _VectorArgs *__va) { return Creategdf_column_handler(*__va->__fbb, __va->__o->columns[i].get(), __va->__rehasher); }, &_va ) : 0;
+  auto _columnNames = _o->columnNames.size() ? _fbb.CreateVectorOfStrings(_o->columnNames) : 0;
+  return blazingdb::protocol::CreateBlazingTable(
+      _fbb,
+      _name,
+      _columns,
+      _columnNames);
+}
+
+inline TableGroupT *TableGroup::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new TableGroupT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void TableGroup::UnPackTo(TableGroupT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = tables(); if (_e) { _o->tables.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->tables[_i] = std::unique_ptr<BlazingTableT>(_e->Get(_i)->UnPack(_resolver)); } } };
+  { auto _e = name(); if (_e) _o->name = _e->str(); };
+}
+
+inline flatbuffers::Offset<TableGroup> TableGroup::Pack(flatbuffers::FlatBufferBuilder &_fbb, const TableGroupT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateTableGroup(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<TableGroup> CreateTableGroup(flatbuffers::FlatBufferBuilder &_fbb, const TableGroupT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const TableGroupT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _tables = _o->tables.size() ? _fbb.CreateVector<flatbuffers::Offset<BlazingTable>> (_o->tables.size(), [](size_t i, _VectorArgs *__va) { return CreateBlazingTable(*__va->__fbb, __va->__o->tables[i].get(), __va->__rehasher); }, &_va ) : 0;
+  auto _name = _o->name.empty() ? 0 : _fbb.CreateString(_o->name);
+  return blazingdb::protocol::CreateTableGroup(
+      _fbb,
+      _tables,
+      _name);
+}
+
 namespace orchestrator {
+
+inline DMLRequestT *DMLRequest::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DMLRequestT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DMLRequest::UnPackTo(DMLRequestT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = query(); if (_e) _o->query = _e->str(); };
+  { auto _e = tableGroup(); if (_e) _o->tableGroup = std::unique_ptr<blazingdb::protocol::TableGroupT>(_e->UnPack(_resolver)); };
+}
+
+inline flatbuffers::Offset<DMLRequest> DMLRequest::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DMLRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDMLRequest(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DMLRequest> CreateDMLRequest(flatbuffers::FlatBufferBuilder &_fbb, const DMLRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DMLRequestT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _query = _o->query.empty() ? 0 : _fbb.CreateString(_o->query);
+  auto _tableGroup = _o->tableGroup ? CreateTableGroup(_fbb, _o->tableGroup.get(), _rehasher) : 0;
+  return blazingdb::protocol::orchestrator::CreateDMLRequest(
+      _fbb,
+      _query,
+      _tableGroup);
+}
+
+inline DDLRequestT *DDLRequest::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DDLRequestT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DDLRequest::UnPackTo(DDLRequestT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = query(); if (_e) _o->query = _e->str(); };
+}
+
+inline flatbuffers::Offset<DDLRequest> DDLRequest::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDDLRequest(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DDLRequest> CreateDDLRequest(flatbuffers::FlatBufferBuilder &_fbb, const DDLRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DDLRequestT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _query = _o->query.empty() ? 0 : _fbb.CreateString(_o->query);
+  return blazingdb::protocol::orchestrator::CreateDDLRequest(
+      _fbb,
+      _query);
+}
 
 }  // namespace orchestrator
 
 namespace interpreter {
 
+inline DMLRequestT *DMLRequest::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DMLRequestT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DMLRequest::UnPackTo(DMLRequestT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = logicalPlan(); if (_e) _o->logicalPlan = _e->str(); };
+  { auto _e = tableGroup(); if (_e) _o->tableGroup = std::unique_ptr<blazingdb::protocol::TableGroupT>(_e->UnPack(_resolver)); };
+}
+
+inline flatbuffers::Offset<DMLRequest> DMLRequest::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DMLRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDMLRequest(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DMLRequest> CreateDMLRequest(flatbuffers::FlatBufferBuilder &_fbb, const DMLRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DMLRequestT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _logicalPlan = _o->logicalPlan.empty() ? 0 : _fbb.CreateString(_o->logicalPlan);
+  auto _tableGroup = _o->tableGroup ? CreateTableGroup(_fbb, _o->tableGroup.get(), _rehasher) : 0;
+  return blazingdb::protocol::interpreter::CreateDMLRequest(
+      _fbb,
+      _logicalPlan,
+      _tableGroup);
+}
+
+inline GetResultRequestT *GetResultRequest::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new GetResultRequestT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void GetResultRequest::UnPackTo(GetResultRequestT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = resultToken(); _o->resultToken = _e; };
+}
+
+inline flatbuffers::Offset<GetResultRequest> GetResultRequest::Pack(flatbuffers::FlatBufferBuilder &_fbb, const GetResultRequestT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateGetResultRequest(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<GetResultRequest> CreateGetResultRequest(flatbuffers::FlatBufferBuilder &_fbb, const GetResultRequestT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const GetResultRequestT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _resultToken = _o->resultToken;
+  return blazingdb::protocol::interpreter::CreateGetResultRequest(
+      _fbb,
+      _resultToken);
+}
+
 }  // namespace interpreter
 
+inline RequestT *Request::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new RequestT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void Request::UnPackTo(RequestT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = header(); if (_e) _o->header = std::unique_ptr<Header>(new Header(*_e)); };
+  { auto _e = payload(); if (_e) { _o->payload.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->payload[_i] = _e->Get(_i); } } };
+}
+
+inline flatbuffers::Offset<Request> Request::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RequestT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRequest(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Request> CreateRequest(flatbuffers::FlatBufferBuilder &_fbb, const RequestT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RequestT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _header = _o->header ? _o->header.get() : 0;
+  auto _payload = _o->payload.size() ? _fbb.CreateVector(_o->payload) : 0;
+  return blazingdb::protocol::CreateRequest(
+      _fbb,
+      _header,
+      _payload);
+}
+
+}  // namespace protocol
+}  // namespace blazingdb
+
+namespace com {
+namespace blazingdb {
+namespace protocol {
 namespace calcite {
+namespace plan {
+namespace messages {
+
+inline TableScanT *TableScan::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new TableScanT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void TableScan::UnPackTo(TableScanT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = qualifiedName(); if (_e) { _o->qualifiedName.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->qualifiedName[_i] = _e->Get(_i)->str(); } } };
+}
+
+inline flatbuffers::Offset<TableScan> TableScan::Pack(flatbuffers::FlatBufferBuilder &_fbb, const TableScanT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateTableScan(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<TableScan> CreateTableScan(flatbuffers::FlatBufferBuilder &_fbb, const TableScanT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const TableScanT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _qualifiedName = _o->qualifiedName.size() ? _fbb.CreateVectorOfStrings(_o->qualifiedName) : 0;
+  return com::blazingdb::protocol::calcite::plan::messages::CreateTableScan(
+      _fbb,
+      _qualifiedName);
+}
+
+inline LogicalProjectT *LogicalProject::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new LogicalProjectT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void LogicalProject::UnPackTo(LogicalProjectT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = columnNames(); if (_e) { _o->columnNames.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->columnNames[_i] = _e->Get(_i)->str(); } } };
+  { auto _e = columnValues(); if (_e) { _o->columnValues.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->columnValues[_i] = _e->Get(_i)->str(); } } };
+}
+
+inline flatbuffers::Offset<LogicalProject> LogicalProject::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LogicalProjectT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateLogicalProject(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<LogicalProject> CreateLogicalProject(flatbuffers::FlatBufferBuilder &_fbb, const LogicalProjectT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LogicalProjectT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _columnNames = _o->columnNames.size() ? _fbb.CreateVectorOfStrings(_o->columnNames) : 0;
+  auto _columnValues = _o->columnValues.size() ? _fbb.CreateVectorOfStrings(_o->columnValues) : 0;
+  return com::blazingdb::protocol::calcite::plan::messages::CreateLogicalProject(
+      _fbb,
+      _columnNames,
+      _columnValues);
+}
+
+inline LogicalAggregateT *LogicalAggregate::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new LogicalAggregateT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void LogicalAggregate::UnPackTo(LogicalAggregateT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = groups(); if (_e) { _o->groups.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->groups[_i] = _e->Get(_i); } } };
+}
+
+inline flatbuffers::Offset<LogicalAggregate> LogicalAggregate::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LogicalAggregateT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateLogicalAggregate(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<LogicalAggregate> CreateLogicalAggregate(flatbuffers::FlatBufferBuilder &_fbb, const LogicalAggregateT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LogicalAggregateT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _groups = _o->groups.size() ? _fbb.CreateVector(_o->groups) : 0;
+  return com::blazingdb::protocol::calcite::plan::messages::CreateLogicalAggregate(
+      _fbb,
+      _groups);
+}
+
+inline LogicalUnionT *LogicalUnion::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new LogicalUnionT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void LogicalUnion::UnPackTo(LogicalUnionT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = all(); _o->all = _e; };
+}
+
+inline flatbuffers::Offset<LogicalUnion> LogicalUnion::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LogicalUnionT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateLogicalUnion(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<LogicalUnion> CreateLogicalUnion(flatbuffers::FlatBufferBuilder &_fbb, const LogicalUnionT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LogicalUnionT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _all = _o->all;
+  return com::blazingdb::protocol::calcite::plan::messages::CreateLogicalUnion(
+      _fbb,
+      _all);
+}
+
+inline RelNodeT *RelNode::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new RelNodeT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void RelNode::UnPackTo(RelNodeT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = type(); _o->type = _e; };
+  { auto _e = data(); if (_e) { _o->data.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->data[_i] = _e->Get(_i); } } };
+  { auto _e = inputs(); if (_e) { _o->inputs.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->inputs[_i] = std::unique_ptr<RelNodeT>(_e->Get(_i)->UnPack(_resolver)); } } };
+}
+
+inline flatbuffers::Offset<RelNode> RelNode::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RelNodeT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRelNode(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<RelNode> CreateRelNode(flatbuffers::FlatBufferBuilder &_fbb, const RelNodeT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RelNodeT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _type = _o->type;
+  auto _data = _o->data.size() ? _fbb.CreateVector(_o->data) : 0;
+  auto _inputs = _o->inputs.size() ? _fbb.CreateVector<flatbuffers::Offset<RelNode>> (_o->inputs.size(), [](size_t i, _VectorArgs *__va) { return CreateRelNode(*__va->__fbb, __va->__o->inputs[i].get(), __va->__rehasher); }, &_va ) : 0;
+  return com::blazingdb::protocol::calcite::plan::messages::CreateRelNode(
+      _fbb,
+      _type,
+      _data,
+      _inputs);
+}
+
+inline RexCallT *RexCall::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new RexCallT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void RexCall::UnPackTo(RexCallT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = operands(); if (_e) { _o->operands.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->operands[_i] = std::unique_ptr<RexNodeT>(_e->Get(_i)->UnPack(_resolver)); } } };
+}
+
+inline flatbuffers::Offset<RexCall> RexCall::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RexCallT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRexCall(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<RexCall> CreateRexCall(flatbuffers::FlatBufferBuilder &_fbb, const RexCallT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RexCallT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _operands = _o->operands.size() ? _fbb.CreateVector<flatbuffers::Offset<RexNode>> (_o->operands.size(), [](size_t i, _VectorArgs *__va) { return CreateRexNode(*__va->__fbb, __va->__o->operands[i].get(), __va->__rehasher); }, &_va ) : 0;
+  return com::blazingdb::protocol::calcite::plan::messages::CreateRexCall(
+      _fbb,
+      _operands);
+}
+
+inline RexInputRefT *RexInputRef::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new RexInputRefT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void RexInputRef::UnPackTo(RexInputRefT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = index(); if (_e) { _o->index.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->index[_i] = _e->Get(_i); } } };
+}
+
+inline flatbuffers::Offset<RexInputRef> RexInputRef::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RexInputRefT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRexInputRef(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<RexInputRef> CreateRexInputRef(flatbuffers::FlatBufferBuilder &_fbb, const RexInputRefT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RexInputRefT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _index = _o->index.size() ? _fbb.CreateVector(_o->index) : 0;
+  return com::blazingdb::protocol::calcite::plan::messages::CreateRexInputRef(
+      _fbb,
+      _index);
+}
+
+inline RexLiteralT *RexLiteral::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new RexLiteralT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void RexLiteral::UnPackTo(RexLiteralT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = value(); if (_e) { _o->value.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->value[_i] = _e->Get(_i); } } };
+}
+
+inline flatbuffers::Offset<RexLiteral> RexLiteral::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RexLiteralT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRexLiteral(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<RexLiteral> CreateRexLiteral(flatbuffers::FlatBufferBuilder &_fbb, const RexLiteralT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RexLiteralT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _value = _o->value.size() ? _fbb.CreateVector(_o->value) : 0;
+  return com::blazingdb::protocol::calcite::plan::messages::CreateRexLiteral(
+      _fbb,
+      _value);
+}
+
+inline RexNodeT *RexNode::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new RexNodeT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void RexNode::UnPackTo(RexNodeT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = type(); _o->type = _e; };
+  { auto _e = sqlKind(); _o->sqlKind = _e; };
+  { auto _e = sqlTypeName(); _o->sqlTypeName = _e; };
+  { auto _e = data(); if (_e) { _o->data.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->data[_i] = _e->Get(_i); } } };
+}
+
+inline flatbuffers::Offset<RexNode> RexNode::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RexNodeT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRexNode(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<RexNode> CreateRexNode(flatbuffers::FlatBufferBuilder &_fbb, const RexNodeT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RexNodeT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _type = _o->type;
+  auto _sqlKind = _o->sqlKind;
+  auto _sqlTypeName = _o->sqlTypeName;
+  auto _data = _o->data.size() ? _fbb.CreateVector(_o->data) : 0;
+  return com::blazingdb::protocol::calcite::plan::messages::CreateRexNode(
+      _fbb,
+      _type,
+      _sqlKind,
+      _sqlTypeName,
+      _data);
+}
+
+}  // namespace messages
+}  // namespace plan
+}  // namespace calcite
+}  // namespace protocol
+}  // namespace blazingdb
+}  // namespace com
+
+namespace blazingdb {
+namespace protocol {
+namespace calcite {
+
+inline DMLResponseT *DMLResponse::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DMLResponseT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DMLResponse::UnPackTo(DMLResponseT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = logicalPlan(); if (_e) _o->logicalPlan = _e->str(); };
+  { auto _e = time(); _o->time = _e; };
+}
+
+inline flatbuffers::Offset<DMLResponse> DMLResponse::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DMLResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDMLResponse(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DMLResponse> CreateDMLResponse(flatbuffers::FlatBufferBuilder &_fbb, const DMLResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DMLResponseT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _logicalPlan = _o->logicalPlan.empty() ? 0 : _fbb.CreateString(_o->logicalPlan);
+  auto _time = _o->time;
+  return blazingdb::protocol::calcite::CreateDMLResponse(
+      _fbb,
+      _logicalPlan,
+      _time);
+}
+
+inline DDLResponseT *DDLResponse::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DDLResponseT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DDLResponse::UnPackTo(DDLResponseT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = time(); _o->time = _e; };
+}
+
+inline flatbuffers::Offset<DDLResponse> DDLResponse::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDDLResponse(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DDLResponse> CreateDDLResponse(flatbuffers::FlatBufferBuilder &_fbb, const DDLResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DDLResponseT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _time = _o->time;
+  return blazingdb::protocol::calcite::CreateDDLResponse(
+      _fbb,
+      _time);
+}
 
 }  // namespace calcite
 
 namespace orchestrator {
 
+inline AuthResponseT *AuthResponse::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new AuthResponseT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void AuthResponse::UnPackTo(AuthResponseT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = accessToken(); _o->accessToken = _e; };
+}
+
+inline flatbuffers::Offset<AuthResponse> AuthResponse::Pack(flatbuffers::FlatBufferBuilder &_fbb, const AuthResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateAuthResponse(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<AuthResponse> CreateAuthResponse(flatbuffers::FlatBufferBuilder &_fbb, const AuthResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const AuthResponseT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _accessToken = _o->accessToken;
+  return blazingdb::protocol::orchestrator::CreateAuthResponse(
+      _fbb,
+      _accessToken);
+}
+
 }  // namespace orchestrator
 
+inline NodeConnectionT *NodeConnection::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new NodeConnectionT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void NodeConnection::UnPackTo(NodeConnectionT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = path(); if (_e) _o->path = _e->str(); };
+  { auto _e = type(); _o->type = _e; };
+}
+
+inline flatbuffers::Offset<NodeConnection> NodeConnection::Pack(flatbuffers::FlatBufferBuilder &_fbb, const NodeConnectionT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateNodeConnection(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<NodeConnection> CreateNodeConnection(flatbuffers::FlatBufferBuilder &_fbb, const NodeConnectionT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const NodeConnectionT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _path = _o->path.empty() ? 0 : _fbb.CreateString(_o->path);
+  auto _type = _o->type;
+  return blazingdb::protocol::CreateNodeConnection(
+      _fbb,
+      _path,
+      _type);
+}
+
 namespace orchestrator {
+
+inline DMLResponseT *DMLResponse::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DMLResponseT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DMLResponse::UnPackTo(DMLResponseT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = resultToken(); _o->resultToken = _e; };
+  { auto _e = nodeConnection(); if (_e) _o->nodeConnection = std::unique_ptr<blazingdb::protocol::NodeConnectionT>(_e->UnPack(_resolver)); };
+  { auto _e = calciteTime(); _o->calciteTime = _e; };
+}
+
+inline flatbuffers::Offset<DMLResponse> DMLResponse::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DMLResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDMLResponse(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DMLResponse> CreateDMLResponse(flatbuffers::FlatBufferBuilder &_fbb, const DMLResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DMLResponseT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _resultToken = _o->resultToken;
+  auto _nodeConnection = _o->nodeConnection ? CreateNodeConnection(_fbb, _o->nodeConnection.get(), _rehasher) : 0;
+  auto _calciteTime = _o->calciteTime;
+  return blazingdb::protocol::orchestrator::CreateDMLResponse(
+      _fbb,
+      _resultToken,
+      _nodeConnection,
+      _calciteTime);
+}
+
+inline DDLResponseT *DDLResponse::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new DDLResponseT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void DDLResponse::UnPackTo(DDLResponseT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+}
+
+inline flatbuffers::Offset<DDLResponse> DDLResponse::Pack(flatbuffers::FlatBufferBuilder &_fbb, const DDLResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDDLResponse(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<DDLResponse> CreateDDLResponse(flatbuffers::FlatBufferBuilder &_fbb, const DDLResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const DDLResponseT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  return blazingdb::protocol::orchestrator::CreateDDLResponse(
+      _fbb);
+}
 
 }  // namespace orchestrator
 
 namespace interpreter {
 
+inline ExecutePlanResponseT *ExecutePlanResponse::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new ExecutePlanResponseT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void ExecutePlanResponse::UnPackTo(ExecutePlanResponseT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = resultToken(); _o->resultToken = _e; };
+  { auto _e = nodeConnection(); if (_e) _o->nodeConnection = std::unique_ptr<blazingdb::protocol::NodeConnectionT>(_e->UnPack(_resolver)); };
+}
+
+inline flatbuffers::Offset<ExecutePlanResponse> ExecutePlanResponse::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ExecutePlanResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateExecutePlanResponse(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<ExecutePlanResponse> CreateExecutePlanResponse(flatbuffers::FlatBufferBuilder &_fbb, const ExecutePlanResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ExecutePlanResponseT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _resultToken = _o->resultToken;
+  auto _nodeConnection = _o->nodeConnection ? CreateNodeConnection(_fbb, _o->nodeConnection.get(), _rehasher) : 0;
+  return blazingdb::protocol::interpreter::CreateExecutePlanResponse(
+      _fbb,
+      _resultToken,
+      _nodeConnection);
+}
+
+inline BlazingMetadataT *BlazingMetadata::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new BlazingMetadataT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void BlazingMetadata::UnPackTo(BlazingMetadataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = status(); if (_e) _o->status = _e->str(); };
+  { auto _e = message(); if (_e) _o->message = _e->str(); };
+  { auto _e = time(); _o->time = _e; };
+  { auto _e = rows(); _o->rows = _e; };
+}
+
+inline flatbuffers::Offset<BlazingMetadata> BlazingMetadata::Pack(flatbuffers::FlatBufferBuilder &_fbb, const BlazingMetadataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateBlazingMetadata(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<BlazingMetadata> CreateBlazingMetadata(flatbuffers::FlatBufferBuilder &_fbb, const BlazingMetadataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const BlazingMetadataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _status = _o->status.empty() ? 0 : _fbb.CreateString(_o->status);
+  auto _message = _o->message.empty() ? 0 : _fbb.CreateString(_o->message);
+  auto _time = _o->time;
+  auto _rows = _o->rows;
+  return blazingdb::protocol::interpreter::CreateBlazingMetadata(
+      _fbb,
+      _status,
+      _message,
+      _time,
+      _rows);
+}
+
+inline GetResultResponseT *GetResultResponse::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new GetResultResponseT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void GetResultResponse::UnPackTo(GetResultResponseT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = metadata(); if (_e) _o->metadata = std::unique_ptr<BlazingMetadataT>(_e->UnPack(_resolver)); };
+  { auto _e = columns(); if (_e) { _o->columns.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->columns[_i] = std::unique_ptr<blazingdb::protocol::gdf::gdf_column_handlerT>(_e->Get(_i)->UnPack(_resolver)); } } };
+  { auto _e = columnNames(); if (_e) { _o->columnNames.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->columnNames[_i] = _e->Get(_i)->str(); } } };
+}
+
+inline flatbuffers::Offset<GetResultResponse> GetResultResponse::Pack(flatbuffers::FlatBufferBuilder &_fbb, const GetResultResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateGetResultResponse(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<GetResultResponse> CreateGetResultResponse(flatbuffers::FlatBufferBuilder &_fbb, const GetResultResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const GetResultResponseT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _metadata = _o->metadata ? CreateBlazingMetadata(_fbb, _o->metadata.get(), _rehasher) : 0;
+  auto _columns = _o->columns.size() ? _fbb.CreateVector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> (_o->columns.size(), [](size_t i, _VectorArgs *__va) { return Creategdf_column_handler(*__va->__fbb, __va->__o->columns[i].get(), __va->__rehasher); }, &_va ) : 0;
+  auto _columnNames = _o->columnNames.size() ? _fbb.CreateVectorOfStrings(_o->columnNames) : 0;
+  return blazingdb::protocol::interpreter::CreateGetResultResponse(
+      _fbb,
+      _metadata,
+      _columns,
+      _columnNames);
+}
+
 }  // namespace interpreter
+
+inline ResponseT *Response::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new ResponseT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void Response::UnPackTo(ResponseT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = status(); _o->status = _e; };
+  { auto _e = payload(); if (_e) { _o->payload.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->payload[_i] = _e->Get(_i); } } };
+}
+
+inline flatbuffers::Offset<Response> Response::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ResponseT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateResponse(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Response> CreateResponse(flatbuffers::FlatBufferBuilder &_fbb, const ResponseT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ResponseT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _status = _o->status;
+  auto _payload = _o->payload.size() ? _fbb.CreateVector(_o->payload) : 0;
+  return blazingdb::protocol::CreateResponse(
+      _fbb,
+      _status,
+      _payload);
+}
+
+inline ResponseErrorT *ResponseError::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = new ResponseErrorT();
+  UnPackTo(_o, _resolver);
+  return _o;
+}
+
+inline void ResponseError::UnPackTo(ResponseErrorT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = errors(); if (_e) _o->errors = _e->str(); };
+}
+
+inline flatbuffers::Offset<ResponseError> ResponseError::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ResponseErrorT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateResponseError(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<ResponseError> CreateResponseError(flatbuffers::FlatBufferBuilder &_fbb, const ResponseErrorT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ResponseErrorT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _errors = _o->errors.empty() ? 0 : _fbb.CreateString(_o->errors);
+  return blazingdb::protocol::CreateResponseError(
+      _fbb,
+      _errors);
+}
 
 }  // namespace protocol
 }  // namespace blazingdb
