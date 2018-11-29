@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rel/base/RelBase.h"
+#include "rex/base/RexBase.h"
 #include "rel/visitor/RelVisitable.h"
 
 namespace blazingdb {
@@ -9,11 +10,14 @@ namespace dto {
 
 class RelNode : public virtual RelVisitable {
 public:
-    RelNodePtr getOperand();
+    virtual ~RelNode();
 
-    RelNode* setOperand(RelNodePtr& node);
+public:
+    RexNodePtr& getOperand();
 
-    RelNode* setOperand(RelNodePtr&& node);
+    RelNode* setOperand(RexNodePtr& node);
+
+    RelNode* setOperand(RexNodePtr&& node);
 
 public:
     RelNodePtr getInput(std::size_t i);
@@ -30,7 +34,7 @@ public:
     RelNode* setInput(std::size_t i, RelNodePtr&& node);
 
 private:
-    RelNodePtr operand;
+    RexNodePtr operand;
     VectorRelNodePtr inputs;
 };
 
