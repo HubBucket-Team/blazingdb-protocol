@@ -52,7 +52,7 @@ class RelNodeBuilder : public NodeBuilder {
 public:
     virtual ~RelNodeBuilder();
 
-    RelNodeBuilder(const Buffer<std::int8_t> &);
+    RelNodeBuilder(const Buffer<std::uint8_t> &);
     void Build() const final;
 
 private:
