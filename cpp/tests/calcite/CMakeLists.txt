@@ -2,7 +2,7 @@ set(CALCITE_DIR ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite)
 
 set(RelNodeBuilderTest_SRCS
   RelNodeBuilderTest.cpp
-  ${CALCITE_DIR}/flatbuffers/RelNodeBuilder.cpp
+  ${CALCITE_DIR}/messages/RelNodeBuilder.cpp
 )
 
 configure_test(RelNodeBuilderTest "${RelNodeBuilderTest_SRCS}")

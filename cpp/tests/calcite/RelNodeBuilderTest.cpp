@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include <blazingdb/protocol/calcite/flatbuffers/RelNodeBuilder.hpp>
+#include <blazingdb/protocol/calcite/messages/RelNodeBuilder.hpp>
 
 TEST(RelNodeBuilderTest, Main) {
-    using namespace blazingdb::protocol::calcite::flatbuffers;
+    using namespace blazingdb::protocol::calcite::messages;
 
     const std::size_t DATA_SIZE = 512;
     std::int8_t data[DATA_SIZE];

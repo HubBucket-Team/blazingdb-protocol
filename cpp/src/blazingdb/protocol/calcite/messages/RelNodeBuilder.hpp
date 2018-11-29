@@ -1,5 +1,5 @@
-#ifndef BLAZINGDB_PROTOCOL_CALCITE_FLATBUFFERS_RELNODEBUILDER_H_
-#define BLAZINGDB_PROTOCOL_CALCITE_FLATBUFFERS_RELNODEBUILDER_H_
+#ifndef BLAZINGDB_PROTOCOL_CALCITE_MESSAGES_RELNODEBUILDER_H_
+#define BLAZINGDB_PROTOCOL_CALCITE_MESSAGES_RELNODEBUILDER_H_
 
 #include <cstdint>
 #include <memory>
@@ -8,7 +8,7 @@
 namespace blazingdb {
 namespace protocol {
 namespace calcite {
-namespace flatbuffers {
+namespace messages {
 
 template <class T, std::ptrdiff_t diff = -1>
 class Buffer {

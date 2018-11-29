@@ -5,7 +5,7 @@
 namespace blazingdb {
 namespace protocol {
 namespace calcite {
-namespace flatbuffers {
+namespace messages {
 
 class RelNodeBuilder::RelNodeBuilderImpl {
 public:
