@@ -8,9 +8,15 @@ namespace dto {
 
 class RelFactory {
 public:
+    static RelNodePtr createLogicalAggregate();
+
     static RelNodePtr createLogicalFilter();
 
     static RelNodePtr createLogicalProject();
+
+    static RelNodePtr createLogicalUnion();
+
+    static RelNodePtr createTableScan();
 };
 
 }  // namespace dto
