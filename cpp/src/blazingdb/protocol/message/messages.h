@@ -12,14 +12,9 @@
 namespace blazingdb {
 namespace protocol {
 
-class IMessage {
-public:
-  IMessage() = default;
-
-  virtual ~IMessage() = default;
+struct IMessage {
 
   virtual std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const = 0;
-
 };
 
 

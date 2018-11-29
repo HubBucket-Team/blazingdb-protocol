@@ -1,10 +1,6 @@
-namespace blazingdb.protocol.io;
+include "blazingdb/protocol/io/MessageType.fbs";
 
-enum FileSystemType : byte{
-    LOCAL = 0,
-    HDFS,
-    S3,
-}
+namespace blazingdb.protocol.io;
 
 table POSIX{
 
@@ -40,13 +36,18 @@ table S3 {
     sessionToken:string;
 }
 
-union FileSystemParams {
+union FileSystemConnection {
     POSIX, HDFS, S3 
 }
 
 table FileSystemRegisterRequest {
-    type: FileSystemType;
+    authority: string;
     root: string;
-    params: FileSystemParams;
+    fileSystemConnection: FileSystemConnection;
 } 
 root_type FileSystemRegisterRequest;
+
+table FileSystemDeregisterRequest {
+    authority: string;
+} 
+root_type FileSystemDeregisterRequest;

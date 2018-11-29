@@ -12,11 +12,13 @@ using protocol::errors::Error;
 
 //! Thrown by io calls when the query-string is invalid.
 
-class IOError : public Error {};
+class IOError : public Error {
+    
+};
 
 }  // namespace errors
 }  // namespace io
-}  // namespace protocol
+}  // namespace message
 }  // namespace blazingdb
 
 #endif
