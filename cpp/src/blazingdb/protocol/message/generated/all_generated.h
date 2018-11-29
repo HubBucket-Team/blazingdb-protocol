@@ -112,6 +112,8 @@ struct S3;
 
 struct FileSystemRegisterRequest;
 
+struct FileSystemDeregisterRequest;
+
 }  // namespace io
 
 namespace calcite {
@@ -407,36 +409,33 @@ inline const char *EnumNameStatus(Status e) {
 
 namespace io {
 
-enum FileSystemType {
-  FileSystemType_LOCAL = 0,
-  FileSystemType_HDFS = 1,
-  FileSystemType_S3 = 2,
-  FileSystemType_MIN = FileSystemType_LOCAL,
-  FileSystemType_MAX = FileSystemType_S3
+enum MessageType {
+  MessageType_RegisterFileSystem = 0,
+  MessageType_DeregisterFileSystem = 1,
+  MessageType_MIN = MessageType_RegisterFileSystem,
+  MessageType_MAX = MessageType_DeregisterFileSystem
 };
 
-inline const FileSystemType (&EnumValuesFileSystemType())[3] {
-  static const FileSystemType values[] = {
-    FileSystemType_LOCAL,
-    FileSystemType_HDFS,
-    FileSystemType_S3
+inline const MessageType (&EnumValuesMessageType())[2] {
+  static const MessageType values[] = {
+    MessageType_RegisterFileSystem,
+    MessageType_DeregisterFileSystem
   };
   return values;
 }
 
-inline const char * const *EnumNamesFileSystemType() {
+inline const char * const *EnumNamesMessageType() {
   static const char * const names[] = {
-    "LOCAL",
-    "HDFS",
-    "S3",
+    "RegisterFileSystem",
+    "DeregisterFileSystem",
     nullptr
   };
   return names;
 }
 
-inline const char *EnumNameFileSystemType(FileSystemType e) {
+inline const char *EnumNameMessageType(MessageType e) {
   const size_t index = static_cast<int>(e);
-  return EnumNamesFileSystemType()[index];
+  return EnumNamesMessageType()[index];
 }
 
 enum DriverType {
@@ -506,26 +505,26 @@ inline const char *EnumNameEncryptionType(EncryptionType e) {
   return EnumNamesEncryptionType()[index];
 }
 
-enum FileSystemParams {
-  FileSystemParams_NONE = 0,
-  FileSystemParams_POSIX = 1,
-  FileSystemParams_HDFS = 2,
-  FileSystemParams_S3 = 3,
-  FileSystemParams_MIN = FileSystemParams_NONE,
-  FileSystemParams_MAX = FileSystemParams_S3
+enum FileSystemConnection {
+  FileSystemConnection_NONE = 0,
+  FileSystemConnection_POSIX = 1,
+  FileSystemConnection_HDFS = 2,
+  FileSystemConnection_S3 = 3,
+  FileSystemConnection_MIN = FileSystemConnection_NONE,
+  FileSystemConnection_MAX = FileSystemConnection_S3
 };
 
-inline const FileSystemParams (&EnumValuesFileSystemParams())[4] {
-  static const FileSystemParams values[] = {
-    FileSystemParams_NONE,
-    FileSystemParams_POSIX,
-    FileSystemParams_HDFS,
-    FileSystemParams_S3
+inline const FileSystemConnection (&EnumValuesFileSystemConnection())[4] {
+  static const FileSystemConnection values[] = {
+    FileSystemConnection_NONE,
+    FileSystemConnection_POSIX,
+    FileSystemConnection_HDFS,
+    FileSystemConnection_S3
   };
   return values;
 }
 
-inline const char * const *EnumNamesFileSystemParams() {
+inline const char * const *EnumNamesFileSystemConnection() {
   static const char * const names[] = {
     "NONE",
     "POSIX",
@@ -536,29 +535,29 @@ inline const char * const *EnumNamesFileSystemParams() {
   return names;
 }
 
-inline const char *EnumNameFileSystemParams(FileSystemParams e) {
+inline const char *EnumNameFileSystemConnection(FileSystemConnection e) {
   const size_t index = static_cast<int>(e);
-  return EnumNamesFileSystemParams()[index];
+  return EnumNamesFileSystemConnection()[index];
 }
 
-template<typename T> struct FileSystemParamsTraits {
-  static const FileSystemParams enum_value = FileSystemParams_NONE;
+template<typename T> struct FileSystemConnectionTraits {
+  static const FileSystemConnection enum_value = FileSystemConnection_NONE;
 };
 
-template<> struct FileSystemParamsTraits<POSIX> {
-  static const FileSystemParams enum_value = FileSystemParams_POSIX;
+template<> struct FileSystemConnectionTraits<POSIX> {
+  static const FileSystemConnection enum_value = FileSystemConnection_POSIX;
 };
 
-template<> struct FileSystemParamsTraits<HDFS> {
-  static const FileSystemParams enum_value = FileSystemParams_HDFS;
+template<> struct FileSystemConnectionTraits<HDFS> {
+  static const FileSystemConnection enum_value = FileSystemConnection_HDFS;
 };
 
-template<> struct FileSystemParamsTraits<S3> {
-  static const FileSystemParams enum_value = FileSystemParams_S3;
+template<> struct FileSystemConnectionTraits<S3> {
+  static const FileSystemConnection enum_value = FileSystemConnection_S3;
 };
 
-bool VerifyFileSystemParams(flatbuffers::Verifier &verifier, const void *obj, FileSystemParams type);
-bool VerifyFileSystemParamsVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
+bool VerifyFileSystemConnection(flatbuffers::Verifier &verifier, const void *obj, FileSystemConnection type);
+bool VerifyFileSystemConnectionVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
 
 }  // namespace io
 
@@ -2510,71 +2509,72 @@ inline flatbuffers::Offset<S3> CreateS3Direct(
 
 struct FileSystemRegisterRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_TYPE = 4,
+    VT_AUTHORITY = 4,
     VT_ROOT = 6,
-    VT_PARAMS_TYPE = 8,
-    VT_PARAMS = 10
+    VT_FILESYSTEMCONNECTION_TYPE = 8,
+    VT_FILESYSTEMCONNECTION = 10
   };
-  FileSystemType type() const {
-    return static_cast<FileSystemType>(GetField<int8_t>(VT_TYPE, 0));
+  const flatbuffers::String *authority() const {
+    return GetPointer<const flatbuffers::String *>(VT_AUTHORITY);
   }
   const flatbuffers::String *root() const {
     return GetPointer<const flatbuffers::String *>(VT_ROOT);
   }
-  FileSystemParams params_type() const {
-    return static_cast<FileSystemParams>(GetField<uint8_t>(VT_PARAMS_TYPE, 0));
+  FileSystemConnection fileSystemConnection_type() const {
+    return static_cast<FileSystemConnection>(GetField<uint8_t>(VT_FILESYSTEMCONNECTION_TYPE, 0));
   }
-  const void *params() const {
-    return GetPointer<const void *>(VT_PARAMS);
+  const void *fileSystemConnection() const {
+    return GetPointer<const void *>(VT_FILESYSTEMCONNECTION);
   }
-  template<typename T> const T *params_as() const;
-  const POSIX *params_as_POSIX() const {
-    return params_type() == FileSystemParams_POSIX ? static_cast<const POSIX *>(params()) : nullptr;
+  template<typename T> const T *fileSystemConnection_as() const;
+  const POSIX *fileSystemConnection_as_POSIX() const {
+    return fileSystemConnection_type() == FileSystemConnection_POSIX ? static_cast<const POSIX *>(fileSystemConnection()) : nullptr;
   }
-  const HDFS *params_as_HDFS() const {
-    return params_type() == FileSystemParams_HDFS ? static_cast<const HDFS *>(params()) : nullptr;
+  const HDFS *fileSystemConnection_as_HDFS() const {
+    return fileSystemConnection_type() == FileSystemConnection_HDFS ? static_cast<const HDFS *>(fileSystemConnection()) : nullptr;
   }
-  const S3 *params_as_S3() const {
-    return params_type() == FileSystemParams_S3 ? static_cast<const S3 *>(params()) : nullptr;
+  const S3 *fileSystemConnection_as_S3() const {
+    return fileSystemConnection_type() == FileSystemConnection_S3 ? static_cast<const S3 *>(fileSystemConnection()) : nullptr;
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, VT_TYPE) &&
+           VerifyOffset(verifier, VT_AUTHORITY) &&
+           verifier.Verify(authority()) &&
            VerifyOffset(verifier, VT_ROOT) &&
            verifier.Verify(root()) &&
-           VerifyField<uint8_t>(verifier, VT_PARAMS_TYPE) &&
-           VerifyOffset(verifier, VT_PARAMS) &&
-           VerifyFileSystemParams(verifier, params(), params_type()) &&
+           VerifyField<uint8_t>(verifier, VT_FILESYSTEMCONNECTION_TYPE) &&
+           VerifyOffset(verifier, VT_FILESYSTEMCONNECTION) &&
+           VerifyFileSystemConnection(verifier, fileSystemConnection(), fileSystemConnection_type()) &&
            verifier.EndTable();
   }
 };
 
-template<> inline const POSIX *FileSystemRegisterRequest::params_as<POSIX>() const {
-  return params_as_POSIX();
+template<> inline const POSIX *FileSystemRegisterRequest::fileSystemConnection_as<POSIX>() const {
+  return fileSystemConnection_as_POSIX();
 }
 
-template<> inline const HDFS *FileSystemRegisterRequest::params_as<HDFS>() const {
-  return params_as_HDFS();
+template<> inline const HDFS *FileSystemRegisterRequest::fileSystemConnection_as<HDFS>() const {
+  return fileSystemConnection_as_HDFS();
 }
 
-template<> inline const S3 *FileSystemRegisterRequest::params_as<S3>() const {
-  return params_as_S3();
+template<> inline const S3 *FileSystemRegisterRequest::fileSystemConnection_as<S3>() const {
+  return fileSystemConnection_as_S3();
 }
 
 struct FileSystemRegisterRequestBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_type(FileSystemType type) {
-    fbb_.AddElement<int8_t>(FileSystemRegisterRequest::VT_TYPE, static_cast<int8_t>(type), 0);
+  void add_authority(flatbuffers::Offset<flatbuffers::String> authority) {
+    fbb_.AddOffset(FileSystemRegisterRequest::VT_AUTHORITY, authority);
   }
   void add_root(flatbuffers::Offset<flatbuffers::String> root) {
     fbb_.AddOffset(FileSystemRegisterRequest::VT_ROOT, root);
   }
-  void add_params_type(FileSystemParams params_type) {
-    fbb_.AddElement<uint8_t>(FileSystemRegisterRequest::VT_PARAMS_TYPE, static_cast<uint8_t>(params_type), 0);
+  void add_fileSystemConnection_type(FileSystemConnection fileSystemConnection_type) {
+    fbb_.AddElement<uint8_t>(FileSystemRegisterRequest::VT_FILESYSTEMCONNECTION_TYPE, static_cast<uint8_t>(fileSystemConnection_type), 0);
   }
-  void add_params(flatbuffers::Offset<void> params) {
-    fbb_.AddOffset(FileSystemRegisterRequest::VT_PARAMS, params);
+  void add_fileSystemConnection(flatbuffers::Offset<void> fileSystemConnection) {
+    fbb_.AddOffset(FileSystemRegisterRequest::VT_FILESYSTEMCONNECTION, fileSystemConnection);
   }
   explicit FileSystemRegisterRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -2590,30 +2590,79 @@ struct FileSystemRegisterRequestBuilder {
 
 inline flatbuffers::Offset<FileSystemRegisterRequest> CreateFileSystemRegisterRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
-    FileSystemType type = FileSystemType_LOCAL,
+    flatbuffers::Offset<flatbuffers::String> authority = 0,
     flatbuffers::Offset<flatbuffers::String> root = 0,
-    FileSystemParams params_type = FileSystemParams_NONE,
-    flatbuffers::Offset<void> params = 0) {
+    FileSystemConnection fileSystemConnection_type = FileSystemConnection_NONE,
+    flatbuffers::Offset<void> fileSystemConnection = 0) {
   FileSystemRegisterRequestBuilder builder_(_fbb);
-  builder_.add_params(params);
+  builder_.add_fileSystemConnection(fileSystemConnection);
   builder_.add_root(root);
-  builder_.add_params_type(params_type);
-  builder_.add_type(type);
+  builder_.add_authority(authority);
+  builder_.add_fileSystemConnection_type(fileSystemConnection_type);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<FileSystemRegisterRequest> CreateFileSystemRegisterRequestDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    FileSystemType type = FileSystemType_LOCAL,
+    const char *authority = nullptr,
     const char *root = nullptr,
-    FileSystemParams params_type = FileSystemParams_NONE,
-    flatbuffers::Offset<void> params = 0) {
+    FileSystemConnection fileSystemConnection_type = FileSystemConnection_NONE,
+    flatbuffers::Offset<void> fileSystemConnection = 0) {
   return blazingdb::protocol::io::CreateFileSystemRegisterRequest(
       _fbb,
-      type,
+      authority ? _fbb.CreateString(authority) : 0,
       root ? _fbb.CreateString(root) : 0,
-      params_type,
-      params);
+      fileSystemConnection_type,
+      fileSystemConnection);
+}
+
+struct FileSystemDeregisterRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_AUTHORITY = 4
+  };
+  const flatbuffers::String *authority() const {
+    return GetPointer<const flatbuffers::String *>(VT_AUTHORITY);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_AUTHORITY) &&
+           verifier.Verify(authority()) &&
+           verifier.EndTable();
+  }
+};
+
+struct FileSystemDeregisterRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_authority(flatbuffers::Offset<flatbuffers::String> authority) {
+    fbb_.AddOffset(FileSystemDeregisterRequest::VT_AUTHORITY, authority);
+  }
+  explicit FileSystemDeregisterRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  FileSystemDeregisterRequestBuilder &operator=(const FileSystemDeregisterRequestBuilder &);
+  flatbuffers::Offset<FileSystemDeregisterRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<FileSystemDeregisterRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FileSystemDeregisterRequest> CreateFileSystemDeregisterRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> authority = 0) {
+  FileSystemDeregisterRequestBuilder builder_(_fbb);
+  builder_.add_authority(authority);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FileSystemDeregisterRequest> CreateFileSystemDeregisterRequestDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *authority = nullptr) {
+  return blazingdb::protocol::io::CreateFileSystemDeregisterRequest(
+      _fbb,
+      authority ? _fbb.CreateString(authority) : 0);
 }
 
 }  // namespace io
@@ -2656,20 +2705,20 @@ namespace interpreter {
 
 namespace io {
 
-inline bool VerifyFileSystemParams(flatbuffers::Verifier &verifier, const void *obj, FileSystemParams type) {
+inline bool VerifyFileSystemConnection(flatbuffers::Verifier &verifier, const void *obj, FileSystemConnection type) {
   switch (type) {
-    case FileSystemParams_NONE: {
+    case FileSystemConnection_NONE: {
       return true;
     }
-    case FileSystemParams_POSIX: {
+    case FileSystemConnection_POSIX: {
       auto ptr = reinterpret_cast<const POSIX *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case FileSystemParams_HDFS: {
+    case FileSystemConnection_HDFS: {
       auto ptr = reinterpret_cast<const HDFS *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case FileSystemParams_S3: {
+    case FileSystemConnection_S3: {
       auto ptr = reinterpret_cast<const S3 *>(obj);
       return verifier.VerifyTable(ptr);
     }
@@ -2677,12 +2726,12 @@ inline bool VerifyFileSystemParams(flatbuffers::Verifier &verifier, const void *
   }
 }
 
-inline bool VerifyFileSystemParamsVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types) {
+inline bool VerifyFileSystemConnectionVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types) {
   if (!values || !types) return !values && !types;
   if (values->size() != types->size()) return false;
   for (flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
-    if (!VerifyFileSystemParams(
-        verifier,  values->Get(i), types->GetEnum<FileSystemParams>(i))) {
+    if (!VerifyFileSystemConnection(
+        verifier,  values->Get(i), types->GetEnum<FileSystemConnection>(i))) {
       return false;
     }
   }
