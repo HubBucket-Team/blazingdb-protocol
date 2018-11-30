@@ -164,18 +164,22 @@ enum MessageType {
   MessageType_DDL_DROP_TABLE = 3,
   MessageType_AuthOpen = 4,
   MessageType_AuthClose = 5,
+  MessageType_RegisterFileSystem = 6,
+  MessageType_DeregisterFileSystem = 7,
   MessageType_MIN = MessageType_DDL,
-  MessageType_MAX = MessageType_AuthClose
+  MessageType_MAX = MessageType_DeregisterFileSystem
 };
 
-inline const MessageType (&EnumValuesMessageType())[6] {
+inline const MessageType (&EnumValuesMessageType())[8] {
   static const MessageType values[] = {
     MessageType_DDL,
     MessageType_DML,
     MessageType_DDL_CREATE_TABLE,
     MessageType_DDL_DROP_TABLE,
     MessageType_AuthOpen,
-    MessageType_AuthClose
+    MessageType_AuthClose,
+    MessageType_RegisterFileSystem,
+    MessageType_DeregisterFileSystem
   };
   return values;
 }
@@ -188,6 +192,8 @@ inline const char * const *EnumNamesMessageType() {
     "DDL_DROP_TABLE",
     "AuthOpen",
     "AuthClose",
+    "RegisterFileSystem",
+    "DeregisterFileSystem",
     nullptr
   };
   return names;
@@ -317,16 +323,20 @@ enum MessageType {
   MessageType_GetResult = 1,
   MessageType_FreeResult = 2,
   MessageType_CloseConnection = 3,
+  MessageType_RegisterFileSystem = 4,
+  MessageType_DeregisterFileSystem = 5,
   MessageType_MIN = MessageType_ExecutePlan,
-  MessageType_MAX = MessageType_CloseConnection
+  MessageType_MAX = MessageType_DeregisterFileSystem
 };
 
-inline const MessageType (&EnumValuesMessageType())[4] {
+inline const MessageType (&EnumValuesMessageType())[6] {
   static const MessageType values[] = {
     MessageType_ExecutePlan,
     MessageType_GetResult,
     MessageType_FreeResult,
-    MessageType_CloseConnection
+    MessageType_CloseConnection,
+    MessageType_RegisterFileSystem,
+    MessageType_DeregisterFileSystem
   };
   return values;
 }
@@ -337,6 +347,8 @@ inline const char * const *EnumNamesMessageType() {
     "GetResult",
     "FreeResult",
     "CloseConnection",
+    "RegisterFileSystem",
+    "DeregisterFileSystem",
     nullptr
   };
   return names;
@@ -408,35 +420,6 @@ inline const char *EnumNameStatus(Status e) {
 }
 
 namespace io {
-
-enum MessageType {
-  MessageType_RegisterFileSystem = 0,
-  MessageType_DeregisterFileSystem = 1,
-  MessageType_MIN = MessageType_RegisterFileSystem,
-  MessageType_MAX = MessageType_DeregisterFileSystem
-};
-
-inline const MessageType (&EnumValuesMessageType())[2] {
-  static const MessageType values[] = {
-    MessageType_RegisterFileSystem,
-    MessageType_DeregisterFileSystem
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesMessageType() {
-  static const char * const names[] = {
-    "RegisterFileSystem",
-    "DeregisterFileSystem",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameMessageType(MessageType e) {
-  const size_t index = static_cast<int>(e);
-  return EnumNamesMessageType()[index];
-}
 
 enum DriverType {
   DriverType_UNDEFINED = 0,

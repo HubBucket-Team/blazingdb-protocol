@@ -119,6 +119,14 @@ public:
       payloadBufferSize = _copy_payload->size();
   }
 
+  RequestMessage(Header &&_header, Buffer& payload) 
+      : IMessage(), header{_header} 
+  {
+      // _copy_payload = payload.getBufferData(); 
+      payloadBuffer = payload.data();
+      payloadBufferSize = payload.size();
+  }
+
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
     flatbuffers::FlatBufferBuilder builder{0};
     auto payload_offset = builder.CreateVector(payloadBuffer, payloadBufferSize);
@@ -238,7 +246,12 @@ auto MakeRequest(int8_t message_type, uint64_t sessionToken, IMessage& payload) 
   auto bufferedData = request.getBufferData();
   return bufferedData;
 }
- 
+  
+auto MakeRequest(int8_t message_type, uint64_t sessionToken, Buffer& payload) -> std::shared_ptr<flatbuffers::DetachedBuffer>{
+  RequestMessage request{ Header{message_type, sessionToken}, payload}; 
+  auto bufferedData = request.getBufferData();
+  return bufferedData;
+} 
 
 template <typename ResponseType>
 ResponseType MakeResponse (Buffer &responseBuffer) {

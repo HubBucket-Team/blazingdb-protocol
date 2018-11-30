@@ -2,48 +2,59 @@ import flatbuffers
 import copy
 import numpy
 from blazingdb.messages.blazingdb.protocol.io \
-    import FileSystemRegisterRequest, FileSystemConnection, FileSystemType, DriverType, EncryptionType, HDFS, S3, POSIX
+    import FileSystemRegisterRequest, FileSystemDeregisterRequest, FileSystemConnection, FileSystemType, DriverType, EncryptionType, HDFS, S3, POSIX
 
 import blazingdb.protocol.transport
 import blazingdb.protocol.transport as transport
 from blazingdb.messages.blazingdb.protocol.Status import Status
+from blazingdb.messages.blazingdb.protocol.io.MessageType \
+  import MessageType as FileSystemMessageType
+ 
+class FileSystemRegisterRequestSchema:    
+    def __init__(self, authority, root, type, params):
+        self.authority = authority
+        self.root = root
+        self.params = params
+        self.type = type
+  
+    def ToBuffer(self):
+        builder = flatbuffers.Builder(1024)
+        authority = builder.CreateString(self.authority)
+        root = builder.CreateString(self.root)
+        if self.type == FileSystemConnection.FileSystemConnection.HDFS:
+            fileSystemConnection, fileSystemConnectionType = MakeHdfsFileSystemConnection(builder, self.params)
+        elif self.type == FileSystemConnection.FileSystemConnection.S3:
+            fileSystemConnection, fileSystemConnectionType = MakeS3FileSystemRegisterRequest(builder, self.params)
+        else:
+            fileSystemConnection, fileSystemConnectionType = MakePosixFileSystemConnection(builder, self.params)
 
-# class FileSystemRegisterRequestSchema(transport.schema(FileSystemRegisterRequest)):
-#   fsType = transport.NumberSegment()
-#   root = transport.StringSegment()
-#   params = transport.UnionSegment(FileSystemParams)
+        FileSystemRegisterRequest.FileSystemRegisterRequestStart(builder)
+        FileSystemRegisterRequest.FileSystemRegisterRequestAddAuthority(builder, authority)
+        FileSystemRegisterRequest.FileSystemRegisterRequestAddRoot(builder, root)
 
+        FileSystemRegisterRequest.FileSystemRegisterRequestAddFileSystemConnectionType(builder, fileSystemConnectionType)
+        FileSystemRegisterRequest.FileSystemRegisterRequestAddFileSystemConnection(builder, fileSystemConnection)
+        fs = FileSystemRegisterRequest.FileSystemRegisterRequestEnd(builder)
+        builder.Finish(fs)
+        return builder.Output()
 
-class FileSystemRegisterRequestSchema:
-  def __init__(self, authority, root, params):
-      self.authority = authority
-      self.root = root
-      self.params = params
-
-def MakeFileSystemRegisterRequest(authority, root, type, params):
-    builder = flatbuffers.Builder(1024)
-    authority = builder.CreateString(authority)
-    root = builder.CreateString(root)
-    if type == FileSystemConnection.FileSystemConnection.HDFS:
-        fileSystemConnection, fileSystemConnectionType = MakeHdfsFileSystemConnection(builder, params)
-    elif type == FileSystemConnection.FileSystemConnection.S3:
-        fileSystemConnection, fileSystemConnectionType = MakeS3FileSystemRegisterRequest(builder, params)
-    else:
-        fileSystemConnection, fileSystemConnectionType = MakePosixFileSystemConnection(builder, params)
-
-    FileSystemRegisterRequest.FileSystemRegisterRequestStart(builder)
-    FileSystemRegisterRequest.FileSystemRegisterRequestAddAuthority(builder, authority)
-    FileSystemRegisterRequest.FileSystemRegisterRequestAddRoot(builder, root)
-
-    FileSystemRegisterRequest.FileSystemRegisterRequestAddFileSystemConnectionType(builder, fileSystemConnectionType)
-    FileSystemRegisterRequest.FileSystemRegisterRequestAddFileSystemConnection(builder, fileSystemConnection)
-    fs = FileSystemRegisterRequest.FileSystemRegisterRequestEnd(builder)
-    builder.Finish(fs)
-    return builder.Output()
+class FileSystemDeregisterRequestSchema: 
+    def __init__(self, authority):
+        self.authority = authority
+        
+    def ToBuffer(self):
+        builder = flatbuffers.Builder(1024)
+        authority = builder.CreateString(self.authority)
+        FileSystemDeregisterRequest.FileSystemDeregisterRequestStart(builder)
+        FileSystemDeregisterRequest.FileSystemDeregisterRequestAddAuthority(builder, authority)
+        fs = FileSystemDeregisterRequest.FileSystemDeregisterRequestEnd(builder)
+        builder.Finish(fs)
+        return builder.Output()
+ 
 
 
 def MakePosixFileSystemConnection(builder, params):
-    return None, FileSystemConnection.FileSystemConnection.POSIX
+    return 0, FileSystemConnection.FileSystemConnection.POSIX
 
 def MakeHdfsFileSystemConnection(builder, params):
     host = builder.CreateString(params.host)

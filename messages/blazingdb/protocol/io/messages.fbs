@@ -1,4 +1,3 @@
-include "blazingdb/protocol/io/MessageType.fbs";
 
 namespace blazingdb.protocol.io;
 

@@ -9,4 +9,6 @@ class MessageType(object):
     DDL_DROP_TABLE = 3
     AuthOpen = 4
     AuthClose = 5
+    RegisterFileSystem = 6
+    DeregisterFileSystem = 7
 
