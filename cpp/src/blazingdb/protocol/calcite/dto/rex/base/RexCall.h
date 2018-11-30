@@ -6,7 +6,7 @@ namespace blazingdb {
 namespace protocol {
 namespace dto {
 
-class RexCall : public RexNode {
+class RexCall : public RexNode, public virtual RexVisitable {
 public:
     RexCall();
 
@@ -14,6 +14,9 @@ public:
 
 public:
     VectorRexNodePtr& getOperands() override;
+
+public:
+    void accept(RexVisitor* visitor) override;
 
 private:
     VectorRexNodePtr operands;

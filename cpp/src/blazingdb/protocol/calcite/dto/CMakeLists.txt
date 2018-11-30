@@ -1,0 +1,26 @@
+
+set(source_files
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rel/base/RelNode.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rel/factory/RelFactory.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rel/node/LogicalAggregate.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rel/node/LogicalFilter.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rel/node/LogicalProject.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rel/node/LogicalUnion.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rel/node/TableScan.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/base/RexCall.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/base/RexNode.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/factory/RexFactory.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/CorrelVariable.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/DynamicParam.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/FieldAccess.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/InputRef.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/Literal.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/LocalRef.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/Over.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/PatternFieldRef.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/RangeRef.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/SubQuery.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/TableInputRef.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/Variable.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/visitor/Visitor.cpp
+)
