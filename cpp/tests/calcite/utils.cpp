@@ -33,6 +33,20 @@ CreateInputsVector(flatbuffers::FlatBufferBuilder &flatBufferBuilder,
 }
 
 flatbuffers::DetachedBuffer CreateRelNodeDetachedBuffer(
+    flatbuffers::FlatBufferBuilder &   flatBufferBuilder,
+    const RelNodeType                  relNodeType,
+    const flatbuffers::DetachedBuffer &dataDetachedBuffer) {
+    auto dataOffset = flatBufferBuilder.CreateVector(
+        reinterpret_cast<std::int8_t *>(
+            const_cast<std::uint8_t *>(dataDetachedBuffer.data())),
+        dataDetachedBuffer.size());
+    auto relNodeOffset =
+        CreateRelNode(flatBufferBuilder, relNodeType, dataOffset);
+    flatBufferBuilder.Finish(relNodeOffset);
+    return flatBufferBuilder.Release();
+}
+
+flatbuffers::DetachedBuffer CreateRelNodeDetachedBuffer(
     const RelNodeType                  relNodeType,
     const flatbuffers::DetachedBuffer &dataDetachedBuffer) {
     flatbuffers::FlatBufferBuilder flatBufferBuilder(0);
@@ -46,12 +60,58 @@ flatbuffers::DetachedBuffer CreateRelNodeDetachedBuffer(
     return flatBufferBuilder.Release();
 }
 
+template <class Input, class... Inputs>
+void AddInputs(flatbuffers::FlatBufferBuilder &           flatBufferBuilder,
+               std::vector<flatbuffers::Offset<RelNode>> &inputOffsets,
+               Input &                                    inputDetachedBuffer) {
+    auto input = flatbuffers::GetRoot<RelNode>(inputDetachedBuffer.data());
+
+    std::vector<std::int8_t> data(input->data()->begin(), input->data()->end());
+
+    auto inputOffset =
+        CreateRelNodeDirect(flatBufferBuilder, input->type(), &data);
+
+    inputOffsets.push_back(inputOffset);
+}
+
+template <class Input, class... Inputs>
+void AddInputs(flatbuffers::FlatBufferBuilder &           flatBufferBuilder,
+               std::vector<flatbuffers::Offset<RelNode>> &inputOffsets,
+               Input &                                    inputDetachedBuffer,
+               Inputs &... inputDetachedBuffers) {
+    AddInputs(flatBufferBuilder, inputOffsets, inputDetachedBuffer);
+    AddInputs(flatBufferBuilder, inputOffsets, inputDetachedBuffers...);
+}
+
+template <class... Inputs>
+flatbuffers::DetachedBuffer CreateRelNodeDetachedBuffer(
+    const RelNodeType                  relNodeType,
+    const flatbuffers::DetachedBuffer &dataDetachedBuffer,
+    Inputs &... inputs) {
+    flatbuffers::FlatBufferBuilder flatBufferBuilder(0);
+
+    auto dataOffset = flatBufferBuilder.CreateVector(
+        reinterpret_cast<std::int8_t *>(
+            const_cast<std::uint8_t *>(dataDetachedBuffer.data())),
+        dataDetachedBuffer.size());
+
+    std::vector<flatbuffers::Offset<RelNode>> inputOffsets;
+    AddInputs(flatBufferBuilder, inputOffsets, inputs...);
+    auto inputsOffset = flatBufferBuilder.CreateVector(inputOffsets);
+
+    auto relNodeOffset =
+        CreateRelNode(flatBufferBuilder, relNodeType, dataOffset, inputsOffset);
+    flatBufferBuilder.Finish(relNodeOffset);
+
+    return flatBufferBuilder.Release();
+}
+
 }  // namespace
 
 namespace factory {
 
-flatbuffers::DetachedBuffer
-CreateTableScanDetachedBuffer(const std::vector<std::string> &qualifiedName) {
+flatbuffers::DetachedBuffer CreateTableScanNodeDetachedBuffer(
+    const std::vector<std::string> &qualifiedName) {
     flatbuffers::FlatBufferBuilder flatBufferBuilder(0);
     auto                           qualifiedNameOffset =
         flatBufferBuilder.CreateVectorOfStrings(qualifiedName);
@@ -63,11 +123,18 @@ CreateTableScanDetachedBuffer(const std::vector<std::string> &qualifiedName) {
                                        tableScanDetachedBuffer);
 }
 
-flatbuffers::DetachedBuffer CreateLogicalUnionDetachedBuffer(const bool all) {
+flatbuffers::DetachedBuffer CreateLogicalUnionNodeDetachedBuffer(
+    const bool                         all,
+    const flatbuffers::DetachedBuffer &leftNodeDetachedBuffer,
+    const flatbuffers::DetachedBuffer &rightNodeDetachedBuffer) {
     flatbuffers::FlatBufferBuilder flatBufferBuilder(0);
     auto logicalUnionOffset = CreateLogicalUnion(flatBufferBuilder, all);
     flatBufferBuilder.Finish(logicalUnionOffset);
-    return flatBufferBuilder.Release();
+    auto logicalUnionDetachedBuffer = flatBufferBuilder.Release();
+    return CreateRelNodeDetachedBuffer(RelNodeType_LogicalUnion,
+                                       logicalUnionDetachedBuffer,
+                                       leftNodeDetachedBuffer,
+                                       rightNodeDetachedBuffer);
 }
 
 }  // namespace factory

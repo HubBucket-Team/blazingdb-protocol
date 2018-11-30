@@ -6,11 +6,11 @@
 TEST(RelNodeBuilderTest, SingleCreation) {
     using namespace com::blazingdb::protocol::calcite::plan::messages;
 
-    auto leftTableScanDetachedBuffer =
-        factory::CreateTableScanDetachedBuffer({"left", "table"});
+    auto leftTableScanNodeDetachedBuffer =
+        factory::CreateTableScanNodeDetachedBuffer({"left", "table"});
 
     auto leftTableScanNode =
-        flatbuffers::GetRoot<RelNode>(leftTableScanDetachedBuffer.data());
+        flatbuffers::GetRoot<RelNode>(leftTableScanNodeDetachedBuffer.data());
 
     EXPECT_EQ(RelNodeType_TableScan, leftTableScanNode->type());
     EXPECT_NE(nullptr, leftTableScanNode->data());
@@ -20,6 +20,21 @@ TEST(RelNodeBuilderTest, SingleCreation) {
 
     EXPECT_EQ("left", leftTableScan->qualifiedName()->GetAsString(0)->str());
     EXPECT_EQ("table", leftTableScan->qualifiedName()->GetAsString(1)->str());
+}
+
+TEST(RelNodeBuilderTest, SingleNestedCreation) {
+    using namespace com::blazingdb::protocol::calcite::plan::messages;
+
+    auto leftTableScanNodeDetachedBuffer =
+        factory::CreateTableScanNodeDetachedBuffer({"left", "table"});
+    auto rightTableScanNodeDetachedBuffer =
+        factory::CreateTableScanNodeDetachedBuffer({"right", "table"});
+
+    auto logicalUnionNodeDetachedBuffer =
+        factory::CreateLogicalUnionNodeDetachedBuffer(
+            true,
+            leftTableScanNodeDetachedBuffer,
+            rightTableScanNodeDetachedBuffer);
 }
 
 TEST(RelNodeBuilderTest, Main) {

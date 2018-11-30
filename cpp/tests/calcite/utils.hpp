@@ -3,10 +3,13 @@
 namespace factory {
 using namespace com::blazingdb::protocol::calcite::plan::messages;
 
-flatbuffers::DetachedBuffer
-CreateTableScanDetachedBuffer(const std::vector<std::string> &qualifiedName);
+flatbuffers::DetachedBuffer CreateTableScanNodeDetachedBuffer(
+    const std::vector<std::string> &qualifiedName);
 
-flatbuffers::DetachedBuffer CreateLogicalUnionDetachedBuffer(const bool all);
+flatbuffers::DetachedBuffer CreateLogicalUnionNodeDetachedBuffer(
+    const bool                         all,
+    const flatbuffers::DetachedBuffer &leftNodeDetachedBuffer,
+    const flatbuffers::DetachedBuffer &rightNodeDetachedBuffer);
 
 }  // namespace factory
 
