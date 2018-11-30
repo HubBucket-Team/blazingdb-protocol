@@ -1,4 +1,5 @@
 #include "rex/base/RexCall.h"
+#include "rex/visitor/RexVisitor.h"
 
 namespace blazingdb {
 namespace protocol {
@@ -13,6 +14,10 @@ RexCall::RexCall(KindName kind, TypeName type)
 
 VectorRexNodePtr& RexCall::getOperands() {
     return operands;
+}
+
+void RexCall::accept(RexVisitor* visitor) {
+    visitor->visit(this);
 }
 
 }  // namespace dto

@@ -9,9 +9,9 @@ namespace dto {
 
 class RexVisitor;
 
-class Call : public RexCall, public virtual RexVisitable {
+class RangeRef : public RexCall, public virtual RexVisitable {
 public:
-    Call(KindName kind, TypeName type);
+    RangeRef(KindName kind, TypeName type);
 
 public:
     void accept(RexVisitor* visitor) override;
