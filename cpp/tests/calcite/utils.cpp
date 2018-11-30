@@ -1,4 +1,5 @@
 #include "utils.hpp"
+#include <iostream>
 
 using namespace com::blazingdb::protocol::calcite::plan::messages;
 
@@ -17,17 +18,17 @@ flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<RelNode>>>
 CreateInputsVector(flatbuffers::FlatBufferBuilder &flatBufferBuilder,
                    const std::initializer_list<flatbuffers::DetachedBuffer *>
                        &inputDetachedBuffers) {
-    std::vector<flatbuffers::DetachedBuffer *> reversed{inputDetachedBuffers};
+    auto inputSize           = inputDetachedBuffers.size();
+    auto inputDetachedBuffer = inputDetachedBuffers.begin();
 
-    std::vector<flatbuffers::Offset<RelNode>> results(reversed.size());
-
-    for (auto it = reversed.rbegin(); it != reversed.rend(); ++it) {
-        auto &db     = *it;
-        auto  offset = CreateInputOffset(flatBufferBuilder, *db);
-        results.push_back(offset);
+    flatBufferBuilder.StartVector(inputSize,
+                                  sizeof(flatbuffers::Offset<RelNode>));
+    for (auto i = inputSize; i > 0;) {
+        flatBufferBuilder.PushElement(inputDetachedBuffer[--i]);
     }
-
-    auto inputsOffset = flatBufferBuilder.CreateVector(results);
+    auto inputsOffset =
+        flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<RelNode>>>(
+            flatBufferBuilder.EndVector(inputSize));
 
     return inputsOffset;
 }
@@ -61,26 +62,24 @@ flatbuffers::DetachedBuffer CreateRelNodeDetachedBuffer(
 }
 
 template <class Input, class... Inputs>
-void AddInputs(flatbuffers::FlatBufferBuilder &           flatBufferBuilder,
-               std::vector<flatbuffers::Offset<RelNode>> &inputOffsets,
-               Input &                                    inputDetachedBuffer) {
+void AddInputs(flatbuffers::FlatBufferBuilder &flatBufferBuilder,
+               flatbuffers::Offset<RelNode> *  inputOffsets,
+               Input &                         inputDetachedBuffer) {
     auto input = flatbuffers::GetRoot<RelNode>(inputDetachedBuffer.data());
-
     std::vector<std::int8_t> data(input->data()->begin(), input->data()->end());
-
-    auto inputOffset =
+    flatbuffers::Offset<RelNode> inputOffset =
         CreateRelNodeDirect(flatBufferBuilder, input->type(), &data);
-
-    inputOffsets.push_back(inputOffset);
+    std::memcpy(
+        inputOffsets, &inputOffset, sizeof(flatbuffers::Offset<RelNode>));
 }
 
 template <class Input, class... Inputs>
-void AddInputs(flatbuffers::FlatBufferBuilder &           flatBufferBuilder,
-               std::vector<flatbuffers::Offset<RelNode>> &inputOffsets,
-               Input &                                    inputDetachedBuffer,
+void AddInputs(flatbuffers::FlatBufferBuilder &flatBufferBuilder,
+               flatbuffers::Offset<RelNode> *  inputOffsets,
+               Input &                         inputDetachedBuffer,
                Inputs &... inputDetachedBuffers) {
     AddInputs(flatBufferBuilder, inputOffsets, inputDetachedBuffer);
-    AddInputs(flatBufferBuilder, inputOffsets, inputDetachedBuffers...);
+    AddInputs(flatBufferBuilder, ++inputOffsets, inputDetachedBuffers...);
 }
 
 template <class... Inputs>
@@ -95,9 +94,10 @@ flatbuffers::DetachedBuffer CreateRelNodeDetachedBuffer(
             const_cast<std::uint8_t *>(dataDetachedBuffer.data())),
         dataDetachedBuffer.size());
 
-    std::vector<flatbuffers::Offset<RelNode>> inputOffsets;
+    flatbuffers::Offset<RelNode> inputOffsets[sizeof...(inputs)];
     AddInputs(flatBufferBuilder, inputOffsets, inputs...);
-    auto inputsOffset = flatBufferBuilder.CreateVector(inputOffsets);
+    auto inputsOffset =
+        flatBufferBuilder.CreateVector(inputOffsets, sizeof...(inputs));
 
     auto relNodeOffset =
         CreateRelNode(flatBufferBuilder, relNodeType, dataOffset, inputsOffset);

@@ -47,12 +47,32 @@ TEST(RelNodeBuilderTest, SingleNestedCreation) {
 
     EXPECT_TRUE(logicalUnion->all());
 
+    EXPECT_NE(nullptr, logicalUnionNode->inputs());
     EXPECT_EQ(2, logicalUnionNode->inputs()->Length());
 
-    auto leftTableScanNode =
-        flatbuffers::GetRoot<RelNode>(logicalUnionNode->inputs()->Get(0));
+    auto leftTableScanNode = logicalUnionNode->inputs()->Get(0);
 
     EXPECT_EQ(RelNodeType_TableScan, leftTableScanNode->type());
+    EXPECT_EQ(nullptr, leftTableScanNode->inputs());
+
+    auto leftTableScan =
+        flatbuffers::GetRoot<TableScan>(leftTableScanNode->data()->Data());
+
+    EXPECT_EQ(2, leftTableScan->qualifiedName()->Length());
+    EXPECT_EQ("left", leftTableScan->qualifiedName()->GetAsString(0)->str());
+    EXPECT_EQ("table", leftTableScan->qualifiedName()->GetAsString(1)->str());
+
+    auto rightTableScanNode = logicalUnionNode->inputs()->Get(1);
+
+    EXPECT_EQ(RelNodeType_TableScan, rightTableScanNode->type());
+    EXPECT_EQ(nullptr, rightTableScanNode->inputs());
+
+    auto rightTableScan =
+        flatbuffers::GetRoot<TableScan>(rightTableScanNode->data()->Data());
+
+    EXPECT_EQ(2, rightTableScan->qualifiedName()->Length());
+    EXPECT_EQ("right", rightTableScan->qualifiedName()->GetAsString(0)->str());
+    EXPECT_EQ("table", rightTableScan->qualifiedName()->GetAsString(1)->str());
 }
 
 TEST(RelNodeBuilderTest, Main) {
