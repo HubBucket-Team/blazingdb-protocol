@@ -1,39 +1,29 @@
-#include "../../src/blazingdb/protocol/message/generated/all_generated.h"
 #include <blazingdb/protocol/calcite/messages/RelNodeBuilder.hpp>
 #include <gtest/gtest.h>
 
-namespace factory {
-using namespace com::blazingdb::protocol::calcite::plan::messages;
+#include "utils.hpp"
 
-flatbuffers::DetachedBuffer
-createTableScanOffset(const std::vector<std::string> &qualifiedName);
-
-flatbuffers::DetachedBuffer
-createTableScanOffset(const std::vector<std::string> &qualifiedName) {
-    flatbuffers::FlatBufferBuilder fbb(0);
-    auto qualifiedNameOffset = fbb.CreateVectorOfStrings(qualifiedName);
-    auto tableScanOffset     = CreateTableScan(fbb, qualifiedNameOffset);
-    fbb.Finish(tableScanOffset);
-    return fbb.Release();
-}
-
-}  // namespace factory
-
-void CreateTree();
-
-void CreateTree() {
+TEST(RelNodeBuilderTest, SingleCreation) {
     using namespace com::blazingdb::protocol::calcite::plan::messages;
 
-    flatbuffers::FlatBufferBuilder fbb(0);
+    auto leftTableScanDetachedBuffer =
+        factory::CreateTableScanDetachedBuffer({"left", "table"});
 
-    auto rootNodeOffset =
-        CreateRelNode(fbb, RelNodeType::RelNodeType_Root, 0, 0);
+    auto leftTableScanNode =
+        flatbuffers::GetRoot<RelNode>(leftTableScanDetachedBuffer.data());
+
+    EXPECT_EQ(RelNodeType_TableScan, leftTableScanNode->type());
+    EXPECT_NE(nullptr, leftTableScanNode->data());
+
+    auto leftTableScan =
+        flatbuffers::GetRoot<TableScan>(leftTableScanNode->data()->Data());
+
+    EXPECT_EQ("left", leftTableScan->qualifiedName()->GetAsString(0)->str());
+    EXPECT_EQ("table", leftTableScan->qualifiedName()->GetAsString(1)->str());
 }
 
 TEST(RelNodeBuilderTest, Main) {
     using namespace blazingdb::protocol::calcite::messages;
-
-    CreateTree();
 
     const std::size_t DATA_SIZE = 512;
     std::uint8_t      data[DATA_SIZE];
