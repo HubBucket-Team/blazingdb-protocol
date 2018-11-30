@@ -1,7 +1,18 @@
 #pragma once
 
-#include "rex/base/KindName.h"
-#include "rex/base/TypeName.h"
-#include "rex/base/RexNode.h"
-#include "rex/base/RexCall.h"
-#include "rex/base/RexFactory.h"
+#include <memory>
+#include <vector>
+
+namespace blazingdb {
+namespace protocol {
+namespace dto {
+
+class RexNode;
+
+using RexNodePtr = std::shared_ptr<RexNode>;
+
+using VectorRexNodePtr = std::vector<RexNodePtr>;
+
+}  // namespace dto
+}  // namespace protocol
+}  // namespace blazingdb

@@ -4,15 +4,18 @@ namespace blazingdb {
 namespace protocol {
 namespace dto {
 
-class RelVisitor;
+class Literal;
+class TableInputRef;
 
-class RelVisitable {
+class RexVisitor {
 public:
-    virtual ~RelVisitable()
+    virtual ~RexVisitor()
     { }
 
 public:
-    virtual void accept(RelVisitor* visitor) = 0;
+    virtual void visit(Literal* node) = 0;
+
+    virtual void visit(TableInputRef* node) = 0;
 };
 
 }  // namespace dto

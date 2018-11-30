@@ -1,19 +1,23 @@
 #include "rel/base/RelNode.h"
+#include "rex/base/RexNode.h"
 
 namespace blazingdb {
 namespace protocol {
 namespace dto {
 
-RelNodePtr RelNode::getOperand() {
+RelNode::~RelNode()
+{ }
+
+RexNodePtr& RelNode::getOperand() {
     return operand;
 }
 
-RelNode* RelNode::setOperand(RelNodePtr& node) {
+RelNode* RelNode::setOperand(RexNodePtr& node) {
     operand = node;
     return this;
 }
 
-RelNode* RelNode::setOperand(RelNodePtr&& node) {
+RelNode* RelNode::setOperand(RexNodePtr&& node) {
     operand = std::move(node);
     return this;
 }
