@@ -7,4 +7,6 @@ class MessageType(object):
     GetResult = 1
     FreeResult = 2
     CloseConnection = 3
+    RegisterFileSystem = 4
+    DeregisterFileSystem = 5
 

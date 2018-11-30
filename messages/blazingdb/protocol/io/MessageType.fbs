@@ -1,3 +1,0 @@
-namespace blazingdb.protocol.io;
-
-enum MessageType : byte { RegisterFileSystem = 0, DeregisterFileSystem}

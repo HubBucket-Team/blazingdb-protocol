@@ -47,6 +47,29 @@ enum FileSystemType {
 
 using namespace blazingdb::protocol;
 
+
+class FileSystemDeregisterRequestMessage : public StringTypeMessage<::blazingdb::protocol::io::FileSystemDeregisterRequest> {
+public:
+  FileSystemDeregisterRequestMessage(const std::string& string_value)
+      : StringTypeMessage<::blazingdb::protocol::io::FileSystemDeregisterRequest>(string_value)
+  {
+  }
+
+  FileSystemDeregisterRequestMessage (const uint8_t* buffer)
+      :  StringTypeMessage<::blazingdb::protocol::io::FileSystemDeregisterRequest>(buffer, &::blazingdb::protocol::io::FileSystemDeregisterRequest::authority)
+  {
+  }
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
+    return this->getBufferDataUsing(::blazingdb::protocol::io::CreateFileSystemDeregisterRequestDirect);
+  }
+
+  std::string getAuthority () {
+    return string_value;
+  }
+};
+
+
 class FileSystemRegisterRequestMessage : public IMessage {
 public:
   FileSystemRegisterRequestMessage(const std::string &authority, const std::string &root)
@@ -88,7 +111,6 @@ public:
       };    
     }
   }
-  ~FileSystemRegisterRequestMessage() = default;
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
     flatbuffers::FlatBufferBuilder builder;
