@@ -35,6 +35,24 @@ TEST(RelNodeBuilderTest, SingleNestedCreation) {
             true,
             leftTableScanNodeDetachedBuffer,
             rightTableScanNodeDetachedBuffer);
+
+    auto logicalUnionNode =
+        flatbuffers::GetRoot<RelNode>(logicalUnionNodeDetachedBuffer.data());
+
+    EXPECT_EQ(RelNodeType_LogicalUnion, logicalUnionNode->type());
+    EXPECT_NE(nullptr, logicalUnionNode->data());
+
+    auto logicalUnion =
+        flatbuffers::GetRoot<LogicalUnion>(logicalUnionNode->data()->Data());
+
+    EXPECT_TRUE(logicalUnion->all());
+
+    EXPECT_EQ(2, logicalUnionNode->inputs()->Length());
+
+    auto leftTableScanNode =
+        flatbuffers::GetRoot<RelNode>(logicalUnionNode->inputs()->Get(0));
+
+    EXPECT_EQ(RelNodeType_TableScan, leftTableScanNode->type());
 }
 
 TEST(RelNodeBuilderTest, Main) {
