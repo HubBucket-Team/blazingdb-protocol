@@ -8,6 +8,7 @@ set(source_files
     ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rel/node/LogicalUnion.cpp
     ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rel/node/TableScan.cpp
     ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/base/RexCall.cpp
+    ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/base/RexData.cpp
     ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/base/RexNode.cpp
     ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/factory/RexFactory.cpp
     ${CMAKE_SOURCE_DIR}/src/blazingdb/protocol/calcite/dto/rex/node/CorrelVariable.cpp

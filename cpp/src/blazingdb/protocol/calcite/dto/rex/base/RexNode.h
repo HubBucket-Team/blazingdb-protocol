@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rex/base/RexBase.h"
+#include "rex/base/RexData.h"
 #include "rex/base/KindName.h"
 #include "rex/base/TypeName.h"
 #include "rex/visitor/RexVisitable.h"
@@ -28,11 +29,21 @@ public:
     void setTypeName(TypeName value);
 
 public:
+    RexData& getRexData();
+
+    void setRexData(RexData& data);
+
+    void setRexData(RexData&& data);
+
+public:
     virtual VectorRexNodePtr& getOperands() = 0;
 
 private:
     KindName kindName;
     TypeName typeName;
+
+private:
+    RexData rexData;
 };
 
 }  // namespace dto

@@ -30,6 +30,18 @@ void RexNode::setTypeName(TypeName value) {
     typeName = value;
 }
 
+RexData& RexNode::getRexData() {
+    return rexData;
+}
+
+void RexNode::setRexData(RexData& data) {
+    rexData = data;
+}
+
+void RexNode::setRexData(RexData&& data) {
+    rexData = std::move(data);
+}
+
 }  // namespace dto
 }  // namespace protocol
 }  // namespace blazingdb
