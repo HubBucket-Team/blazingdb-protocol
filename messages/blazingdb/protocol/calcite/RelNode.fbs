@@ -20,7 +20,7 @@ table TableScan {
 
 table LogicalProject {
     columnNames: [string];
-    columnValues: [string];
+    columnIndices: [ulong];
 }
 
 table LogicalAggregate {

@@ -699,6 +699,8 @@ enum SqlKind {
   SqlKind_CREATE_TYPE = 208,
   SqlKind_DROP_TYPE = 209,
   SqlKind_OTHER_DDL = 210,
+  SqlKind_AMIN = SqlKind_OTHER,
+  SqlKind_AMAX = SqlKind_OTHER_DDL
 };
 
 inline const SqlKind (&EnumValuesSqlKind())[211] {
@@ -2503,22 +2505,21 @@ inline flatbuffers::Offset<TableScan> CreateTableScanDirect(
 struct LogicalProject FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_COLUMNNAMES = 4,
-    VT_COLUMNVALUES = 6
+    VT_COLUMNINDICES = 6
   };
   const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *columnNames() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_COLUMNNAMES);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *columnValues() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_COLUMNVALUES);
+  const flatbuffers::Vector<uint64_t> *columnIndices() const {
+    return GetPointer<const flatbuffers::Vector<uint64_t> *>(VT_COLUMNINDICES);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_COLUMNNAMES) &&
            verifier.Verify(columnNames()) &&
            verifier.VerifyVectorOfStrings(columnNames()) &&
-           VerifyOffset(verifier, VT_COLUMNVALUES) &&
-           verifier.Verify(columnValues()) &&
-           verifier.VerifyVectorOfStrings(columnValues()) &&
+           VerifyOffset(verifier, VT_COLUMNINDICES) &&
+           verifier.Verify(columnIndices()) &&
            verifier.EndTable();
   }
 };
@@ -2529,8 +2530,8 @@ struct LogicalProjectBuilder {
   void add_columnNames(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNames) {
     fbb_.AddOffset(LogicalProject::VT_COLUMNNAMES, columnNames);
   }
-  void add_columnValues(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnValues) {
-    fbb_.AddOffset(LogicalProject::VT_COLUMNVALUES, columnValues);
+  void add_columnIndices(flatbuffers::Offset<flatbuffers::Vector<uint64_t>> columnIndices) {
+    fbb_.AddOffset(LogicalProject::VT_COLUMNINDICES, columnIndices);
   }
   explicit LogicalProjectBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -2547,9 +2548,9 @@ struct LogicalProjectBuilder {
 inline flatbuffers::Offset<LogicalProject> CreateLogicalProject(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNames = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnValues = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<uint64_t>> columnIndices = 0) {
   LogicalProjectBuilder builder_(_fbb);
-  builder_.add_columnValues(columnValues);
+  builder_.add_columnIndices(columnIndices);
   builder_.add_columnNames(columnNames);
   return builder_.Finish();
 }
@@ -2557,11 +2558,11 @@ inline flatbuffers::Offset<LogicalProject> CreateLogicalProject(
 inline flatbuffers::Offset<LogicalProject> CreateLogicalProjectDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *columnNames = nullptr,
-    const std::vector<flatbuffers::Offset<flatbuffers::String>> *columnValues = nullptr) {
+    const std::vector<uint64_t> *columnIndices = nullptr) {
   return com::blazingdb::protocol::calcite::plan::messages::CreateLogicalProject(
       _fbb,
       columnNames ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*columnNames) : 0,
-      columnValues ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*columnValues) : 0);
+      columnIndices ? _fbb.CreateVector<uint64_t>(*columnIndices) : 0);
 }
 
 struct LogicalAggregate FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
