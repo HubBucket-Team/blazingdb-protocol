@@ -11,5 +11,10 @@ flatbuffers::DetachedBuffer CreateLogicalUnionNodeDetachedBuffer(
     const flatbuffers::DetachedBuffer &leftNodeDetachedBuffer,
     const flatbuffers::DetachedBuffer &rightNodeDetachedBuffer);
 
+flatbuffers::DetachedBuffer CreateLogicalProjectNodeDetachedBuffer(
+    const std::vector<std::string> &   columnNames,
+    const std::vector<std::size_t> &   columnIndices,
+    const flatbuffers::DetachedBuffer &tableScanNodeDetachedBuffer);
+
 }  // namespace factory
 

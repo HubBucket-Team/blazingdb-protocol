@@ -137,4 +137,21 @@ flatbuffers::DetachedBuffer CreateLogicalUnionNodeDetachedBuffer(
                                        rightNodeDetachedBuffer);
 }
 
+flatbuffers::DetachedBuffer CreateLogicalProjectNodeDetachedBuffer(
+    const std::vector<std::string> &   columnNames,
+    const std::vector<std::size_t> &   columnIndices,
+    const flatbuffers::DetachedBuffer &tableScanNodeDetachedBuffer) {
+    flatbuffers::FlatBufferBuilder flatBufferBuilder(0);
+    auto                           columnNamesOffset =
+        flatBufferBuilder.CreateVectorOfStrings(columnNames);
+    auto columnIndicesOffset  = flatBufferBuilder.CreateVector(columnIndices);
+    auto logicalProjectOffset = CreateLogicalProject(
+        flatBufferBuilder, columnNamesOffset, columnIndicesOffset);
+    flatBufferBuilder.Finish(logicalProjectOffset);
+    auto logicalProjectDetachedBuffer = flatBufferBuilder.Release();
+    return CreateRelNodeDetachedBuffer(RelNodeType_LogicalProject,
+                                       logicalProjectDetachedBuffer,
+                                       tableScanNodeDetachedBuffer);
+}
+
 }  // namespace factory
