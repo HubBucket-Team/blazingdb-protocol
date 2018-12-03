@@ -12,7 +12,7 @@
 #include <blazingdb/protocol/api.h>
 #include <iostream>
 #include "flatbuffers/flatbuffers.h"
-#include "../all_generated.h"
+#include "../../all_generated.h"
 #include "gdf_dto.h"
 
 namespace blazingdb {
