@@ -8,3 +8,5 @@ set(RelNodeBuilderTest_SRCS
 
 configure_test(RelNodeBuilderTest "${RelNodeBuilderTest_SRCS}")
 target_link_libraries(RelNodeBuilderTest Google::Flatbuffers)
+
+add_subdirectory(dto)

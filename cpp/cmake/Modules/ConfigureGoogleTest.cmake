@@ -37,6 +37,8 @@ add_library(GTest::Main INTERFACE IMPORTED)
 add_dependencies(GTest::Main GTest::GTest)
 target_link_libraries(GTest::Main INTERFACE ${GTEST_ROOT}/lib/libgtest_main.a)
 
+link_directories(${GTEST_ROOT}/lib/)
+
 enable_testing()
 
 endif()
