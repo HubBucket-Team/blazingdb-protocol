@@ -18,7 +18,7 @@ public:
 
     uint8_t getUnsignedInteger08();
 
-    int16_t  getSignedInteger16();
+    int16_t getSignedInteger16();
 
     uint16_t getUnsignedInteger16();
 

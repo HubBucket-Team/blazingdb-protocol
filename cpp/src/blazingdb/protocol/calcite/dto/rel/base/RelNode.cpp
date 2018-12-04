@@ -1,5 +1,6 @@
 #include "rel/base/RelNode.h"
 #include "rex/base/RexNode.h"
+#include "rel/visitor/RelVisitor.h"
 
 namespace blazingdb {
 namespace protocol {
@@ -7,6 +8,10 @@ namespace dto {
 
 RelNode::~RelNode()
 { }
+
+void RelNode::accept(RelVisitor* visitor) {
+    visitor->visit(this);
+}
 
 RexNodePtr& RelNode::getOperand() {
     return operand;

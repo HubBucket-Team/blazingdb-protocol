@@ -13,6 +13,9 @@ public:
     virtual ~RelNode();
 
 public:
+    void accept(RelVisitor* visitor) override;
+
+public:
     RexNodePtr& getOperand();
 
     RelNode* setOperand(RexNodePtr& node);

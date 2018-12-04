@@ -8,6 +8,8 @@ namespace dto {
 
 class RelFactory {
 public:
+    static RelNodePtr createRelNode();
+
     static RelNodePtr createLogicalAggregate();
 
     static RelNodePtr createLogicalFilter();

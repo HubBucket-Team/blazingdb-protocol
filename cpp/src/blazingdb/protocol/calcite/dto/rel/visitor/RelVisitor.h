@@ -4,6 +4,7 @@ namespace blazingdb {
 namespace protocol {
 namespace dto {
 
+class RelNode;
 class LogicalAggregate;
 class LogicalFilter;
 class LogicalProject;
@@ -16,6 +17,8 @@ public:
     { }
 
 public:
+    virtual void visit(RelNode* node) = 0;
+
     virtual void visit(LogicalAggregate* node) = 0;
 
     virtual void visit(LogicalFilter* node) = 0;

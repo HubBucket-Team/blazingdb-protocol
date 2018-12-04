@@ -5,6 +5,10 @@ namespace blazingdb {
 namespace protocol {
 namespace dto {
 
+RelNodePtr RelFactory::createRelNode() {
+    return std::make_shared<RelNode>();
+}
+
 RelNodePtr RelFactory::createLogicalAggregate() {
     return (RelNodePtr) std::make_shared<LogicalAggregate>();
 }
