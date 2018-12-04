@@ -7,7 +7,7 @@ namespace blazingdb.protocol.gdf;
 table gdf_column_handler {
     data: cudaIpcMemHandle_t;
     valid: cudaIpcMemHandle_t;
-    size: ushort;
+    size: ulong;
     dtype: gdf_dtype;
     dtype_info: gdf_dtype_extra_info;
     null_count: ushort;

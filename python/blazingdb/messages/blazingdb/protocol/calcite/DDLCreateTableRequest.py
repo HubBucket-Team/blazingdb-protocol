@@ -23,7 +23,7 @@ class DDLCreateTableRequest(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return None
+        return bytes()
 
     # DDLCreateTableRequest
     def ColumnNames(self, j):
@@ -60,7 +60,7 @@ class DDLCreateTableRequest(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return None
+        return bytes()
 
 def DDLCreateTableRequestStart(builder): builder.StartObject(4)
 def DDLCreateTableRequestAddName(builder, name): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
