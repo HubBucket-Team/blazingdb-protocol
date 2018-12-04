@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <memory>
 #include <type_traits>
+#include "rel/base/RelBase.h"
 
 namespace blazingdb {
 namespace protocol {
@@ -35,11 +36,13 @@ private:
     const std::size_t size_;
 };
 
+namespace LogicalPlan = blazingdb::protocol::dto;
+
 class NodeBuilder {
 public:
     inline NodeBuilder()          = default;
     inline virtual ~NodeBuilder() = default;
-    virtual void Build() const    = 0;
+    virtual LogicalPlan::RelNodePtr Build() const = 0;
 
 private:
     NodeBuilder(const NodeBuilder &) = delete;
@@ -53,7 +56,7 @@ public:
     virtual ~RelNodeBuilder();
 
     RelNodeBuilder(const Buffer<std::uint8_t> &);
-    void Build() const final;
+    LogicalPlan::RelNodePtr Build() const final;
 
 private:
     class RelNodeBuilderImpl;

@@ -1,7 +1,9 @@
 #include <blazingdb/protocol/calcite/messages/RelNodeBuilder.hpp>
+#include <typeinfo>
 #include <gtest/gtest.h>
 
 #include "utils.hpp"
+#include "LogicalPlan.h"
 
 TEST(RelNodeBuilderTest, SingleCreation) {
     using namespace com::blazingdb::protocol::calcite::plan::messages;
@@ -100,12 +102,32 @@ TEST(RelNodeBuilderTest, TwiceNestedCreation) {
     EXPECT_TRUE(logicalUnion->all());
 }
 
-TEST(RelNodeBuilderTest, Main) {
-    using namespace blazingdb::protocol::calcite::messages;
+TEST(RelNodeBuilderTest, RelNodes) {
+    namespace LogicalPlan = blazingdb::protocol::dto;
+    using namespace com::blazingdb::protocol::calcite::plan::messages;
+    namespace Builder = blazingdb::protocol::calcite::messages;
 
-    const std::size_t DATA_SIZE = 512;
-    std::uint8_t      data[DATA_SIZE];
+    auto leftTableScanNodeDetachedBuffer =
+        factory::CreateTableScanNodeDetachedBuffer({"left", "table"});
+    auto rightTableScanNodeDetachedBuffer =
+        factory::CreateTableScanNodeDetachedBuffer({"right", "table"});
 
-    RelNodeBuilder relNodeBilder(data);
-    relNodeBilder.Build();
+    auto logicalUnionNodeDetachedBuffer =
+        factory::CreateLogicalUnionNodeDetachedBuffer(
+            true,
+            leftTableScanNodeDetachedBuffer,
+            rightTableScanNodeDetachedBuffer);
+
+    Builder::Buffer<std::uint8_t> buffer(logicalUnionNodeDetachedBuffer.data(),
+                                         logicalUnionNodeDetachedBuffer.size());
+
+    Builder::RelNodeBuilder relNodeBilder(buffer);
+    auto relNode = relNodeBilder.Build();
+
+    EXPECT_TRUE(relNode->getInputs().size() == 2);
+    EXPECT_TRUE(typeid(*relNode) == typeid(LogicalPlan::LogicalUnion));
+    EXPECT_TRUE(relNode->getInputs()[0]->getInputs().size() == 0);
+    EXPECT_TRUE(typeid(*(relNode->getInputs()[0])) == typeid(LogicalPlan::TableScan));
+    EXPECT_TRUE(relNode->getInputs()[1]->getInputs().size() == 0);
+    EXPECT_TRUE(typeid(*(relNode->getInputs()[1])) == typeid(LogicalPlan::TableScan));
 }
