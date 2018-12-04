@@ -140,11 +140,31 @@ public:
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
 
-  std::string get_authority() const {
+  std::string getAuthority() const {
     return authority;
   }
-  std::string get_root () const {
+  std::string getRoot () const {
     return root;
+  }
+  
+  HDFS getHdfs() const {
+    return hdfs;
+  }
+
+  S3 getS3() const {
+    return s3;
+  }
+  
+  bool isLocal() const {
+    return type == FileSystemType_POSIX;
+  }
+
+  bool isHdfs() const {
+    return type == FileSystemType_HDFS;
+  }
+
+  bool isS3() const {
+    return type == FileSystemType_S3;
   }
   
 

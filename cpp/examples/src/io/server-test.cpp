@@ -13,8 +13,8 @@ int main() {
                      -> blazingdb::protocol::Buffer {
 
      blazingdb::message::io::FileSystemRegisterRequestMessage message(buffer.data());
-     std::cout << message.get_authority() << std::endl;
-     std::cout << message.get_root() << std::endl;
+     std::cout << message.getAuthority() << std::endl;
+     std::cout << message.getRoot() << std::endl;
      
      return blazingdb::protocol::Buffer(
          reinterpret_cast<const std::uint8_t *>("BlazingDB Response"), 18);
