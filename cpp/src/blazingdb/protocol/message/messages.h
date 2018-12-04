@@ -7,7 +7,7 @@
 #include <blazingdb/protocol/api.h>
 #include <iostream>
 #include "flatbuffers/flatbuffers.h"
-#include "generated/all_generated.h"
+#include "../all_generated.h"
 
 namespace blazingdb {
 namespace protocol {

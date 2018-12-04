@@ -26,6 +26,16 @@ make -j8 install
 
 ```
 ./build_libraries.sh
+
+```
+### Build cpp blazingdb-protocol library
+
+```
+cd cpp && mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX=/some_directory/protocol_install \
+      -DFLATBUFFERS_INSTALL_DIR=/home/aocsa/flatbuffers_install \
+      .. 
+make 
 ```
 
 ## Initialize Services
