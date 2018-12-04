@@ -23,14 +23,14 @@ class DDLDropTableRequest(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return None
+        return bytes()
 
     # DDLDropTableRequest
     def DbName(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return None
+        return bytes()
 
 def DDLDropTableRequestStart(builder): builder.StartObject(2)
 def DDLDropTableRequestAddName(builder, name): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
