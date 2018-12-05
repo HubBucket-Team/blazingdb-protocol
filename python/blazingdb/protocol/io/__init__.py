@@ -10,6 +10,11 @@ from blazingdb.messages.blazingdb.protocol.Status import Status
 from blazingdb.messages.blazingdb.protocol.io.MessageType \
   import MessageType as FileSystemMessageType
  
+from blazingdb.messages.blazingdb.protocol.io.FileSystemConnection \
+  import FileSystemConnection as FileSystemType
+ 
+
+
 class FileSystemRegisterRequestSchema:    
     def __init__(self, authority, root, type, params):
         self.authority = authority

@@ -9,7 +9,7 @@ from blazingdb.protocol.transport.channel import MakeRequestBuffer
 from blazingdb.protocol.orchestrator import DMLResponseSchema
 from blazingdb.protocol.interpreter import GetResultRequestSchema
 
-from blazingdb.protocol.io  import DriverType, FileSystemRegisterRequestSchema, FileSystemDeregisterRequestSchema
+from blazingdb.protocol.io  import DriverType, FileSystemConnection, FileSystemRegisterRequestSchema, FileSystemDeregisterRequestSchema
 from collections import namedtuple
 
 
@@ -27,9 +27,8 @@ def main():
     hdfs = namedtuple("HDFS", d.keys())(*d.values())
     print (hdfs)
 
-    # buffer = io.MakeFileSystemRegisterRequest('authority_name', 'root/', io.FileSystemConnection.FileSystemConnection.HDFS, hdfs)
-
-    schema = FileSystemDeregisterRequestSchema(authority = 'authority_name_de')
+    schema =  FileSystemRegisterRequestSchema('authority_name', 'root/', FileSystemConnection.FileSystemConnection.HDFS, hdfs)
+    # schema = FileSystemDeregisterRequestSchema(authority = 'authority_name_de')
     print(client.send(schema.ToBuffer()))
 
 
