@@ -10,7 +10,16 @@ class RelVisitor;
 
 class LogicalUnion : public RelNode, public virtual RelVisitable {
 public:
+    LogicalUnion(bool all);
+
+public:
     void accept(RelVisitor* visitor) override;
+
+public:
+    bool getAll() const;
+
+private:
+    const bool all;
 };
 
 }  // namespace dto

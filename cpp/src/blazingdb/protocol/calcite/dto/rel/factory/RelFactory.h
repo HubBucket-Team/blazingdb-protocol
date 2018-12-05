@@ -10,15 +10,23 @@ class RelFactory {
 public:
     static RelNodePtr createRelNode();
 
-    static RelNodePtr createLogicalAggregate();
+    static RelNodePtr createLogicalAggregate(std::vector<std::uint64_t>& groups);
+
+    static RelNodePtr createLogicalAggregate(std::vector<std::uint64_t>&& groups = {});
 
     static RelNodePtr createLogicalFilter();
 
-    static RelNodePtr createLogicalProject();
+    static RelNodePtr createLogicalProject(std::vector<std::string>& columnNames,
+                                           std::vector<std::uint64_t>& columnIndices);
 
-    static RelNodePtr createLogicalUnion();
+    static RelNodePtr createLogicalProject(std::vector<std::string>&& columnNames = {},
+                                           std::vector<std::uint64_t>&& columnIndices = {});
 
-    static RelNodePtr createTableScan();
+    static RelNodePtr createLogicalUnion(bool all = false);
+
+    static RelNodePtr createTableScan(std::vector<std::string>& qualifiedName);
+
+    static RelNodePtr createTableScan(std::vector<std::string>&& qualifiedName = {});
 };
 
 }  // namespace dto

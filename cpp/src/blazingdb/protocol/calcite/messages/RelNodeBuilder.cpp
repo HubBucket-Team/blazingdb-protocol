@@ -1,6 +1,7 @@
 #include "RelNodeBuilder.hpp"
 #include "LogicalPlan.h"
 #include "../../message/generated/all_generated.h"
+#include <algorithm>
 
 namespace blazingdb {
 namespace protocol {
@@ -60,7 +61,21 @@ void RelNodeBuilder::RelNodeBuilderImpl::buildRelNodeDTO(LogicalPlan::RelNodePtr
 void RelNodeBuilder::RelNodeBuilderImpl::createRelNodeDTO(LogicalPlan::RelNodePtr& output, const Calcite::RelNode* input) const {
     switch (input->type()) {
         case Calcite::RelNodeType_LogicalProject: {
-            output = LogicalPlan::RelFactory::createLogicalProject();
+            const auto* node = flatbuffers::GetRoot<Calcite::LogicalProject>(input->data()->Data());
+
+            std::vector<std::string> columnNames;
+            std::transform(node->columnNames()->begin(),
+                           node->columnNames()->end(),
+                           std::back_inserter(columnNames),
+                           [](const auto* string) -> std::string {
+                               return string->str();
+                           });
+
+            std::vector<std::uint64_t> columnIndices(node->columnIndices()->begin(),
+                                                     node->columnIndices()->end());
+
+            output = LogicalPlan::RelFactory::createLogicalProject(std::move(columnNames),
+                                                                   std::move(columnIndices));
             break;
         }
         case Calcite::RelNodeType_LogicalFilter: {
@@ -68,15 +83,32 @@ void RelNodeBuilder::RelNodeBuilderImpl::createRelNodeDTO(LogicalPlan::RelNodePt
             break;
         }
         case Calcite::RelNodeType_TableScan: {
-            output = LogicalPlan::RelFactory::createTableScan();
+            const auto* node = flatbuffers::GetRoot<Calcite::TableScan>(input->data()->Data());
+
+            std::vector<std::string> qualifiedName;
+            std::transform(node->qualifiedName()->begin(),
+                           node->qualifiedName()->end(),
+                           std::back_inserter(qualifiedName),
+                           [](const auto* string) -> std::string {
+                               return string->str();
+                           });
+
+            output = LogicalPlan::RelFactory::createTableScan(std::move(qualifiedName));
             break;
         }
         case Calcite::RelNodeType_LogicalAggregate: {
-            output = LogicalPlan::RelFactory::createLogicalAggregate();
+            const auto* node = flatbuffers::GetRoot<Calcite::LogicalAggregate>(input->data()->Data());
+
+            std::vector<std::uint64_t> groups(node->groups()->begin(),
+                                              node->groups()->end());
+
+            output = LogicalPlan::RelFactory::createLogicalAggregate(std::move(groups));
             break;
         }
         case Calcite::RelNodeType_LogicalUnion: {
-            output = LogicalPlan::RelFactory::createLogicalUnion();
+            const auto* node = flatbuffers::GetRoot<Calcite::LogicalUnion>(input->data()->Data());
+
+            output = LogicalPlan::RelFactory::createLogicalUnion(node->all());
             break;
         }
     }
