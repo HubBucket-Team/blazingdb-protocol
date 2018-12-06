@@ -3,14 +3,10 @@ import blazingdb.protocol.interpreter
 import blazingdb.protocol.orchestrator
 import blazingdb.protocol.transport.channel
 
-from blazingdb.protocol.interpreter import InterpreterMessage
-from blazingdb.protocol.transport.channel import ResponseSchema
-from blazingdb.protocol.transport.channel import MakeRequestBuffer
-from blazingdb.protocol.orchestrator import DMLResponseSchema
-from blazingdb.protocol.interpreter import GetResultRequestSchema
-
-from blazingdb.protocol.io  import DriverType, FileSystemConnection, FileSystemRegisterRequestSchema, FileSystemDeregisterRequestSchema
+from blazingdb.protocol.io import FileSystemRegisterRequestSchema, FileSystemDeregisterRequestSchema
 from collections import namedtuple
+
+from blazingdb.protocol.io import DriverType, FileSystemType
 
 
 def main():
@@ -21,13 +17,13 @@ def main():
         'host': 'string',
         'port': 8080,
         'user': 'string',
-        'driverType': DriverType.DriverType.LIBHDFS,
+        'driverType': DriverType.LIBHDFS,
         'kerberosTicket': 'string'
     }
     hdfs = namedtuple("HDFS", d.keys())(*d.values())
-    print (hdfs)
+    print(hdfs)
 
-    schema =  FileSystemRegisterRequestSchema('authority_name', 'root/', FileSystemConnection.FileSystemConnection.HDFS, hdfs)
+    schema = FileSystemRegisterRequestSchema('authority_name', 'root/', FileSystemType.HDFS, hdfs)
     # schema = FileSystemDeregisterRequestSchema(authority = 'authority_name_de')
     print(client.send(schema.ToBuffer()))
 

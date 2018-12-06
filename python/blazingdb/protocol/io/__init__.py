@@ -2,18 +2,13 @@ import flatbuffers
 import copy
 import numpy
 from blazingdb.messages.blazingdb.protocol.io \
-    import FileSystemRegisterRequest, FileSystemDeregisterRequest, FileSystemConnection, FileSystemType, DriverType, EncryptionType, HDFS, S3, POSIX
+    import FileSystemRegisterRequest, FileSystemDeregisterRequest, HDFS, S3, POSIX
 
-import blazingdb.protocol.transport
-import blazingdb.protocol.transport as transport
-from blazingdb.messages.blazingdb.protocol.Status import Status
-from blazingdb.messages.blazingdb.protocol.io.MessageType \
-  import MessageType as FileSystemMessageType
- 
-from blazingdb.messages.blazingdb.protocol.io.FileSystemConnection \
-  import FileSystemConnection as FileSystemType
- 
+from blazingdb.messages.blazingdb.protocol.io import DriverType, EncryptionType, FileSystemConnection
 
+DriverType = DriverType.DriverType
+EncryptionType = EncryptionType.EncryptionType
+FileSystemType = FileSystemConnection.FileSystemConnection
 
 class FileSystemRegisterRequestSchema:    
     def __init__(self, authority, root, type, params):
@@ -26,9 +21,9 @@ class FileSystemRegisterRequestSchema:
         builder = flatbuffers.Builder(1024)
         authority = builder.CreateString(self.authority)
         root = builder.CreateString(self.root)
-        if self.type == FileSystemConnection.FileSystemConnection.HDFS:
+        if self.type == FileSystemType.HDFS:
             fileSystemConnection, fileSystemConnectionType = MakeHdfsFileSystemConnection(builder, self.params)
-        elif self.type == FileSystemConnection.FileSystemConnection.S3:
+        elif self.type == FileSystemType.S3:
             fileSystemConnection, fileSystemConnectionType = MakeS3FileSystemRegisterRequest(builder, self.params)
         else:
             fileSystemConnection, fileSystemConnectionType = MakePosixFileSystemConnection(builder, self.params)
@@ -59,7 +54,7 @@ class FileSystemDeregisterRequestSchema:
 
 
 def MakePosixFileSystemConnection(builder, params):
-    return 0, FileSystemConnection.FileSystemConnection.POSIX
+    return 0, FileSystemType.POSIX
 
 def MakeHdfsFileSystemConnection(builder, params):
     host = builder.CreateString(params.host)
@@ -72,7 +67,7 @@ def MakeHdfsFileSystemConnection(builder, params):
     HDFS.HDFSAddDriverType(builder, params.driverType)  # check if it is enum
     HDFS.HDFSAddKerberosTicket(builder, ticket)
     paramObj = HDFS.HDFSEnd(builder)
-    return paramObj, FileSystemConnection.FileSystemConnection.HDFS
+    return paramObj, FileSystemType.HDFS
 
 
 def MakeS3FileSystemRegisterRequest(builder, params):
@@ -89,4 +84,4 @@ def MakeS3FileSystemRegisterRequest(builder, params):
     S3.S3AddSecretKey(builder, secretKey)
     S3.S3AddSessionToken(builder, sessionToken)
     paramObj = S3.S3End(builder)
-    return paramObj, FileSystemConnection.FileSystemConnection.S3
+    return paramObj, FileSystemType.S3
