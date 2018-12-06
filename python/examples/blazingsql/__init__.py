@@ -1,20 +1,12 @@
-
-from libgdf_cffi import ffi
-from pygdf.datetime import DatetimeColumn
-from pygdf.numerical import NumericalColumn
-
-from pygdf import _gdf
-from pygdf import column
-from pygdf import numerical
-from pygdf import DataFrame
-from pygdf.dataframe import Series
-from pygdf.buffer import Buffer
-from pygdf import utils
+from cudf import _gdf
+from cudf.dataframe.column import Column
+from cudf import DataFrame
+from cudf.dataframe.dataframe import Series
+from cudf.dataframe.buffer import Buffer
+from cudf import utils
 
 import numpy as np
 import pandas as pd
-from libgdf_cffi import  libgdf
-
 
 import contextlib
 from blazingdb.protocol.transport.channel import ResponseErrorSchema
@@ -38,13 +30,12 @@ from blazingdb.protocol.orchestrator import DMLResponseSchema
 from blazingdb.protocol.interpreter import GetResultRequestSchema
 from blazingdb.protocol.interpreter import GetQueryResultFrom
 
-# NDarray device helper
 from numba import cuda
 from numba.cuda.cudadrv import driver, devices
+
 require_context = devices.require_context
 current_context = devices.get_context
 gpus = devices.gpus
-
 
 @contextlib.contextmanager
 def open_connection(path):
@@ -283,7 +274,7 @@ class Database:
                          'valid': b"",
                          'size': cffiView.size,
                          'dtype': cffiView.dtype,
-                         'dtype_info': 0,  # TODO dtype_info is currently not used in pygdf
+                         'dtype_info': 0,  # TODO dtype_info is currently not used in cudf
                          'null_count': cffiView.null_count})
                 else:
                     table["columns"].append(
@@ -291,7 +282,7 @@ class Database:
                          'valid': bytes(series._column._mask.mem.get_ipc_handle()._ipc_handle.handle),
                          'size': cffiView.size,
                          'dtype': cffiView.dtype,
-                         'dtype_info': 0,  # TODO dtype_info is currently not used in pygdf
+                         'dtype_info': 0,  # TODO dtype_info is currently not used in cudf
                          'null_count': cffiView.null_count})
             tableGroup["tables"].append(table)
         return tableGroup
