@@ -3,7 +3,7 @@ import blazingdb.protocol.interpreter
 import blazingdb.protocol.orchestrator
 import blazingdb.protocol.transport.channel
 
-from blazingdb.protocol.io import FileSystemRegisterRequestSchema, FileSystemDeregisterRequestSchema
+from blazingdb.protocol.io import FileSystemRegisterRequestSchema, FileSystemDeregisterRequestSchema, CsvFileSchema
 from collections import namedtuple
 
 from blazingdb.protocol.io import DriverType, FileSystemType
@@ -29,4 +29,19 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    path = 'path'
+    delimiter = '|'
+    line_terminator = '\n'
+    skip_rows = 0
+    names = ['1', '2']
+    dtypes = [1,  2]
+
+    requestSchema = blazingdb.protocol.io.CsvFileSchema(path=path, delimiter=delimiter, lineTerminator=line_terminator,
+                                                        skipRows=skip_rows, names=names, dtypes=dtypes)
+    buffer = requestSchema.ToBuffer()
+    obj = blazingdb.protocol.io.CsvFileSchema.From(buffer)
+
+    print(obj.path)
+    print(obj.names)
+    print(obj.dtypes)

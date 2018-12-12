@@ -178,6 +178,64 @@ private:
   S3 s3;
 };
 
+
+
+class LoadCsvFileRequestMessage : public IMessage {
+public:
+  LoadCsvFileRequestMessage(const std::string path,
+      const std::string & delimiter,
+			const std::string & line_terminator,
+			int skip_rows,
+			const std::vector<std::string> & names,
+			const std::vector<int> & dtypes)
+      : IMessage(), path{path}, delimiter{delimiter}, line_terminator{line_terminator}, skip_rows{skip_rows}, names{names}, dtypes{dtypes}
+  {
+
+  }
+
+  LoadCsvFileRequestMessage(const uint8_t *buffer) : IMessage() {
+    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::io::CsvFile>(buffer);
+    path =  std::string{pointer->path()->c_str()};
+    delimiter =  std::string{pointer->delimiter()->c_str()};
+    line_terminator =  std::string{pointer->lineTerminator()->c_str()};
+    skip_rows =  pointer->skipRows();
+
+    auto ColumnNamesFrom = [](const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *rawNames) -> std::vector<std::string> {
+      std::vector<std::string> columnNames;
+      for (const auto& rawName : *rawNames){
+        auto name = std::string{rawName->c_str()};  
+        columnNames.push_back(name);
+      }
+      return columnNames;
+    };
+    auto ColumnTypesFrom = [](const flatbuffers::Vector<int32_t> *rawValues) -> std::vector<int> {
+      std::vector<int> values;
+      for (const auto& val : *rawValues){
+        values.push_back(val);
+      }
+      return values;
+    };
+    names = ColumnNamesFrom(pointer->names());
+    dtypes = ColumnTypesFrom(pointer->dtypes());
+  }
+  
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
+    return nullptr;
+  }
+
+public:
+  std::string path;
+  std::string delimiter;
+  std::string line_terminator;
+  int skip_rows;
+  std::vector<std::string> names;
+  std::vector<int> dtypes;
+};
+
+class LoadParquetFileRequestMessage : public IMessage {
+
+};
+
 }  // namespace io
 }  // namespace message
 }  // namespace blazingdb

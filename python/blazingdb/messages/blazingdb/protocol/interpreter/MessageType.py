@@ -9,4 +9,6 @@ class MessageType(object):
     CloseConnection = 3
     RegisterFileSystem = 4
     DeregisterFileSystem = 5
+    LoadCSV = 6
+    LoadParquet = 7
 

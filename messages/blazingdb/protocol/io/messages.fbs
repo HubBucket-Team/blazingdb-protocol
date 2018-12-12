@@ -50,3 +50,22 @@ table FileSystemDeregisterRequest {
     authority: string;
 } 
 root_type FileSystemDeregisterRequest;
+
+
+table CsvFile {
+    path:string;
+    delimiter:string;
+    lineTerminator:string;
+    skipRows:int;
+    names:[string];
+    dtypes:[int];
+}
+root_type CsvFile;
+
+table ParquetFile {
+    path:string;
+    rowGroupIndices:[int];
+    columnIndices:[int];
+}
+
+root_type ParquetFile;

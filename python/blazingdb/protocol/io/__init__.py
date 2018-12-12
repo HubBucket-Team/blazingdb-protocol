@@ -1,10 +1,12 @@
 import flatbuffers
 import copy
 import numpy
+import blazingdb.protocol.transport as transport
 from blazingdb.messages.blazingdb.protocol.io \
-    import FileSystemRegisterRequest, FileSystemDeregisterRequest, HDFS, S3, POSIX
+    import FileSystemRegisterRequest, FileSystemDeregisterRequest, HDFS, S3, POSIX, CsvFile, ParquetFile
 
 from blazingdb.messages.blazingdb.protocol.io import DriverType, EncryptionType, FileSystemConnection
+
 
 DriverType = DriverType.DriverType
 EncryptionType = EncryptionType.EncryptionType
@@ -85,3 +87,17 @@ def MakeS3FileSystemRegisterRequest(builder, params):
     S3.S3AddSessionToken(builder, sessionToken)
     paramObj = S3.S3End(builder)
     return paramObj, FileSystemType.S3
+
+class CsvFileSchema(transport.schema(CsvFile)):
+    path = transport.StringSegment()
+    delimiter = transport.StringSegment()
+    lineTerminator = transport.StringSegment()
+    skipRows = transport.NumberSegment()
+    names = transport.VectorStringSegment(transport.StringSegment)
+    dtypes = transport.VectorSegment(transport.NumberSegment)
+
+class ParquetFileSchema(transport.schema(ParquetFile)):
+    path = transport.StringSegment()
+    rowGroupIndices = transport.VectorSegment(transport.NumberSegment)
+    columnIndices = transport.VectorSegment(transport.NumberSegment)
+
