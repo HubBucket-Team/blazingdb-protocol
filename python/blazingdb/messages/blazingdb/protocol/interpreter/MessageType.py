@@ -11,4 +11,5 @@ class MessageType(object):
     DeregisterFileSystem = 5
     LoadCSV = 6
     LoadParquet = 7
+    DML_FS = 8
 

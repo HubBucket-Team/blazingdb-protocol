@@ -179,26 +179,38 @@ private:
 };
 
 
+std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flatbuffers::FlatBufferBuilder &builder, const std::vector<std::string> &strings)   {
+  std::vector<flatbuffers::Offset<flatbuffers::String>> offsets;
+  for (auto & str: strings) {
+    offsets.push_back( builder.CreateString(str.data()));
+  }
+  return offsets;
+}
 
-class LoadCsvFileRequestMessage : public IMessage {
-public:
-  LoadCsvFileRequestMessage(const std::string path,
-      const std::string & delimiter,
-			const std::string & line_terminator,
-			int skip_rows,
-			const std::vector<std::string> & names,
-			const std::vector<int> & dtypes)
-      : IMessage(), path{path}, delimiter{delimiter}, line_terminator{line_terminator}, skip_rows{skip_rows}, names{names}, dtypes{dtypes}
-  {
+struct CsvFileSchema {
+  std::string path;
+  std::string delimiter = "|";
+  std::string line_terminator = "\n";
+  int skip_rows = 0;
+  std::vector<std::string> names;
+  std::vector<int> dtypes;
 
+
+  static flatbuffers::Offset<blazingdb::protocol::io::CsvFile> Serialize(flatbuffers::FlatBufferBuilder &builder, CsvFileSchema data) {
+    std::vector<int> dtypes;
+    std::vector<flatbuffers::Offset<flatbuffers::String>>  names = BuildeFlatStringList(builder, data.names);
+    // std::vector<int32_t> &dtypes = data.dtypes; ??@todo
+     
+    return blazingdb::protocol::io::CreateCsvFile(builder, builder.CreateString(data.path.c_str()), builder.CreateString(data.delimiter.c_str()), builder.CreateString(data.line_terminator.c_str()), data.skip_rows, builder.CreateVector(names), builder.CreateVector( data.dtypes.data(),  data.dtypes.size()) );
   }
 
-  LoadCsvFileRequestMessage(const uint8_t *buffer) : IMessage() {
-    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::io::CsvFile>(buffer);
-    path =  std::string{pointer->path()->c_str()};
-    delimiter =  std::string{pointer->delimiter()->c_str()};
-    line_terminator =  std::string{pointer->lineTerminator()->c_str()};
-    skip_rows =  pointer->skipRows();
+  static void Deserialize(const blazingdb::protocol::io::CsvFile *pointer, CsvFileSchema* schema) {
+    schema->path =  std::string{pointer->path()->c_str()};
+    if (std::string{pointer->delimiter()->c_str()}.length() > 0)
+      schema->delimiter =  std::string{pointer->delimiter()->c_str()};
+    if (std::string{pointer->lineTerminator()->c_str()}.length() > 0)
+      schema->line_terminator =  std::string{pointer->lineTerminator()->c_str()};
+    schema->skip_rows =  pointer->skipRows();
 
     auto ColumnNamesFrom = [](const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *rawNames) -> std::vector<std::string> {
       std::vector<std::string> columnNames;
@@ -215,26 +227,205 @@ public:
       }
       return values;
     };
-    names = ColumnNamesFrom(pointer->names());
-    dtypes = ColumnTypesFrom(pointer->dtypes());
+    schema->names = ColumnNamesFrom(pointer->names());
+    schema->dtypes = ColumnTypesFrom(pointer->dtypes());
   }
+};
+
+class LoadCsvFileRequestMessage : public IMessage, CsvFileSchema {
+public:
+  LoadCsvFileRequestMessage(const std::string path,
+      const std::string & delimiter,
+			const std::string & line_terminator,
+			int skip_rows,
+			const std::vector<std::string> & names,
+			const std::vector<int> & dtypes)
+      : IMessage()
+  {
+     this->path = path;
+     this->delimiter = delimiter;
+     this->line_terminator = line_terminator;
+     this->skip_rows = skip_rows;
+     this->names = names;
+     this->dtypes = dtypes;
+  }
+
+  LoadCsvFileRequestMessage(const uint8_t *buffer) : IMessage() {
+    auto data = flatbuffers::GetRoot<blazingdb::protocol::io::CsvFile>(buffer);
+    CsvFileSchema::Deserialize(data, this);
+  }
+
   
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
     return nullptr;
   }
+  CsvFileSchema* fileSchema() {
+    return this;
+  }
 
-public:
+};
+
+struct ParquetFileSchema {
   std::string path;
-  std::string delimiter;
-  std::string line_terminator;
-  int skip_rows;
-  std::vector<std::string> names;
-  std::vector<int> dtypes;
+  std::vector<int> rowGroupIndices;
+  std::vector<int> columnIndices;
+
+  static flatbuffers::Offset<blazingdb::protocol::io::ParquetFile> Serialize(flatbuffers::FlatBufferBuilder &builder, ParquetFileSchema &data) {
+      //@todo 
+      // copy rowGroupIndices and columnIndices
+      // make sure you can use these data!  
+    return blazingdb::protocol::io::CreateParquetFileDirect(builder, data.path.c_str());
+  }
+  static void Deserialize (const blazingdb::protocol::io::ParquetFile *pointer, ParquetFileSchema* schema){
+      schema->path =  std::string{pointer->path()->c_str()};
+
+      //@todo 
+      // copy rowGroupIndices and columnIndices
+      // make sure you can use these data!  
+  }
 };
 
-class LoadParquetFileRequestMessage : public IMessage {
+class LoadParquetFileRequestMessage : public IMessage, ParquetFileSchema {
+public:
+  LoadParquetFileRequestMessage(std::string path, std::vector<int> rowGroupIndices, std::vector<int> columnIndices)
+    : IMessage{}
+  {
+    this->path = path;
+    this->rowGroupIndices = rowGroupIndices;
+    this->columnIndices = columnIndices;
+  }
 
+  LoadParquetFileRequestMessage(const uint8_t *buffer) : IMessage() {
+    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::io::ParquetFile>(buffer);
+    ParquetFileSchema::Deserialize(pointer, this);
+  }
+
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
+    return nullptr;
+  }
+
+  ParquetFileSchema* fileSchema() {
+    return this;
+  }
 };
+
+struct FileSystemBlazingTableSchema {
+  std::string name;
+  blazingdb::protocol::io::FileSchemaType schemaType;
+  CsvFileSchema csv;
+  ParquetFileSchema parquet;
+  std::vector<std::string> files;
+  std::vector<std::string> columnNames;
+};
+
+struct FileSystemTableGroupSchema {
+  std::vector<FileSystemBlazingTableSchema> tables;
+  std::string name;
+};
+
+
+class FileSystemDMLRequestMessage : public IMessage {
+public: 
+  FileSystemDMLRequestMessage(const uint8_t *buffer) : IMessage() {
+    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::io::FileSystemDMLRequest>(buffer);
+    statement =  std::string{pointer->statement()->c_str()};
+
+
+
+    auto get_table_group = [] (const blazingdb::protocol::io::FileSystemTableGroup * tableGroup) {
+      std::string name = std::string{tableGroup->name()->c_str()};
+      std::vector<FileSystemBlazingTableSchema> tables;
+
+
+      auto _ListFrom = [](const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *rawNames) {
+        std::vector<std::string> columnNames;
+        for (const auto& rawName : *rawNames){
+          auto name = std::string{rawName->c_str()};  
+          columnNames.push_back(name);
+        }
+        return columnNames;
+      };
+
+      auto rawTables = tableGroup->tables();
+      for (const auto& table : *rawTables) {
+
+        std::string name = std::string{table->name()->c_str()};
+        blazingdb::protocol::io::FileSchemaType schemaType = table->schemaType();
+        std::vector<std::string> files = _ListFrom(table->files());
+        std::vector<std::string> columnNames = _ListFrom(table->columnNames());
+        if (schemaType == blazingdb::protocol::io::FileSchemaType::FileSchemaType_CSV) {
+          CsvFileSchema csv;
+          CsvFileSchema::Deserialize(table->csv(), &csv);
+
+          tables.push_back(FileSystemBlazingTableSchema{
+              .name = name,
+              .schemaType = schemaType,
+              .csv = csv,
+              .parquet = ParquetFileSchema{},
+              .files = files,
+              .columnNames = columnNames,
+          });
+        } else {
+          ParquetFileSchema parquet;
+          ParquetFileSchema::Deserialize(table->parquet(), &parquet);
+
+          tables.push_back(FileSystemBlazingTableSchema{
+              .name = name,
+              .schemaType = schemaType,
+              .csv = CsvFileSchema{},
+              .parquet = parquet,
+              .files = files,
+              .columnNames = columnNames,
+          });
+        }
+      }
+      return FileSystemTableGroupSchema {
+          .tables = tables,
+          .name = name,
+      };
+    };
+    tableGroup = get_table_group(pointer->tableGroup());
+  }
+  FileSystemDMLRequestMessage( std::string statement,  FileSystemTableGroupSchema tableGroup) 
+    : statement{statement}, tableGroup{tableGroup}, IMessage() 
+  {
+    
+  } 
+
+  flatbuffers::Offset<blazingdb::protocol::io::FileSystemTableGroup> _BuildTableGroup(flatbuffers::FlatBufferBuilder &builder,
+                                                        FileSystemTableGroupSchema tableGroup) const {
+    auto tableNameOffset = builder.CreateString(tableGroup.name);
+    std::vector<flatbuffers::Offset<blazingdb::protocol::io::FileSystemBlazingTable>> tablesOffset;
+
+    for (FileSystemBlazingTableSchema& table : tableGroup.tables) {
+      auto columnNames = BuildeFlatStringList(builder, table.columnNames);
+      auto filesNames = BuildeFlatStringList(builder, table.files);
+      flatbuffers::Offset<flatbuffers::String> nameOffset = builder.CreateString(table.name);
+      blazingdb::protocol::io::FileSchemaType schemaType = table.schemaType;
+      flatbuffers::Offset<blazingdb::protocol::io::CsvFile> csvOffset = CsvFileSchema::Serialize(builder, table.csv);
+      flatbuffers::Offset<blazingdb::protocol::io::ParquetFile> parquetOffset = ParquetFileSchema::Serialize(builder, table.parquet);
+      flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> filesOffset = builder.CreateVector(filesNames);
+      flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNamesOffset = builder.CreateVector(columnNames);
+      tablesOffset.push_back( blazingdb::protocol::io::CreateFileSystemBlazingTable(builder, nameOffset, schemaType, csvOffset, parquetOffset, filesOffset, columnNamesOffset));
+    }
+
+    auto tables = builder.CreateVector(tablesOffset);
+    return blazingdb::protocol::io::CreateFileSystemTableGroup(builder, tables, tableNameOffset);
+  }
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
+       flatbuffers::FlatBufferBuilder builder;
+    auto logicalPlan_offset = builder.CreateString(statement);
+    auto tableGroupOffset = _BuildTableGroup(builder, tableGroup);
+    builder.Finish(blazingdb::protocol::io::CreateFileSystemDMLRequest(builder, logicalPlan_offset, tableGroupOffset));
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+
+  }
+  std::string statement;
+  FileSystemTableGroupSchema tableGroup;
+};
+
 
 }  // namespace io
 }  // namespace message

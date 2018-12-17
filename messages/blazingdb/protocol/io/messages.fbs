@@ -67,5 +67,33 @@ table ParquetFile {
     rowGroupIndices:[int];
     columnIndices:[int];
 }
-
 root_type ParquetFile;
+ 
+enum FileSchemaType :byte {
+    CSV,
+    PARQUET 
+}
+
+table FileSystemBlazingTable {
+    name: string;
+    schemaType: FileSchemaType;
+    csv: CsvFile;  //#use this
+    parquet: ParquetFile;     //#either this   
+    files: [string];
+	columnNames: [string];
+}
+root_type FileSystemBlazingTable;
+
+table FileSystemTableGroup {
+    tables: [FileSystemBlazingTable];
+    name: string;
+}
+root_type FileSystemTableGroup;
+
+table FileSystemDMLRequest {
+    statement: string;
+    tableGroup: FileSystemTableGroup;
+}
+
+root_type FileSystemDMLRequest;
+
