@@ -38,6 +38,7 @@ struct S3 {
   std::string sessionToken;
 };
 
+//#warning, verificar no duplicados en all_generated.h
 enum FileSystemType {
   FileSystemType_NONE = 0,
   FileSystemType_POSIX = 1,

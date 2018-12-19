@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 project(blazing_protocol_examples)
 find_package(Threads)
 
-set(LIBRARIES blazingdb-protocol  ${CMAKE_THREAD_LIBS_INIT})
+set(LIBRARIES Threads::Threads blazingdb-protocol)
 
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src)
 

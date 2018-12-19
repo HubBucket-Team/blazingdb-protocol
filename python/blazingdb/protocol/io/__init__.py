@@ -14,7 +14,7 @@ EncryptionType = EncryptionType.EncryptionType
 FileSystemType = FileSystemConnection.FileSystemConnection
 FileSchemaType = FileSchemaType.FileSchemaType
 
-
+#todo, crear mappers para unions, see union_segment
 class FileSystemRegisterRequestSchema:
     def __init__(self, authority, root, type, params):
         self.authority = authority
@@ -22,6 +22,7 @@ class FileSystemRegisterRequestSchema:
         self.params = params
         self.type = type
 
+    #todo, crear mappers para unions
     def ToBuffer(self):
         builder = flatbuffers.Builder(1024)
         authority = builder.CreateString(self.authority)
@@ -45,6 +46,7 @@ class FileSystemRegisterRequestSchema:
         return builder.Output()
 
 
+#todo, crear mappers para unions, see union_segment
 class FileSystemDeregisterRequestSchema:
     def __init__(self, authority):
         self.authority = authority
@@ -168,69 +170,4 @@ def BuildFileSystemDMLRequestSchema(statement, tableGroupDto):
         tables.append(table)
     tableGroup = FileSystemTableGroupSchema(tables=tables, name=tableGroupName)
     return FileSystemDMLRequestSchema(statement=statement, tableGroup=tableGroup)
-
-# # schema.kwargs
-# def _CreateFileSchema(builder, schema):
-#     if schema.type == "csv":
-#         type = FileSchemaType.CsvFile
-#         obj = CsvFileSchema(**schema.kwargs)
-#     else:
-#         type = FileSchemaType.ParquetFile
-#         obj = ParquetFileSchema(**schema.kwargs)
-#     return obj._allocate_segments(builder), type
-#
-# def _CreateFiles (builder, files):
-#     None
-#
-# def _CreateColumnNames(builder, column_names):
-#     None
-#
-# # schema.table_name
-# # schema.column_names
-#
-# def _CreateTable(builder, schema, files):
-#     assert len(schema.table_name) > 0
-#     table_name = builder.CreateString(schema.table_name)
-#
-#     FileSystemBlazingTable.FileSystemBlazingTableStart(builder)
-#     FileSystemBlazingTable.FileSystemBlazingTableAddName(table_name)
-#
-#     fileConfig, fileConfigType = _CreateFileSchema(builder, schema)
-#     files = _CreateFiles(builder, files)
-#     columnNames = _CreateColumnNames(builder, schema.column_names)
-#     FileSystemBlazingTable.FileSystemBlazingTableAddFileConfigType(fileConfigType)
-#     FileSystemBlazingTable.FileSystemBlazingTableAddFileConfig(fileConfig)
-#     FileSystemBlazingTable.FileSystemBlazingTableAddFiles(files)
-#     FileSystemBlazingTable.FileSystemBlazingTableAddColumnNames(columnNames)
-#     return FileSystemBlazingTable.FileSystemBlazingTableEnd(builder)
-#
-# def _CreateTables(builder, sql_data):
-#     FileSystemTableGroup.FileSystemTableGroupStartTablesVector(builder, len(sql_data.items()))
-#     for schema, files in sql_data.items():
-#         table = _CreateTable(builder, schema, files)
-#         builder.PrependUOffsetTRelative(table)
-#     return FileSystemTableGroup.FileSystemTableGroupEnd(builder)
-#
-# def _CreateTableGroup(builder, sql_data):
-#     dbname = builder.CreateString('main')
-#     tables = _CreateTables(builder, sql_data)
-#     FileSystemTableGroup.FileSystemTableGroupStart(builder)
-#     FileSystemTableGroup.FileSystemTableGroupAddName(dbname)
-#     FileSystemTableGroup.FileSystemTableGroupAddTables(tables)
-#     return FileSystemTableGroup.FileSystemTableGroupEnd(builder)
-#
-# class FileSystemDMLRequestSchema:
-#     def __init__(self, statement, sql_data):
-#         self.statement = statement
-#         self.sql_data = sql_data
-#
-#     def ToBuffer(self):
-#         builder = flatbuffers.Builder(1024)
-#         statement = builder.CreateString(self.statement)
-#         tableGroup = _CreateTableGroup(builder, self.sql_data)
-#         FileSystemDMLRequest.FileSystemDMLRequestStart(builder)
-#         FileSystemDMLRequest.FileSystemDMLRequestAddStatement(builder, statement)
-#         FileSystemDMLRequest.FileSystemDMLRequestAddTableGroup(tableGroup)
-#         fs = FileSystemDMLRequest.FileSystemDMLRequestEnd(builder)
-#         builder.Finish(fs)
-#         return builder.Output()
+ 
