@@ -107,8 +107,8 @@ public:
 class DDLDropTableRequestMessage : public IMessage {
 public:
 
-  DDLDropTableRequestMessage()
-      : IMessage()
+  DDLDropTableRequestMessage(std::string name, std::string dbName)
+      : name{name}, dbName{dbName}, IMessage()
   {
 
   }
@@ -139,8 +139,8 @@ public:
 class DDLCreateTableRequestMessage : public IMessage {
 public:
 
-  DDLCreateTableRequestMessage()
-    : IMessage()
+  DDLCreateTableRequestMessage(std::string name, std::string dbName, std::vector<std::string> columnNames, std::vector<std::string> columnTypes)
+    : name{name}, dbName{dbName}, columnNames{columnNames}, columnTypes{columnTypes}, IMessage()
   {
 
   }
