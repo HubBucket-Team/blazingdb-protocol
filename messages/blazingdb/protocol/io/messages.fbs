@@ -1,0 +1,99 @@
+
+namespace blazingdb.protocol.io;
+
+table POSIX{
+
+}
+
+enum DriverType :byte {
+    UNDEFINED,
+    LIBHDFS, // LIBHDFS requires Java CLASSPATH and native HDFS in LD_LIBRARY_PATH
+    LIBHDFS3 // LIBHDFS3 requires C++ pivotalrd-libhdfs3 library in LD_LIBRARY_PATH
+}
+
+table HDFS {
+    host:string;
+    port:int;
+    user:string;
+    driverType:DriverType;
+    kerberosTicket:string;
+}
+
+enum EncryptionType :byte {
+    UNDEFINED,
+    NONE,
+    AES_256,
+    AWS_KMS // AWS Key Management Service
+}
+
+table S3 {
+    bucketName:string;
+    encryptionType:EncryptionType;
+    kmsKeyAmazonResourceName:string;
+    accessKeyId:string;
+    secretKey:string;
+    sessionToken:string;
+}
+
+union FileSystemConnection {
+    POSIX, HDFS, S3 
+}
+
+table FileSystemRegisterRequest {
+    authority: string;
+    root: string;
+    fileSystemConnection: FileSystemConnection;
+} 
+root_type FileSystemRegisterRequest;
+
+table FileSystemDeregisterRequest {
+    authority: string;
+} 
+root_type FileSystemDeregisterRequest;
+
+
+table CsvFile {
+    path:string;
+    delimiter:string;
+    lineTerminator:string;
+    skipRows:int;
+    names:[string];
+    dtypes:[int];
+}
+root_type CsvFile;
+
+table ParquetFile {
+    path:string;
+    rowGroupIndices:[int];
+    columnIndices:[int];
+}
+root_type ParquetFile;
+ 
+enum FileSchemaType :byte {
+    CSV,
+    PARQUET 
+}
+
+table FileSystemBlazingTable {
+    name: string;
+    schemaType: FileSchemaType;
+    csv: CsvFile;  //#use this
+    parquet: ParquetFile;     //#either this   
+    files: [string];
+	columnNames: [string];
+}
+root_type FileSystemBlazingTable;
+
+table FileSystemTableGroup {
+    tables: [FileSystemBlazingTable];
+    name: string;
+}
+root_type FileSystemTableGroup;
+
+table FileSystemDMLRequest {
+    statement: string;
+    tableGroup: FileSystemTableGroup;
+}
+
+root_type FileSystemDMLRequest;
+
