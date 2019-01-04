@@ -53,6 +53,22 @@ private:
   }
 };
 
+
+class ZeroMqServer {
+public:
+  explicit ZeroMqServer(const std::string &connection);
+
+  ~ZeroMqServer(); 
+
+  using Callable = blazingdb::protocol::Buffer (*)(const blazingdb::protocol::Buffer &requestBuffer);
+
+  void handle(Callable &&callback) ;
+
+private:
+    class impl;
+    std::unique_ptr<impl> pimpl;
+};
+
 }  // namespace protocol
 }  // namespace blazingdb
 
