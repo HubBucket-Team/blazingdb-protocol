@@ -12,9 +12,8 @@ project(zeromq-download NONE)
 include(ExternalProject)
 
 ExternalProject_Add(zeromq
-    GIT_REPOSITORY    git@github.com:BlazingDB/zeromq.git
-    GIT_TAG           v4.3.0
-    SOURCE_SUBDIR     cpp
+    GIT_REPOSITORY    git@github.com:zeromq/libzmq.git
+    GIT_TAG           master 
     SOURCE_DIR        "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/thirdparty/zeromq-src"
     BINARY_DIR        "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/thirdparty/zeromq-build"
     INSTALL_DIR       "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/thirdparty/zeromq-install"

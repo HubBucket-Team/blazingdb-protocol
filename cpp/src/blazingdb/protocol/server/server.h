@@ -1,5 +1,6 @@
 #ifndef BLAZINGDB_PROTOCOL_SERVER_SERVER_H_
 #define BLAZINGDB_PROTOCOL_SERVER_SERVER_H_
+#include <zmq.h>
 
 #include <unistd.h>
 #include <memory>
@@ -56,25 +57,7 @@ private:
 
 class ZeroMqServer {
 public:
-  explicit ZeroMqServer(const std::string &connection);
-
-  ~ZeroMqServer(); 
-
-  using Callable = blazingdb::protocol::Buffer (*)(const blazingdb::protocol::Buffer &requestBuffer);
-
-  void handle(Callable &&callback) ;
-
-private:
-    class impl;
-    std::unique_ptr<impl> pimpl;
-};
-
-
-#include <zmq.h>
-
-class ZeroMqServer::impl {
-public:
-  impl(const std::string &connection): context{zmq_ctx_new()}, socket{ zmq_socket (context, ZMQ_REQ) } {
+  explicit ZeroMqServer(const std::string &connection): context{zmq_ctx_new()}, socket{ zmq_socket (context, ZMQ_REQ) } {
     auto rc = zmq_bind(socket, connection.c_str());
     assert (rc == 0);
   }
@@ -94,17 +77,7 @@ private:
     void *context;
     void * socket;
 };
-
-ZeroMqServer::ZeroMqServer(const std::string &connection) :  pimpl{std::make_unique<impl>(connection)}{
-}
-
-ZeroMqServer::~ZeroMqServer() 
-{}
-
-void ZeroMqServer::handle(ZeroMqServer::Callable &&callback)  {
-  this->pimpl->handle(std::move(callback));
-}
-
+ 
 
 }  // namespace protocol
 }  // namespace blazingdb

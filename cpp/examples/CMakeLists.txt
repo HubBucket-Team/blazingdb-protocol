@@ -30,17 +30,17 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src
 )
 
-set(LIBRARIES Threads::Threads blazingdb-protocol libzmq-static)
+set(LIBRARIES Threads::Threads blazingdb-protocol ${ZEROMQ_STATIC_LIB})
 
-add_executable(api_client src/api/client-test.cpp)
-target_link_libraries(api_client ${LIBRARIES})
+# add_executable(api_client src/api/client-test.cpp)
+# target_link_libraries(api_client ${LIBRARIES})
 
-add_executable(api_server src/api/server-test.cpp)
-target_link_libraries(api_server ${LIBRARIES})
+# add_executable(api_server src/api/server-test.cpp)
+# target_link_libraries(api_server ${LIBRARIES})
 
 add_executable(io_server src/io/server-test.cpp)
 target_link_libraries(io_server ${LIBRARIES})
 
-add_executable(blazingdb_orchestator_service src/orchestrator-service/orchestator-service.cc)
-target_link_libraries(blazingdb_orchestator_service ${LIBRARIES})
+# add_executable(blazingdb_orchestator_service src/orchestrator-service/orchestator-service.cc)
+# target_link_libraries(blazingdb_orchestator_service ${LIBRARIES})
  
