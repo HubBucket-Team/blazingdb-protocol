@@ -26,17 +26,18 @@ class ZeroMqClient {
 public:
   explicit ZeroMqClient(const std::string &connection): context{zmq_ctx_new()}, socket{ zmq_socket (context, ZMQ_REQ) } {
     auto rc = zmq_connect(socket, connection.c_str());
-    assert (rc == 0);
+    //assert (rc == 0);
  }
   
  Buffer send(const Buffer &bufferedData) {
     zmq_send(socket, bufferedData.data(), bufferedData.size(), 0);
     zmq_msg_t msg;
     int rc = zmq_msg_init(&msg);
-    assert(rc != 0);
+    //assert(rc != 0);
     zmq_msg_recv(&msg, socket, 0);
-    auto size = zmq_msg_size(const_cast<zmq_msg_t *>(&msg));
-    Buffer responseBuffer((uint8_t*)&msg, size);
+    auto size = zmq_msg_size(&msg);
+    Buffer responseBuffer((uint8_t*) zmq_msg_data(&msg), size);
+   zmq_msg_close (&msg);
     return responseBuffer;
   }
 
