@@ -4,12 +4,8 @@
 
 #include <blazingdb/protocol/message/io/file_system.h>
 
-int main() {
-   blazingdb::protocol::UnixSocketConnection connection(
-       {"/tmp/socket", std::allocator<char>()});
-   blazingdb::protocol::Server server(connection);
 
-   server.handle([](const blazingdb::protocol::Buffer &buffer)
+auto process(const blazingdb::protocol::Buffer &buffer)
                      -> blazingdb::protocol::Buffer {
 
      blazingdb::message::io::FileSystemRegisterRequestMessage message(buffer.data());
@@ -18,7 +14,13 @@ int main() {
      
      return blazingdb::protocol::Buffer(
          reinterpret_cast<const std::uint8_t *>("BlazingDB Response"), 18);
-   });
+   }
+
+int main() {
+   blazingdb::protocol::ZeroMqServer server("ipc:///tmp/socket");
+
+
+   server.handle(&process);
 
   return 0;
 }

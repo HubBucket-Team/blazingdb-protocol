@@ -57,7 +57,9 @@ private:
 
 class ZeroMqServer {
 public:
-  explicit ZeroMqServer(const std::string &connection): context{zmq_ctx_new()}, socket{ zmq_socket (context, ZMQ_REQ) } {
+  explicit ZeroMqServer(const std::string &connection) {
+    context = zmq_ctx_new();
+    socket = zmq_socket (context, ZMQ_REP);
     auto rc = zmq_bind(socket, connection.c_str());
     assert (rc == 0);
   }

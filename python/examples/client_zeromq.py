@@ -1,21 +1,49 @@
+
+
 import blazingdb.protocol
 import blazingdb.protocol.interpreter
 import blazingdb.protocol.orchestrator
 import blazingdb.protocol.transport.channel
 
-from blazingdb.protocol.interpreter import InterpreterMessage
-from blazingdb.protocol.transport.channel import ResponseSchema
-from blazingdb.protocol.transport.channel import MakeRequestBuffer
-from blazingdb.protocol.orchestrator import DMLResponseSchema
-from blazingdb.protocol.interpreter import GetResultRequestSchema
+from blazingdb.protocol.io import FileSystemRegisterRequestSchema, FileSystemDeregisterRequestSchema, CsvFileSchema
+from collections import namedtuple
+
+from blazingdb.protocol.io import DriverType, FileSystemType
 
 
 def main():
     client = blazingdb.protocol.ZeroMqClient('ipc:///tmp/socket')
-    responseBuffer = client.send('hola desde python')
-    print(responseBuffer)
-    # responseBuffer = client.send(requestBuffer)
-    # print(responseBuffer)
+
+    d = {
+        'host': 'string',
+        'port': 8080,
+        'user': 'string',
+        'driverType': DriverType.LIBHDFS,
+        'kerberosTicket': 'string'
+    }
+    hdfs = namedtuple("HDFS", d.keys())(*d.values())
+    print(hdfs)
+
+    schema = FileSystemRegisterRequestSchema('authority_name', 'root/', FileSystemType.HDFS, hdfs)
+    # schema = FileSystemDeregisterRequestSchema(authority = 'authority_name_de')
+    print(client.send(schema.ToBuffer()))
+
 
 if __name__ == '__main__':
     main()
+    path = 'path'
+    delimiter = '|'
+    line_terminator = '\n'
+    skip_rows = 0
+    names = ['1', '2']
+    dtypes = [1, 2]
+
+    requestSchema = blazingdb.protocol.io.CsvFileSchema(path=path, delimiter=delimiter, lineTerminator=line_terminator,
+                                                        skipRows=skip_rows, names=names, dtypes=dtypes)
+    buffer = requestSchema.ToBuffer()
+    obj = blazingdb.protocol.io.CsvFileSchema.From(buffer)
+
+    print(obj.path)
+    print(obj.names)
+    print(obj.dtypes)
+
