@@ -67,6 +67,7 @@ endif()
 message(STATUS "ZEROMQ_ROOT found in ${ZEROMQ_ROOT}")
 message(STATUS "ZEROMQ_INCLUDEDIR found in ${ZEROMQ_INCLUDEDIR}")
 message(STATUS "ZEROMQ_LIBDIR found in ${ZEROMQ_LIBDIR}")
+message(STATUS "ZEROMQ_STATIC_LIB found in ${ZEROMQ_STATIC_LIB}")
 
 include_directories(${ZEROMQ_INCLUDEDIR})
 

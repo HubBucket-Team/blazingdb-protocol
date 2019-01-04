@@ -69,6 +69,43 @@ private:
     std::unique_ptr<impl> pimpl;
 };
 
+
+#include <zmq.h>
+
+class ZeroMqServer::impl {
+public:
+  impl(const std::string &connection): context{zmq_ctx_new()}, socket{ zmq_socket (context, ZMQ_REQ) } {
+    auto rc = zmq_bind(socket, connection.c_str());
+    assert (rc == 0);
+  }
+
+  using Callable = blazingdb::protocol::Buffer (*)(const blazingdb::protocol::Buffer &requestBuffer);
+  void handle(Callable &&callback)  {
+    zmq_msg_t msg;
+    int rc = zmq_msg_init(&msg);
+    assert(rc != 0);
+    zmq_msg_recv(&msg, socket, 0);
+    auto size = zmq_msg_size(const_cast<zmq_msg_t *>(&msg));
+    Buffer responseBuffer((uint8_t*)&msg, size);
+    Buffer bufferedData = callback(responseBuffer);
+    zmq_send (socket, bufferedData.data(), bufferedData.size(), 0);
+  }
+private:
+    void *context;
+    void * socket;
+};
+
+ZeroMqServer::ZeroMqServer(const std::string &connection) :  pimpl{std::make_unique<impl>(connection)}{
+}
+
+ZeroMqServer::~ZeroMqServer() 
+{}
+
+void ZeroMqServer::handle(ZeroMqServer::Callable &&callback)  {
+  this->pimpl->handle(std::move(callback));
+}
+
+
 }  // namespace protocol
 }  // namespace blazingdb
 
