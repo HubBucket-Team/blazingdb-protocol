@@ -29,17 +29,11 @@ public:
     //assert (rc == 0);
   } 
 
-  Buffer send(std::shared_ptr<flatbuffers::DetachedBuffer> &bufferedData) {
-    zmq_send(socket, bufferedData->data(), bufferedData->size(), 0);
-    zmq_msg_t msg;
-    int rc = zmq_msg_init(&msg);
-    //assert(rc != 0);
-    zmq_msg_recv(&msg, socket, 0);
-    auto size = zmq_msg_size(&msg);
-    Buffer responseBuffer((uint8_t*) zmq_msg_data(&msg), size);
-   zmq_msg_close (&msg);
-    return responseBuffer;
+  
+  Buffer send(std::shared_ptr<flatbuffers::DetachedBuffer> &buffer) {
+    return this->send(Buffer{buffer->data(), buffer->size()});
   }
+
 
   Buffer send(const Buffer &bufferedData) {
     zmq_send(socket, bufferedData.data(), bufferedData.size(), 0);
