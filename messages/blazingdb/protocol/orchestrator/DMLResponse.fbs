@@ -1,7 +1,11 @@
+include "blazingdb/protocol/NodeConnection.fbs";
+
 namespace blazingdb.protocol.orchestrator;
 
 table DMLResponse {
 	resultToken: ulong;
+	nodeConnection: NodeConnection;
+	calciteTime: long;
 }
 
 root_type DMLResponse;

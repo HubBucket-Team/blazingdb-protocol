@@ -3,6 +3,10 @@
 
 #include <blazingdb/protocol/api.h>
 
+#include <blazingdb/protocol/message/io/file_system.h>
+
+using namespace blazingdb::protocol::io;
+
 int main() {
    blazingdb::protocol::UnixSocketConnection connection("/tmp/socket");
    blazingdb::protocol::Client client(connection);

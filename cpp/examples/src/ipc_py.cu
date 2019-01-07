@@ -5,7 +5,7 @@
 
 
 #include "gdf/gdf.h"
-#include "gdf/container/gdf_vector.cuh"
+#include "gdf/library/gdf_column.h"
 #include "gdf/util/gdf_utils.cuh"
 
 #define cudaCheckErrors(msg) \

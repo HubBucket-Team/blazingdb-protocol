@@ -5,11 +5,11 @@
 #include "ral-client.h"
 
 #include "gdf/gdf.h"
-#include "gdf/container/gdf_vector.cuh"
+#include "gdf/library/gdf_column.h"
 #include "gdf/util/gdf_utils.cuh"
 
 using namespace blazingdb::protocol;
- 
+
 int main() {
   blazingdb::protocol::UnixSocketConnection connection("/tmp/ral.socket");
   interpreter::InterpreterClient client{connection};
@@ -18,9 +18,18 @@ int main() {
     LogicalProject(EXPR$0=[>($0, 5)])\n\
       EnumerableTableScan(table=[[main, nation]])";
 
-  ::gdf::container::GdfVector  one;
-  ::gdf::util::create_sample_gdf_column(one); 
+  ::gdf::library::GdfColumn  one;
+  ::gdf::util::create_sample_gdf_column(one);
   ::gdf::util::print_gdf_column(one.get_gdf_column());
+
+  ::gdf::library::GdfColumn  two;
+  ::gdf::util::create_sample_gdf_column(two);
+  ::gdf::util::print_gdf_column(two.get_gdf_column());
+
+  ::gdf::library::GdfColumn  three;
+  ::gdf::util::create_sample_gdf_column(three);
+  ::gdf::util::print_gdf_column(three.get_gdf_column());
+
 
   try {
     auto tableGroup = ::blazingdb::protocol::TableGroupDTO{
@@ -38,16 +47,34 @@ int main() {
                         .time_unit = (gdf_dto::gdf_time_unit)0,
                       },
                   },
+                  ::gdf_dto::gdf_column {
+                        .data = ::gdf::util::BuildCudaIpcMemHandler(two.data()),
+                        .valid = ::gdf::util::BuildCudaIpcMemHandler(two.valid()),
+                        .size = two.size(),
+                        .dtype = (gdf_dto::gdf_dtype)two.dtype(),
+                        .null_count = two.null_count(),
+                        .dtype_info = gdf_dto::gdf_dtype_extra_info {
+                        .time_unit = (gdf_dto::gdf_time_unit)0,
+                      },
+                  },
+                  ::gdf_dto::gdf_column {
+                        .data = ::gdf::util::BuildCudaIpcMemHandler(three.data()),
+                        .valid = ::gdf::util::BuildCudaIpcMemHandler(three.valid()),
+                        .size = three.size(),
+                        .dtype = (gdf_dto::gdf_dtype)three.dtype(),
+                        .null_count = three.null_count(),
+                        .dtype_info = gdf_dto::gdf_dtype_extra_info {
+                        .time_unit = (gdf_dto::gdf_time_unit)0,
+                      },
+                  },
               },
-              .columnNames = {"id"}
+              .columnNames = {"col1, col2, col3"}
           }
       },
       .name = "main",
     };
-    auto resultToken = client.executePlan(logicalPlan, tableGroup, 123456L);
-    std::cout << "executePlan:\n";
-    std::cout << resultToken << std::endl;
-
+    auto resultBuffer = client.executePlan(logicalPlan, tableGroup, 123456L);
+    auto resultToken = 1234L;
     auto resultSet = client.getResult(resultToken, 123456L);
     std::cout << "get result:\n";
     ::gdf::util::DtoToGdfColumn(resultSet);

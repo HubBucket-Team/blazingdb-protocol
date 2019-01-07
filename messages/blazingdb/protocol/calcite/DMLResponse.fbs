@@ -2,6 +2,7 @@ namespace blazingdb.protocol.calcite;
 
 table DMLResponse {
 	logicalPlan: string;
+	time: long;
 }
 
 root_type DMLResponse;

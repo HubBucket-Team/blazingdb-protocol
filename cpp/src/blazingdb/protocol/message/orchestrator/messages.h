@@ -3,7 +3,9 @@
 #include <string>
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
+
 #include "../messages.h"
+#include "../interpreter/messages.h"
 
 namespace blazingdb {
 namespace protocol {
@@ -20,7 +22,7 @@ public:
     query = std::string{pointer->query()->c_str()};
     tableGroup =  pointer->tableGroup();
   }
- 
+
   std::string getQuery () {
     return query;
   }
@@ -37,29 +39,48 @@ private:
   const blazingdb::protocol::TableGroup * tableGroup;
 };
 
+class DMLResponseMessage : public IMessage {
+public:
+  using NodeConnectionDTO = blazingdb::protocol::interpreter::NodeConnectionDTO;
 
-class DMLResponseMessage : public TypedMessage<uint64_t, orchestrator::DMLResponse> {
-public:  
-  
-  DMLResponseMessage(const std::uint64_t& value)
-    : TypedMessage<uint64_t, orchestrator::DMLResponse>(value)
-  {
-  }
-  
-  DMLResponseMessage (const uint8_t* buffer) 
-    :  TypedMessage<uint64_t, orchestrator::DMLResponse>(buffer, &orchestrator::DMLResponse::resultToken)
-  {
+  DMLResponseMessage(const std::uint64_t resultToken,
+                     NodeConnectionDTO & nodeInfo,
+                     const std::int64_t  calciteTime)
+      : IMessage(), resultToken{resultToken}, nodeInfo{nodeInfo},
+        calciteTime_{calciteTime} {}
+
+  DMLResponseMessage(const uint8_t *buffer) : IMessage() {
+    auto pointer =
+        flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DMLResponse>(
+            buffer);
+    resultToken = pointer->resultToken();
+    nodeInfo    = NodeConnectionDTO{
+        .path = std::string{pointer->nodeConnection()->path()->c_str()},
+        .type = pointer->nodeConnection()->type()};
+    calciteTime_ = pointer->calciteTime();
+  };
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
+    flatbuffers::FlatBufferBuilder builder{0};
+    auto                           nodeInfo_offset = CreateNodeConnectionDirect(
+        builder, nodeInfo.path.data(), nodeInfo.type);
+    auto root = orchestrator::CreateDMLResponse(
+      builder, resultToken, nodeInfo_offset, calciteTime_);
+    builder.Finish(root);
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
 
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(orchestrator::CreateDMLResponse);
-  }
+  std::uint64_t getResultToken() const noexcept { return resultToken; }
 
-  uint64_t  getToken () {
-    return value_;
-  }
+  NodeConnectionDTO getNodeInfo() const noexcept { return nodeInfo; }
+
+  std::int64_t getCalciteTime() const noexcept { return calciteTime_; }
+
+public:
+  std::uint64_t     resultToken;
+  NodeConnectionDTO nodeInfo;
+  std::int64_t      calciteTime_;
 };
-
 
 class DDLRequestMessage : public StringTypeMessage<orchestrator::DDLRequest> {
 public:
@@ -109,7 +130,7 @@ public:
     builder.Finish(orchestrator::CreateDDLDropTableRequest(builder, name_offset, dbname_offset));
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
-private:
+public:
   std::string name;
   std::string dbName;
 };
@@ -117,8 +138,8 @@ private:
 
 class DDLCreateTableRequestMessage : public IMessage {
 public:
-  
-  DDLCreateTableRequestMessage() 
+
+  DDLCreateTableRequestMessage()
     : IMessage()
   {
 
@@ -150,12 +171,12 @@ public:
 
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
-private:
+public:
   std::string name;
   std::vector<std::string> columnNames;
   std::vector<std::string> columnTypes;
   std::string dbName;
-  
+
 };
 
 // authorization

@@ -7,4 +7,9 @@ class MessageType(object):
     GetResult = 1
     FreeResult = 2
     CloseConnection = 3
+    RegisterFileSystem = 4
+    DeregisterFileSystem = 5
+    LoadCSV = 6
+    LoadParquet = 7
+    DML_FS = 8
 

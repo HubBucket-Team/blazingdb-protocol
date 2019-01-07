@@ -26,17 +26,17 @@ class ExecutePlanResponse(object):
         return 0
 
     # ExecutePlanResponse
-    def ConnectionInfo(self):
+    def NodeConnection(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
-            from .NodeConnectionInformation import NodeConnectionInformation
-            obj = NodeConnectionInformation()
+            from .NodeConnection import NodeConnection
+            obj = NodeConnection()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
 def ExecutePlanResponseStart(builder): builder.StartObject(2)
 def ExecutePlanResponseAddResultToken(builder, resultToken): builder.PrependUint64Slot(0, resultToken, 0)
-def ExecutePlanResponseAddConnectionInfo(builder, connectionInfo): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(connectionInfo), 0)
+def ExecutePlanResponseAddNodeConnection(builder, nodeConnection): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(nodeConnection), 0)
 def ExecutePlanResponseEnd(builder): return builder.EndObject()

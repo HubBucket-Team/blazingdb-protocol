@@ -1,3 +1,9 @@
+#=============================================================================
+# Copyright 2018 BlazingDB, Inc.
+#     Copyright 2018 Percy Camilo Triveño Aucahuasi <percy@blazingdb.com>
+# Improve the flatc compilation using the schema folders for the generated targets
+#=============================================================================
+
 # Copyright 2015 Google Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,9 +77,11 @@ function(build_flatbuffers flatbuffers_schemas
       )
   endif()
 
+  set(working_dir "${CMAKE_CURRENT_SOURCE_DIR}")
+
   set(schema_glob "*.fbs")
   # Generate the include files parameters.
-  set(include_params "--gen-all")
+  set(include_params "")
   set(all_generated_files "")
   foreach (include_dir ${schema_include_dirs})
     set(include_params -I ${include_dir} ${include_params})
@@ -87,17 +95,30 @@ function(build_flatbuffers flatbuffers_schemas
   endforeach()
 
   foreach(schema ${flatbuffers_schemas})
-    get_filename_component(filename ${schema} NAME_WE)
+    get_filename_component(file_name ${schema} NAME_WE)
+    get_filename_component(full_path ${schema} ABSOLUTE)
+    string(FIND ${full_path} "messages" messages_pos)
+    string(LENGTH ${full_path} len_full_path)
+    string(SUBSTRING ${full_path} ${messages_pos} ${len_full_path} raw_target_id)
+    string(REPLACE "/" "_" target_id ${raw_target_id})
+    string(SUBSTRING ${full_path} ${messages_pos} ${len_full_path} schema_folder_with_file_name)
+    string(FIND ${schema_folder_with_file_name} ${file_name} file_name_in_schema_folder_pos)
+    string(SUBSTRING ${schema_folder_with_file_name} 0 ${file_name_in_schema_folder_pos} schema_folder)
+
+    include_directories(${generated_includes_dir}/${schema_folder})
+
+    set(filename ${target_id})
     # For each schema, do the things we requested.
     if (NOT ${generated_includes_dir} STREQUAL "")
       set(generated_include ${generated_includes_dir}/${filename}_generated.h)
       add_custom_command(
-        OUTPUT ${generated_include}
+        OUTPUT "${generated_includes_dir}/${filename}_generated.h"
         COMMAND ${FLATC} ${FLATC_SCHEMA_ARGS}
-        -o ${generated_includes_dir}
+        -o ${generated_includes_dir}/${schema_folder}
         ${include_params}
         -c ${schema}
-        DEPENDS ${FLATC_TARGET} ${schema} ${additional_dependencies})
+        DEPENDS ${FLATC_TARGET} ${schema} ${additional_dependencies}
+        WORKING_DIRECTORY "${working_dir}")
       list(APPEND all_generated_files ${generated_include})
     endif()
 
@@ -109,7 +130,8 @@ function(build_flatbuffers flatbuffers_schemas
         -o ${binary_schemas_dir}
         ${include_params}
         ${schema}
-        DEPENDS ${FLATC_TARGET} ${schema} ${additional_dependencies})
+        DEPENDS ${FLATC_TARGET} ${schema} ${additional_dependencies}
+        WORKING_DIRECTORY "${working_dir}")
       list(APPEND all_generated_files ${binary_schema})
     endif()
 

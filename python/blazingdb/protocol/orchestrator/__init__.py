@@ -14,6 +14,9 @@ from blazingdb.messages.blazingdb.protocol.orchestrator \
 from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
   import MessageType as OrchestratorMessageType
 
+from blazingdb.messages.blazingdb.protocol \
+  import NodeConnection
+
 from blazingdb.messages.blazingdb.protocol.orchestrator \
   import AuthRequest, AuthResponse
 
@@ -46,9 +49,14 @@ class DDLDropTableRequestSchema(transport.schema(DDLDropTableRequest)):
   name = transport.StringSegment()
   dbName = transport.StringSegment()
 
+class NodeConnectionSchema(transport.schema(NodeConnection)):
+  path = transport.StringSegment()
+  type = transport.NumberSegment()
 
 class DMLResponseSchema(transport.schema(DMLResponse)):
   resultToken = transport.NumberSegment()
+  nodeConnection = transport.SchemaSegment(NodeConnectionSchema)
+  calciteTime = transport.NumberSegment()
 
 class AuthResponseSchema(transport.schema(AuthResponse)):
   accessToken = transport.NumberSegment()

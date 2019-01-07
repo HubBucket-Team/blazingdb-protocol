@@ -7,19 +7,14 @@
 #include <blazingdb/protocol/api.h>
 #include <iostream>
 #include "flatbuffers/flatbuffers.h"
-#include "generated/all_generated.h"
+#include <blazingdb/protocol/all_generated.h>
 
 namespace blazingdb {
 namespace protocol {
 
-class IMessage {
-public:
-  IMessage() = default;
-
-  virtual ~IMessage() = default;
+struct IMessage {
 
   virtual std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const = 0;
-
 };
 
 
@@ -122,6 +117,14 @@ public:
       _copy_payload = payload.getBufferData(); 
       payloadBuffer = _copy_payload->data();
       payloadBufferSize = _copy_payload->size();
+  }
+
+  RequestMessage(Header &&_header, Buffer& payload) 
+      : IMessage(), header{_header} 
+  {
+      // _copy_payload = payload.getBufferData(); 
+      payloadBuffer = payload.data();
+      payloadBufferSize = payload.size();
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
@@ -243,7 +246,12 @@ auto MakeRequest(int8_t message_type, uint64_t sessionToken, IMessage& payload) 
   auto bufferedData = request.getBufferData();
   return bufferedData;
 }
- 
+  
+auto MakeRequest(int8_t message_type, uint64_t sessionToken, Buffer& payload) -> std::shared_ptr<flatbuffers::DetachedBuffer>{
+  RequestMessage request{ Header{message_type, sessionToken}, payload}; 
+  auto bufferedData = request.getBufferData();
+  return bufferedData;
+} 
 
 template <typename ResponseType>
 ResponseType MakeResponse (Buffer &responseBuffer) {
