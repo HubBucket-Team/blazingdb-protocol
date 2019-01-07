@@ -77,3 +77,28 @@ class Client:
     self.connection_.socket_.sendall(_buffer)
     length = struct.unpack('I', self.connection_.socket_.recv(4))[0]
     return self.connection_.socket_.recv(length)
+
+
+import zmq
+
+class ZeroMqClient:
+  def __init__(self, connection):
+    self.ctx = zmq.Context()
+    self.sock = self.ctx.socket(zmq.REQ)
+    self.sock.connect(connection)
+
+  def send(self, _buffer):
+    self.sock.send(_buffer)
+    h = self.sock.recv()
+    return h
+
+class ZeroMqServer:
+  def __init__(self, connection):
+    self.ctx = zmq.Context()
+    self.sock = self.ctx.socket(zmq.REP)
+    self.sock.bind(connection)
+
+  def handle(self, callback):
+    requestBuffer = self.sock.recv()
+    responseBuffer = callback(requestBuffer)
+    self.sock.send(responseBuffer)

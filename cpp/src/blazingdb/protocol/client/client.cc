@@ -41,5 +41,6 @@ Buffer Client::send(std::shared_ptr<flatbuffers::DetachedBuffer> &buffer) {
   return this->send(Buffer{buffer->data(), buffer->size()});
 }
 
+
 }  // namespace protocol
 }  // namespace blazingdb
