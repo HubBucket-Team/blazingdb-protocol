@@ -1,5 +1,6 @@
 #ifndef BLAZINGDB_PROTOCOL_SERVER_SERVER_H_
 #define BLAZINGDB_PROTOCOL_SERVER_SERVER_H_
+#include <zmq.h>
 
 #include <unistd.h>
 #include <memory>
@@ -52,6 +53,37 @@ private:
         std::forward<Callable>(callback));
   }
 };
+
+
+class ZeroMqServer {
+public:
+  explicit ZeroMqServer(const std::string &connection) {
+    context = zmq_ctx_new();
+    socket = zmq_socket (context, ZMQ_REP);
+    auto rc = zmq_bind(socket, connection.c_str());
+    //assert (rc == 0);
+  }
+
+  using Callable = blazingdb::protocol::Buffer (*)(const blazingdb::protocol::Buffer &requestBuffer);
+  void handle(Callable &&callback)  {
+    while (true) {
+      zmq_msg_t msg;
+      int rc = zmq_msg_init(&msg);
+      // assert(rc != 0);
+      zmq_msg_recv(&msg, socket, 0);
+      auto size = zmq_msg_size(&msg);
+      Buffer responseBuffer((uint8_t*) zmq_msg_data(&msg), size);
+      Buffer bufferedData = callback(responseBuffer);
+      zmq_send (socket, bufferedData.data(), bufferedData.size(), 0);
+      zmq_msg_close (&msg);
+    }
+  }
+private:
+    void *context;
+    void * socket;
+};
+  
+
 
 }  // namespace protocol
 }  // namespace blazingdb

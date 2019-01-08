@@ -130,7 +130,7 @@ public:
     builder.Finish(orchestrator::CreateDDLDropTableRequest(builder, name_offset, dbname_offset));
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
-private:
+public:
   std::string name;
   std::string dbName;
 };
@@ -171,7 +171,7 @@ public:
 
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
-private:
+public:
   std::string name;
   std::vector<std::string> columnNames;
   std::vector<std::string> columnTypes;

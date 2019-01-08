@@ -61,3 +61,4 @@ integration/services/cpp/build/
 
 # Eclipse files
 .project
+.pydevproject

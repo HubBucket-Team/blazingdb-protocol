@@ -3,9 +3,10 @@ set(SRCS
   connection/unix_socket_connection.cc
   server/server.cc
 )
+find_package(Threads)
 
 add_library(blazingdb-protocol ${SRCS})
-target_link_libraries(blazingdb-protocol ${FLATBUFFERS_STATIC_LIB})
+target_link_libraries(blazingdb-protocol Threads::Threads  ${ZEROMQ_STATIC_LIB} ${FLATBUFFERS_STATIC_LIB})
 
 add_custom_command(TARGET blazingdb-protocol
   COMMAND ${FLATBUFFERS_FLATC_EXECUTABLE} -c --gen-all

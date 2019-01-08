@@ -275,6 +275,7 @@ class _VectorSegment(Vector):
     o = next(value for value in re.search(p, l).groups() if value)
     f = {
       'String': builder.PrependUOffsetTRelative,
+      'Int32Flags': builder.PrependUint32
     }[o]
 
     getattr(schema._module,
@@ -381,6 +382,22 @@ class SchemaSegment(Segment, Nested):
                for name, segment in self._schema._segments.items()}
     name = self._schema._module_name()
     return type(lowerCamelCase(name), (), members)
+
+
+class UnionSegment(Segment, Nested):
+  def __init__(self, schema):
+    self._schema = schema
+
+  def _bytes(self, builder, schema):
+    return self._schema._allocate_segments(schema._values[self._name], builder)
+
+  def _from(self, _object):
+    _object = getattr(_object, self._object_name())()
+    members = {name: segment._from(_object)
+               for name, segment in self._schema._segments.items()}
+    name = self._schema._module_name()
+    return type(lowerCamelCase(name), (), members)
+
 
 
 def _name_of(module):
