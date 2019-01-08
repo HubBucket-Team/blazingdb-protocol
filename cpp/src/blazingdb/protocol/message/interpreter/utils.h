@@ -161,7 +161,7 @@ static flatbuffers::Offset<TableGroup> BuildDirectTableGroup(flatbuffers::FlatBu
     tablesOffset.push_back( CreateBlazingTable(builder, 
                             builder.CreateString(table->name()->c_str()),
                             builder.CreateVector(columns), 
-                            builder.CreateVector(columnNames)),
+                            builder.CreateVector(columnNames),
                             table->token());
   }
 
