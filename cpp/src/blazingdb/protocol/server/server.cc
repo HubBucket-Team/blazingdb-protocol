@@ -12,7 +12,6 @@
 namespace blazingdb {
 namespace protocol {
 
-
 Server::Server(const Connection &connection) : connection_(connection) {
   unlink(static_cast<const char *>(connection_.address()->sa_data));
 
@@ -24,7 +23,7 @@ Server::Server(const Connection &connection) : connection_(connection) {
   if (listen(connection_.fd(), 100) == -1) {
     throw std::runtime_error("listen error");
   }
-} 
+}
 
 void Server::_Start(const __HandlerBaseType &handler) const {
   for (;;) {

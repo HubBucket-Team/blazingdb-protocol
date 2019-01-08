@@ -14,5 +14,7 @@ UnixSocketConnection::UnixSocketConnection(const std::string &path)
 
 UnixSocketConnection::~UnixSocketConnection() { close(fd_); }
 
+void UnixSocketConnection::initialize() const noexcept {}
+
 }  // namespace protocol
 }  // namespace blazingdb
