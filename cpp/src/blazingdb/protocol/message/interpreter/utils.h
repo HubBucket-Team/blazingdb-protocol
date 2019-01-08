@@ -162,7 +162,7 @@ static flatbuffers::Offset<TableGroup> BuildDirectTableGroup(flatbuffers::FlatBu
                             builder.CreateString(table->name()->c_str()),
                             builder.CreateVector(columns), 
                             builder.CreateVector(columnNames),
-                            table->token());
+                            table->token()));
   }
 
   auto tables = builder.CreateVector(tablesOffset);
