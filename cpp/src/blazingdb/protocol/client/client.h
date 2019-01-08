@@ -1,7 +1,6 @@
 #ifndef BLAZINGDB_PROTOCOL_CLIENT_CLIENT_H_
 #define BLAZINGDB_PROTOCOL_CLIENT_CLIENT_H_
 
-#include <zmq.h>
 #include <memory>
 #include "../buffer/buffer.h"
 #include "../connection/connection.h"

@@ -1,6 +1,5 @@
 #ifndef BLAZINGDB_PROTOCOL_SERVER_SERVER_H_
 #define BLAZINGDB_PROTOCOL_SERVER_SERVER_H_
-#include <zmq.h>
 
 #include <unistd.h>
 #include <memory>
