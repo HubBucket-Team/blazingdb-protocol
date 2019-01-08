@@ -12,7 +12,7 @@ public:
 
   ~UnixSocketConnection() override;
 
-  void initialize() noexcept final;
+  void initialize() const noexcept final;
 
   UnixSocketConnection(const UnixSocketConnection &) = delete;
   UnixSocketConnection(const UnixSocketConnection &&) = delete;
