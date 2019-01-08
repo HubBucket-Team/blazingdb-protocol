@@ -5,8 +5,7 @@ import socket
 import struct
 import threading
 
-
-__all__ = ['UnixSocketConnection', 'Server', 'Client']
+__all__ = ['TcpSocketConnection', 'Server', 'Client']
 
 
 class Buffer(abc.ABC):
@@ -14,20 +13,27 @@ class Buffer(abc.ABC):
   def __len__(self):
     return NotImplemented
 
+
 Buffer.register(bytes)
 
 
-class UnixSocketConnection:
+class TcpSocketConnection:
 
-  def __init__(self, path):
-    self.address_ = path
-    self.socket_ = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
+  def __init__(self, ip, port):
+    self.ip_ = ip
+    self.port_ = port
+    self.socket_ = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
+    server_address = (self.ip_, self.port_)
+    self.sock.connect(server_address)
 
   def __del__(self):
     self.socket_.close()
 
-  def address(self):
-    return self.address_
+  def ip(self):
+    return self.ip_
+
+  def port(self):
+    return self.port_
 
 
 class Server:
@@ -36,7 +42,7 @@ class Server:
 
     def __init__(self, callback, client, address):
       name = 'ThreadFor%s%s' % (str(address), str(random.random()))
-      super().__init__(name=name, daemon=None)
+      super().__init__(name = name, daemon = None)
       self._callback = callback
       self._client = client
 
@@ -77,28 +83,3 @@ class Client:
     self.connection_.socket_.sendall(_buffer)
     length = struct.unpack('I', self.connection_.socket_.recv(4))[0]
     return self.connection_.socket_.recv(length)
-
-
-import zmq
-
-class ZeroMqClient:
-  def __init__(self, connection):
-    self.ctx = zmq.Context()
-    self.sock = self.ctx.socket(zmq.REQ)
-    self.sock.connect(connection)
-
-  def send(self, _buffer):
-    self.sock.send(_buffer)
-    h = self.sock.recv()
-    return h
-
-class ZeroMqServer:
-  def __init__(self, connection):
-    self.ctx = zmq.Context()
-    self.sock = self.ctx.socket(zmq.REP)
-    self.sock.bind(connection)
-
-  def handle(self, callback):
-    requestBuffer = self.sock.recv()
-    responseBuffer = callback(requestBuffer)
-    self.sock.send(responseBuffer)
