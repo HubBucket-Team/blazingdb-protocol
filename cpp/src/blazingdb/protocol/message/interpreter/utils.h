@@ -22,6 +22,7 @@ struct BlazingTableDTO {
   std::string name;
   std::vector<::gdf_dto::gdf_column> columns;
   std::vector<std::string> columnNames;
+  uint64_t token;
 };
 
 struct TableGroupDTO {
@@ -82,6 +83,7 @@ static TableGroupDTO TableGroupDTOFrom(const blazingdb::protocol::TableGroup * t
         .name = std::string{table->name()->c_str()},
         .columns = columns,
         .columnNames = columnNames,
+        .token = table->token()
     });
   }
 
@@ -140,7 +142,7 @@ static flatbuffers::Offset<TableGroup> BuildTableGroup(flatbuffers::FlatBufferBu
   for (auto table : tableGroup.tables) {
     auto columns = BuildFlatColumns(builder, table.columns);
     auto columnNames = BuildFlatColumnNames(builder, table.columnNames);
-    tablesOffset.push_back( CreateBlazingTable(builder, builder.CreateString(table.name), builder.CreateVector(columns), builder.CreateVector(columnNames)));
+    tablesOffset.push_back( CreateBlazingTable(builder, builder.CreateString(table.name), builder.CreateVector(columns), builder.CreateVector(columnNames), table.token));
   }
 
   auto tables = builder.CreateVector(tablesOffset);
@@ -159,7 +161,8 @@ static flatbuffers::Offset<TableGroup> BuildDirectTableGroup(flatbuffers::FlatBu
     tablesOffset.push_back( CreateBlazingTable(builder, 
                             builder.CreateString(table->name()->c_str()),
                             builder.CreateVector(columns), 
-                            builder.CreateVector(columnNames)));
+                            builder.CreateVector(columnNames),
+                            table->token()));
   }
 
   auto tables = builder.CreateVector(tablesOffset);
