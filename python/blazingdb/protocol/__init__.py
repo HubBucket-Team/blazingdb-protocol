@@ -19,6 +19,8 @@ Buffer.register(bytes)
 
 class TcpSocketConnection:
 
+  # ip is the string for the host or regular ip
+  # port is an int number
   def __init__(self, ip, port):
     self.ip_ = ip
     self.port_ = port
