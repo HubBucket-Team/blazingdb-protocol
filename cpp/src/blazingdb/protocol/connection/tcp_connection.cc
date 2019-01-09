@@ -20,15 +20,8 @@ TCPConnection::TCPConnection(const std::string &ip, const std::string &port)
 TCPConnection::~TCPConnection() { close(fd_); }
 
 void TCPConnection::initialize() const noexcept {
-  struct hostent *hostent_ = gethostbyname(ip_.c_str());
-  if (nullptr == hostent_) {
-    // TODO: handle error
-  }
-
-  bcopy(hostent_->h_addr,
-        reinterpret_cast<void *>(
-            const_cast<TCPConnection *>(this)->addr_.sin_addr.s_addr),
-        static_cast<std::size_t>(hostent_->h_length));
+  const_cast<TCPConnection *>(this)->addr_.sin_addr.s_addr =
+      inet_addr(ip_.c_str());
 }
 
 }  // namespace protocol
