@@ -24,7 +24,7 @@ class TcpSocketConnection:
     self.port_ = port
     self.socket_ = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
     server_address = (self.ip_, self.port_)
-    self.sock.connect(server_address)
+    self.socket_.connect(server_address)
 
   def __del__(self):
     self.socket_.close()
