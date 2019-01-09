@@ -15,6 +15,10 @@ namespace protocol {
 TCPConnection::TCPConnection(const std::string &ip, const std::string &port)
     : Connection(socket(AF_INET, SOCK_STREAM, 0), port), ip_{ip} {
   if (fd_ == -1) { throw std::runtime_error("socket error"); }
+  int on = 1;
+  if (setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
+    throw std::runtime_error("set socket option error");
+  }
 }
 
 TCPConnection::~TCPConnection() { close(fd_); }
