@@ -55,6 +55,7 @@ public:
             buffer);
     resultToken = pointer->resultToken();
     nodeInfo    = NodeConnectionDTO{
+        .port = pointer->nodeConnection()->port();
         .path = std::string{pointer->nodeConnection()->path()->c_str()},
         .type = pointer->nodeConnection()->type()};
     calciteTime_ = pointer->calciteTime();
