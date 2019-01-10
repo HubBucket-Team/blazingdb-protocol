@@ -64,7 +64,7 @@ public:
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
     flatbuffers::FlatBufferBuilder builder{0};
     auto                           nodeInfo_offset = CreateNodeConnectionDirect(
-        builder, nodeInfo.path.data(), nodeInfo.type);
+        builder, nodeInfo.port, nodeInfo.path.data(), nodeInfo.type);
     auto root = orchestrator::CreateDMLResponse(
       builder, resultToken, nodeInfo_offset, calciteTime_);
     builder.Finish(root);
