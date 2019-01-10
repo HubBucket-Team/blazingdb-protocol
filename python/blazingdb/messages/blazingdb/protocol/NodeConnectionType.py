@@ -3,6 +3,6 @@
 # namespace: protocol
 
 class NodeConnectionType(object):
-    TPC = 0
+    TCP = 0
     IPC = 1
 
