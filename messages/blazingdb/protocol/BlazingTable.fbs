@@ -5,6 +5,7 @@ table BlazingTable {
   name: string;
   columns: [gdf.gdf_column_handler];
 	columnNames: [string];
+  token: ulong;
 }
 
 root_type BlazingTable;
