@@ -1,8 +1,11 @@
 namespace blazingdb.protocol;
 
-enum NodeConnectionType : byte {TPC, IPC}
+enum NodeConnectionType : byte {TCP, IPC}
 
+// when type is IPC path is the unix socket path (and port will not have a value)
+// when type is TCP path is the host/ip string (and port will have a value)
 table NodeConnection {
+    port: int;
 	path: string;
 	type: NodeConnectionType;
 }

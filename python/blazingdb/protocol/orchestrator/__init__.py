@@ -52,6 +52,7 @@ class DDLDropTableRequestSchema(transport.schema(DDLDropTableRequest)):
 
 class NodeConnectionSchema(transport.schema(NodeConnection)):
   path = transport.StringSegment()
+  port = transport.NumberSegment()
   type = transport.NumberSegment()
 
 class DMLResponseSchema(transport.schema(DMLResponse)):

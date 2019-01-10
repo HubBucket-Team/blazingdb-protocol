@@ -12,6 +12,8 @@ public:
 
   ~UnixSocketConnection() override;
 
+  void initialize() const noexcept final;
+
   UnixSocketConnection(const UnixSocketConnection &) = delete;
   UnixSocketConnection(const UnixSocketConnection &&) = delete;
   void operator=(const UnixSocketConnection &) = delete;

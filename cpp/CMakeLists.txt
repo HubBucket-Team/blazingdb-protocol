@@ -42,7 +42,6 @@ option(SIMPLE_BUILD_EXAMPLES "Build SIMPLE Examples" FALSE)
 # Configure dependencies
 include(ConfigureFlatBuffers)
 include(ConfigureGoogleTest)
-include(ConfigureZeroMQ)
 
 # BEGIN MAIN #
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src)

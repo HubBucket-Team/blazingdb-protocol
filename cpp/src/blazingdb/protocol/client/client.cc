@@ -7,8 +7,10 @@
 
 namespace blazingdb {
 namespace protocol {
- 
+
 Client::Client(const Connection &connection) : connection_(connection) {
+  connection.initialize();
+
   int result =
       connect(connection.fd(), connection.address(), connection.length());
 
@@ -26,7 +28,7 @@ Buffer Client::send(const Buffer &buffer) {
   uint32_t responseBufferLength;
   ssize_t nread =
       read(connection_.fd(), (void*)&responseBufferLength, sizeof(uint32_t));
-  
+
   Buffer responseBuffer;
   responseBuffer.resize(responseBufferLength);
   nread =
