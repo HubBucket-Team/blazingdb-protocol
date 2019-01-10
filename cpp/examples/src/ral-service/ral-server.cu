@@ -100,7 +100,7 @@ static result_pair freeResultService(uint64_t accessToken, Buffer&& requestPaylo
 }
 
 
-static result_pair executePlanService(uint64_t accessToken, Buffer&& requestPayloadBuffer)   {
+static result_pair executePlanService(uint64_t accessToken, Buffer&& requestPayloadBuffer, const interpreter::NodeConnectionDTO &nodeInfo)   {
   interpreter::ExecutePlanRequestMessage requestPayload(requestPayloadBuffer.data());
 
   // ExecutePlan
@@ -112,10 +112,6 @@ static result_pair executePlanService(uint64_t accessToken, Buffer&& requestPayl
   ::gdf::util::ToBlazingFrame(requestPayload.getTableGroup());
 
   uint64_t resultToken = 543210L;
-  interpreter::NodeConnectionDTO nodeInfo {
-      .path = "/tmp/ral.socket",
-      .type = NodeConnectionType {NodeConnectionType_IPC}
-  };
   interpreter::ExecutePlanResponseMessage responsePayload{resultToken, nodeInfo};
   return std::make_pair(Status_Success, responsePayload.getBufferData());
 }

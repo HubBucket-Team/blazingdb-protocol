@@ -100,6 +100,7 @@ class  GetResultRequestMessage :  public TypedMessage<uint64_t, interpreter::Get
 
 
 struct NodeConnectionDTO {
+  int port;
   std::string path;
   NodeConnectionType type;
 };
@@ -118,13 +119,14 @@ public:
     auto pointer = flatbuffers::GetRoot<blazingdb::protocol::interpreter::ExecutePlanResponse>(buffer);
     resultToken = pointer->resultToken();
     nodeInfo = NodeConnectionDTO {
+      .port = pointer->nodeConnection()->port(),
       .path = std::string{pointer->nodeConnection()->path()->c_str()},
       .type = pointer->nodeConnection()->type()
     };
   };
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
     flatbuffers::FlatBufferBuilder builder{0};
-    auto nodeInfo_offset = CreateNodeConnectionDirect(builder, nodeInfo.path.data(), nodeInfo.type);
+    auto nodeInfo_offset = CreateNodeConnectionDirect(builder, nodeInfo.port, nodeInfo.path.data(), nodeInfo.type);
     auto root = interpreter::CreateExecutePlanResponse(builder, resultToken, nodeInfo_offset);
     builder.Finish(root);
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());

@@ -55,6 +55,7 @@ public:
             buffer);
     resultToken = pointer->resultToken();
     nodeInfo    = NodeConnectionDTO{
+        .port = pointer->nodeConnection()->port(),
         .path = std::string{pointer->nodeConnection()->path()->c_str()},
         .type = pointer->nodeConnection()->type()};
     calciteTime_ = pointer->calciteTime();
@@ -63,7 +64,7 @@ public:
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
     flatbuffers::FlatBufferBuilder builder{0};
     auto                           nodeInfo_offset = CreateNodeConnectionDirect(
-        builder, nodeInfo.path.data(), nodeInfo.type);
+        builder, nodeInfo.port, nodeInfo.path.data(), nodeInfo.type);
     auto root = orchestrator::CreateDMLResponse(
       builder, resultToken, nodeInfo_offset, calciteTime_);
     builder.Finish(root);
