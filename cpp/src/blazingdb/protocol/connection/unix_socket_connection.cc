@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 #include <unistd.h>
+#include <sys/un.h>
 
 namespace blazingdb {
 namespace protocol {

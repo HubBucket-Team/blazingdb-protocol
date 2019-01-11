@@ -9,8 +9,6 @@ namespace blazingdb {
 namespace protocol {
 
 Client::Client(const Connection &connection) : connection_(connection) {
-  connection.initialize();
-
   int result =
       connect(connection.fd(), connection.address(), connection.length());
 

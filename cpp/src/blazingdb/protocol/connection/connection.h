@@ -1,13 +1,9 @@
 #ifndef BLAZINGDB_PROTOCOL_CONNECTION_CONNECTION_H_
 #define BLAZINGDB_PROTOCOL_CONNECTION_CONNECTION_H_
 
-#include <arpa/inet.h>
-#include <cstdio>
 #include <cstring>
-#include <netinet/in.h>
 #include <string>
 #include <sys/socket.h>
-#include <sys/types.h>
 #include <sys/un.h>
 
 namespace blazingdb {
@@ -39,9 +35,9 @@ public:
   Connection(const int fd, const std::string &path)
       : fd_(fd), addr_{0, {}}, unused_{0} {
     bzero(&addr_, sizeof(addr_));
-    addr_.sin_family      = AF_INET;
-    addr_.sin_addr.s_addr = INADDR_ANY;
-    addr_.sin_port = htons(static_cast<std::uint16_t>(atoi(path.c_str())));
+    addr_.sun_family = AF_UNIX;
+    std::strncpy(
+        static_cast<char *>(addr_.sun_path), path.c_str(), path.size());
   }
 
   ~Connection() override = default;
@@ -65,7 +61,7 @@ public:
 
 protected:
   int                fd_;
-  struct sockaddr_in addr_;
+  struct sockaddr_un addr_;
 
 private:
   char unused_[6];
