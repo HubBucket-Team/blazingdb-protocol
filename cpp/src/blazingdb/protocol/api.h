@@ -4,7 +4,6 @@
 #include "buffer/buffer.h"
 #include "client/client.h"
 #include "connection/unix_socket_connection.h"
-#include "connection/tcp_connection.h"
 #include "server/server.h"
 #include "message/messages.h"
 
