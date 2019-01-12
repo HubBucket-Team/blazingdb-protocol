@@ -12,4 +12,4 @@ class MessageType(object):
     LoadCSV = 6
     LoadParquet = 7
     DML_FS = 8
-
+    FreeMemory = 9
