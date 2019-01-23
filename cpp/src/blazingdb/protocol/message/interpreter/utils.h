@@ -22,6 +22,7 @@ struct BlazingTableDTO {
   std::string name;
   std::vector<::gdf_dto::gdf_column> columns;
   std::vector<std::string> columnNames;
+  std::vector<uint64_t> columnTokens;
   uint64_t token;
 };
 
@@ -71,6 +72,15 @@ static std::vector<std::string> ColumnNamesFrom(const flatbuffers::Vector<flatbu
   return columnNames;
 }
 
+static std::vector<uint64_t> ColumnTokensFrom(const flatbuffers::Vector<uint64_t> *rawColumnTokens) {
+  std::vector<uint64_t> columnTokens;
+  for (const auto& rawColumnToken : *rawColumnTokens){
+    auto columnToken = rawColumnToken;
+    columnTokens.push_back(columnToken);
+  }
+  return columnTokens;
+}
+
 static TableGroupDTO TableGroupDTOFrom(const blazingdb::protocol::TableGroup * tableGroup) {
   std::string name = std::string{tableGroup->name()->c_str()};
   std::vector<BlazingTableDTO> tables;
@@ -79,10 +89,12 @@ static TableGroupDTO TableGroupDTOFrom(const blazingdb::protocol::TableGroup * t
   for (const auto& table : *rawTables) {
     auto  columns = GdfColumnsFrom(table->columns());
     auto  columnNames = ColumnNamesFrom(table->columnNames());
+    auto  columnTokens = ColumnTokensFrom(table->columnTokens());
     tables.push_back(BlazingTableDTO{
         .name = std::string{table->name()->c_str()},
         .columns = columns,
         .columnNames = columnNames,
+        .columnTokens = columnTokens,
         .token = table->token()
     });
   }

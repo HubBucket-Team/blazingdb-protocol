@@ -4,7 +4,8 @@ namespace blazingdb.protocol;
 table BlazingTable {
   name: string;
   columns: [gdf.gdf_column_handler];
-	columnNames: [string];
+  columnNames: [string];
+  columnTokens: [ulong];
   token: ulong;
 }
 
