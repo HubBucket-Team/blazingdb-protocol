@@ -155,6 +155,8 @@ struct BlazingMetadataDTO{
 
 class GetResultResponseMessage : public IMessage {
 public:
+  /*GetResultResponseMessage (const BlazingMetadataDTO&  metadata, const std::vector<std::string>& columnNames, const std::vector<uint64_t>& columnTokens, const std::vector<::gdf_dto::gdf_column>& columns)
+      : IMessage(), metadata{metadata}, columnNames{columnNames}, columnTokens{columnTokens}, columns{columns}*/
   GetResultResponseMessage (const BlazingMetadataDTO&  metadata, const std::vector<std::string>& columnNames, const std::vector<::gdf_dto::gdf_column>& columns)
       : IMessage(), metadata{metadata}, columnNames{columnNames}, columns{columns}
   {
@@ -173,6 +175,7 @@ public:
     };
 
     columnNames = ColumnNamesFrom(pointer->columnNames());
+    //columnTokens = ColumnTokensFrom(pointer->columnTokens());
     columns = GdfColumnsFrom(pointer->columns());
   }
 
@@ -182,6 +185,9 @@ public:
 
     auto names_offset = BuildFlatColumnNames(builder, columnNames);
     auto values_offset = BuildFlatColumns(builder, columns);
+
+    //auto tokens_offset = BuildFlatColumnTokens(builder, columnTokens); // 
+   // falta token de tabla 
 
     auto root = interpreter::CreateGetResultResponse(builder, metadata_offset, builder.CreateVector(values_offset), builder.CreateVector(names_offset));
     builder.Finish(root);
@@ -198,6 +204,11 @@ public:
     return columnNames;
   }
 
+  /*std::vector<uint64_t> getColumnTokens()
+  {
+    return columnTokens;
+  }*/
+
   std::vector<::gdf_dto::gdf_column> getColumns()
   {
     return columns;
@@ -206,6 +217,7 @@ public:
 public:
   BlazingMetadataDTO  metadata;
   std::vector<std::string> columnNames;
+  //std::vector<uint64_t> columnTokens;
   std::vector<::gdf_dto::gdf_column> columns;
 };
 

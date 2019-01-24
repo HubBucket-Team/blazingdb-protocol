@@ -125,6 +125,9 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildFlatColumnNames(flat
   return offsets;
 };
 
+flatbuffers::Offset<flatbuffers::Vector<uint64_t>>  BuildFlatColumnTokens(flatbuffers::FlatBufferBuilder &builder, const std::vector<uint64_t> &columnTokens) {
+  return builder.CreateVector(columnTokens.data(), columnTokens.size());
+}
 
 std::vector<flatbuffers::Offset<gdf::gdf_column_handler>>  BuildDirectFlatColumns(flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *rawColumns) {
   std::vector<flatbuffers::Offset<gdf::gdf_column_handler>> offsets;
@@ -146,6 +149,15 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildDirectFlatColumnName
   return offsets;
 };
 
+//std::vector<flatbuffers::Offset<uint64_t>>  BuildDirectFlatColumnTokens(flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<uint64_t> *rawTokens) {
+  flatbuffers::Offset<flatbuffers::Vector<uint64_t>>  BuildDirectFlatColumnTokens(flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<uint64_t> *rawTokens) {
+  std::vector<uint64_t> values;
+  for (const auto & token: *rawTokens) {
+    values.push_back( token );
+  }
+  return builder.CreateVector(values.data(), values.size());
+}
+
 static flatbuffers::Offset<TableGroup> BuildTableGroup(flatbuffers::FlatBufferBuilder &builder,
                                                        const TableGroupDTO &tableGroup) {
   auto tableNameOffset = builder.CreateString(tableGroup.name);
@@ -154,7 +166,8 @@ static flatbuffers::Offset<TableGroup> BuildTableGroup(flatbuffers::FlatBufferBu
   for (auto table : tableGroup.tables) {
     auto columns = BuildFlatColumns(builder, table.columns);
     auto columnNames = BuildFlatColumnNames(builder, table.columnNames);
-    tablesOffset.push_back( CreateBlazingTable(builder, builder.CreateString(table.name), builder.CreateVector(columns), builder.CreateVector(columnNames), table.token));
+    auto token_offsets = BuildFlatColumnTokens(builder, table.columnTokens);
+    tablesOffset.push_back( CreateBlazingTable(builder, builder.CreateString(table.name), builder.CreateVector(columns), builder.CreateVector(columnNames), token_offsets, table.token));
   }
 
   auto tables = builder.CreateVector(tablesOffset);
@@ -170,10 +183,12 @@ static flatbuffers::Offset<TableGroup> BuildDirectTableGroup(flatbuffers::FlatBu
   for (const auto &table : *rawTables) {
     auto columns = BuildDirectFlatColumns(builder, table->columns());
     auto columnNames = BuildDirectFlatColumnNames(builder, table->columnNames());
+    auto columnTokens = BuildDirectFlatColumnTokens(builder, table->columnTokens());
     tablesOffset.push_back( CreateBlazingTable(builder, 
                             builder.CreateString(table->name()->c_str()),
                             builder.CreateVector(columns), 
                             builder.CreateVector(columnNames),
+                            columnTokens,
                             table->token()));
   }
 
