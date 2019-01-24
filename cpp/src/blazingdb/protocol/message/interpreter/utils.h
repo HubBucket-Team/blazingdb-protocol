@@ -149,8 +149,7 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildDirectFlatColumnName
   return offsets;
 };
 
-//std::vector<flatbuffers::Offset<uint64_t>>  BuildDirectFlatColumnTokens(flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<uint64_t> *rawTokens) {
-  flatbuffers::Offset<flatbuffers::Vector<uint64_t>>  BuildDirectFlatColumnTokens(flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<uint64_t> *rawTokens) {
+flatbuffers::Offset<flatbuffers::Vector<uint64_t>>  BuildDirectFlatColumnTokens(flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<uint64_t> *rawTokens) {
   std::vector<uint64_t> values;
   for (const auto & token: *rawTokens) {
     values.push_back( token );
