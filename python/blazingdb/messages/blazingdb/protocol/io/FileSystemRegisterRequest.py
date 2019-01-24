@@ -23,14 +23,14 @@ class FileSystemRegisterRequest(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return None
+        return ""
 
     # FileSystemRegisterRequest
     def Root(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return None
+        return ""
 
     # FileSystemRegisterRequest
     def FileSystemConnectionType(self):

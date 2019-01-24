@@ -11,7 +11,7 @@ class MessageType(object):
     AuthClose = 5
     RegisterFileSystem = 6
     DeregisterFileSystem = 7
-    LoadCSV = 8
-    LoadParquet = 9
+    LoadCsvSchema = 8
+    LoadParquetSchema = 9
     DML_FS = 10
 
