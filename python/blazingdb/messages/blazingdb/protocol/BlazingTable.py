@@ -76,7 +76,7 @@ class BlazingTable(object):
         return 0
 
     # BlazingTable
-    def Token(self):
+    def ResultToken(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
@@ -90,5 +90,5 @@ def BlazingTableAddColumnNames(builder, columnNames): builder.PrependUOffsetTRel
 def BlazingTableStartColumnNamesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
 def BlazingTableAddColumnTokens(builder, columnTokens): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(columnTokens), 0)
 def BlazingTableStartColumnTokensVector(builder, numElems): return builder.StartVector(8, numElems, 8)
-def BlazingTableAddToken(builder, token): builder.PrependUint64Slot(4, token, 0)
+def BlazingTableAddResultToken(builder, resultToken): builder.PrependUint64Slot(4, resultToken, 0)
 def BlazingTableEnd(builder): return builder.EndObject()
