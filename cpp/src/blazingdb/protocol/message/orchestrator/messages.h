@@ -216,6 +216,37 @@ private:
   int64_t access_token_;
 };
 
+class DMLDistributedResponseMessage : public IMessage {
+public:
+    DMLDistributedResponseMessage()
+    : IMessage()
+    { }
+
+    DMLDistributedResponseMessage(const uint8_t* buffer)
+    : IMessage() {
+        auto pointer = flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DMLDistributedResponseMessage>(buffer);
+        size = pointer->size();
+        auto array_responses = pointer->responses();
+        for (const auto& response : (*array_responses)) {
+            responses.emplace_back(response);
+        }
+    }
+
+    std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
+        flatbuffers::FlatBufferBuilder builder;
+
+        auto array_responses = builder.CreateVector<DMLResponseMessage>(responses);
+
+        builder.Finish(orchestrator::CreateDMLDistributedResponse(builder, size, array_responses));
+
+        return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+    }
+
+public:
+    std:uint16_t size;
+    std::vector<DMLResponseMessage> responses;
+};
+
 } // orchestrator
 } // protocol
 } // blazingdb
