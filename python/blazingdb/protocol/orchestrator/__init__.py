@@ -27,7 +27,8 @@ class BlazingTableSchema(transport.schema(BlazingTable)):
   name = transport.StringSegment()
   columns = transport.VectorSchemaSegment(gdf_columnSchema)
   columnNames = transport.VectorStringSegment(transport.StringSegment)
-  token = transport.NumberSegment()
+  columnTokens = transport.VectorSegment(transport.NumberSegment)
+  resultToken = transport.NumberSegment()
 
 class TableGroupSchema(transport.schema(TableGroup)):
   tables = transport.VectorSchemaSegment(BlazingTableSchema)
@@ -72,8 +73,9 @@ def BuildDMLRequestSchema(query, tableGroupDto):
   tables = []
   for index, t in enumerate(tableGroupDto['tables']):
     tableName = t['name']
-    token = t['token']
+    resultToken = t['resultToken']
     columnNames = t['columnNames']
+    columnTokens = t['columnTokens']
     columns = []
     for i, c in enumerate(t['columns']):
       if c['data'] is None:
@@ -91,7 +93,7 @@ def BuildDMLRequestSchema(query, tableGroupDto):
                                 null_count=c['null_count'])
       columns.append(gdfColumn)
     table = blazingdb.protocol.orchestrator.BlazingTableSchema(name=tableName, columns=columns,
-                                 columnNames=columnNames, token=token)
+                                 columnNames=columnNames, columnTokens=columnTokens, resultToken=resultToken)
     tables.append(table)
   tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=tables, name=tableGroupName)
   return blazingdb.protocol.orchestrator.DMLRequestSchema(query=query, tableGroup=tableGroup)

@@ -23,7 +23,7 @@ class S3(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return None
+        return ""
 
     # S3
     def EncryptionType(self):
@@ -37,28 +37,28 @@ class S3(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return None
+        return ""
 
     # S3
     def AccessKeyId(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return None
+        return ""
 
     # S3
     def SecretKey(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return None
+        return ""
 
     # S3
     def SessionToken(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return None
+        return ""
 
 def S3Start(builder): builder.StartObject(6)
 def S3AddBucketName(builder, bucketName): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(bucketName), 0)

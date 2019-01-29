@@ -9,7 +9,8 @@ class MessageType(object):
     CloseConnection = 3
     RegisterFileSystem = 4
     DeregisterFileSystem = 5
-    LoadCSV = 6
-    LoadParquet = 7
-    DML_FS = 8
+    LoadCsvSchema = 6
+    LoadParquetSchema = 7
+    ExecutePlanFileSystem = 8
     FreeMemory = 9
+

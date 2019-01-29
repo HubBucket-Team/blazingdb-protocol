@@ -275,7 +275,8 @@ class _VectorSegment(Vector):
     o = next(value for value in re.search(p, l).groups() if value)
     f = {
       'String': builder.PrependUOffsetTRelative,
-      'Int32Flags': builder.PrependUint32
+      'Int32Flags': builder.PrependUint32,
+      'Uint64Flags': builder.PrependUint64
     }[o]
 
     getattr(schema._module,
