@@ -33,6 +33,7 @@ class GetResultResponseSchema(transport.schema(GetResultResponse)):
   metadata = transport.SchemaSegment(BlazingMetadataSchema)
   columns = transport.VectorGdfColumnSegment(gdf_columnSchema)
   columnNames = transport.VectorStringSegment(transport.StringSegment)
+  columnTokens = transport.VectorSegment(transport.NumberSegment)
 
 def _get_bytearray(ipch):
   nr_of_bytes = ipch.ReservedLength()
@@ -53,5 +54,6 @@ def GetQueryResultFrom(payloadBuffer):
   return type('obj', (object,), {
     'metadata': result.metadata,
     'columnNames': list(result.columnNames),
+    'columnTokens': list(result.columnTokens),
     'columns': columns
   })
