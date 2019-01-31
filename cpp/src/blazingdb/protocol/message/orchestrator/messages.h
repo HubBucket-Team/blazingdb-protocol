@@ -217,6 +217,9 @@ private:
 };
 
 class DMLDistributedResponseMessage : public IMessage {
+private:
+    using NodeConnectionDTO = blazingdb::protocol::interpreter::NodeConnectionDTO;
+
 public:
     DMLDistributedResponseMessage()
     : IMessage()
@@ -224,26 +227,45 @@ public:
 
     DMLDistributedResponseMessage(const uint8_t* buffer)
     : IMessage() {
-        auto pointer = flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DMLDistributedResponseMessage>(buffer);
+        auto pointer = flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DMLDistributedResponse>(buffer);
         size = pointer->size();
         auto array_responses = pointer->responses();
         for (const auto& response : (*array_responses)) {
-            responses.emplace_back(response);
+            auto resultToken = response->resultToken();
+            auto nodeInfo  = NodeConnectionDTO {
+                .port = response->nodeConnection()->port(),
+                .path = std::string{response->nodeConnection()->path()->c_str()},
+                .type = response->nodeConnection()->type()
+            };
+            auto calciteTime = response->calciteTime();
+            responses.emplace_back(DMLResponseMessage(resultToken, nodeInfo, calciteTime));
         }
     }
 
     std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
+        std::vector<flatbuffers::Offset<DMLResponse>> dml_responses;
+        for (const auto& response : responses) {
+            flatbuffers::FlatBufferBuilder builder{0};
+
+            auto nodeInfo = CreateNodeConnectionDirect(builder,
+                                                       response.getNodeInfo().port,
+                                                       response.getNodeInfo().path.data(),
+                                                       response.getNodeInfo().type);
+
+            dml_responses.emplace_back(CreateDMLResponse(builder,
+                                                         response.getResultToken(),
+                                                         nodeInfo,
+                                                         response.getCalciteTime()));
+        }
+
         flatbuffers::FlatBufferBuilder builder;
-
-        auto array_responses = builder.CreateVector<DMLResponseMessage>(responses);
-
-        builder.Finish(orchestrator::CreateDMLDistributedResponse(builder, size, array_responses));
+        builder.Finish(CreateDMLDistributedResponseDirect(builder, size, &dml_responses));
 
         return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
     }
 
 public:
-    std:uint16_t size;
+    std::uint16_t size{};
     std::vector<DMLResponseMessage> responses;
 };
 
