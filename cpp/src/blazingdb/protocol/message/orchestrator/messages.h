@@ -244,9 +244,9 @@ public:
 
     std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
         std::vector<flatbuffers::Offset<DMLResponse>> dml_responses;
-        for (const auto& response : responses) {
-            flatbuffers::FlatBufferBuilder builder{0};
+        flatbuffers::FlatBufferBuilder builder;
 
+        for (const auto& response : responses) {
             auto nodeInfo = CreateNodeConnectionDirect(builder,
                                                        response.getNodeInfo().port,
                                                        response.getNodeInfo().path.data(),
@@ -258,7 +258,6 @@ public:
                                                          response.getCalciteTime()));
         }
 
-        flatbuffers::FlatBufferBuilder builder;
         builder.Finish(CreateDMLDistributedResponseDirect(builder, size, &dml_responses));
 
         return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
