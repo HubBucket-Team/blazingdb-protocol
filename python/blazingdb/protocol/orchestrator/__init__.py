@@ -9,7 +9,7 @@ from blazingdb.messages.blazingdb.protocol \
   import TableGroup, BlazingTable
 
 from blazingdb.messages.blazingdb.protocol.orchestrator \
-  import DMLRequest, DMLResponse, DDLRequest, DDLResponse, DDLCreateTableRequest, DDLDropTableRequest
+  import DMLRequest, DMLResponse, DDLRequest, DDLResponse, DDLCreateTableRequest, DDLDropTableRequest, DMLDistributedResponse
 
 from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
   import MessageType as OrchestratorMessageType
@@ -60,6 +60,12 @@ class DMLResponseSchema(transport.schema(DMLResponse)):
   resultToken = transport.NumberSegment()
   nodeConnection = transport.SchemaSegment(NodeConnectionSchema)
   calciteTime = transport.NumberSegment()
+
+
+class DMLDistributedResponseSchema(transport.schema(DMLDistributedResponse)):
+    size = transport.NumberSegment()
+    responses = transport.VectorSchemaSegment(DMLResponseSchema)
+
 
 class AuthResponseSchema(transport.schema(AuthResponse)):
   accessToken = transport.NumberSegment()
