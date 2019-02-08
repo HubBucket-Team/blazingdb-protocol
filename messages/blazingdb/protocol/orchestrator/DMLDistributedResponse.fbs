@@ -3,7 +3,6 @@ include "blazingdb/protocol/orchestrator/DMLResponse.fbs";
 namespace blazingdb.protocol.orchestrator;
 
 table DMLDistributedResponse {
-    size: ushort;
     responses: [DMLResponse];
 }
 

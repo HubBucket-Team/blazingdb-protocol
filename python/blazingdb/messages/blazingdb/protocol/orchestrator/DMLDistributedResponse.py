@@ -19,20 +19,13 @@ class DMLDistributedResponse(object):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # DMLDistributedResponse
-    def Size(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Uint16Flags, o + self._tab.Pos)
-        return 0
-
-    # DMLDistributedResponse
     def Responses(self, j):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
-            from blazingdb.messages.blazingdb.protocol.orchestrator.DMLResponse import DMLResponse
+            from .DMLResponse import DMLResponse
             obj = DMLResponse()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -40,13 +33,12 @@ class DMLDistributedResponse(object):
 
     # DMLDistributedResponse
     def ResponsesLength(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
-def DMLDistributedResponseStart(builder): builder.StartObject(2)
-def DMLDistributedResponseAddSize(builder, size): builder.PrependUint16Slot(0, size, 0)
-def DMLDistributedResponseAddResponses(builder, responses): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(responses), 0)
+def DMLDistributedResponseStart(builder): builder.StartObject(1)
+def DMLDistributedResponseAddResponses(builder, responses): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(responses), 0)
 def DMLDistributedResponseStartResponsesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
 def DMLDistributedResponseEnd(builder): return builder.EndObject()

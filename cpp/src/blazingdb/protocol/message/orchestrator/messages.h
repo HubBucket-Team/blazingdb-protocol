@@ -228,7 +228,6 @@ public:
     DMLDistributedResponseMessage(const uint8_t* buffer)
     : IMessage() {
         auto pointer = flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DMLDistributedResponse>(buffer);
-        size = pointer->size();
         auto array_responses = pointer->responses();
         for (const auto& response : (*array_responses)) {
             auto resultToken = response->resultToken();
@@ -258,13 +257,12 @@ public:
                                                          response.getCalciteTime()));
         }
 
-        builder.Finish(CreateDMLDistributedResponseDirect(builder, size, &dml_responses));
+        builder.Finish(CreateDMLDistributedResponseDirect(builder, &dml_responses));
 
         return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
     }
 
 public:
-    std::uint16_t size{};
     std::vector<DMLResponseMessage> responses;
 };
 

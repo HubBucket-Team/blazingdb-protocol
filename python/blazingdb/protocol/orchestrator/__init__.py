@@ -63,7 +63,6 @@ class DMLResponseSchema(transport.schema(DMLResponse)):
 
 
 class DMLDistributedResponseSchema(transport.schema(DMLDistributedResponse)):
-    size = transport.NumberSegment()
     responses = transport.VectorSchemaSegment(DMLResponseSchema)
 
 
