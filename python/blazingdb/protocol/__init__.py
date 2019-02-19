@@ -37,11 +37,14 @@ class Client:
     try:
       connection.socket_.connect(connection.address())
     except socket.error:
-      raise RuntimeError("connect error")
+      raise RuntimeError("Communication error: connection to " + connection.address() + " was lost")
 
   def send(self, _buffer):
-    length = struct.pack('I', len(_buffer))
-    self.connection_.socket_.sendall(length)
-    self.connection_.socket_.sendall(_buffer)
-    length = struct.unpack('I', self.connection_.socket_.recv(4))[0]
-    return self.connection_.socket_.recv(length)
+    try:
+      length = struct.pack('I', len(_buffer))
+      self.connection_.socket_.sendall(length)
+      self.connection_.socket_.sendall(_buffer)
+      length = struct.unpack('I', self.connection_.socket_.recv(4))[0]
+      return self.connection_.socket_.recv(length)
+    except Exception:
+      raise RuntimeError("Communication error: when sending data to " + self.connection_.address())
