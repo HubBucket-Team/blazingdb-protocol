@@ -36,19 +36,19 @@ table S3 {
 }
 
 union FileSystemConnection {
-    POSIX, HDFS, S3
+    POSIX, HDFS, S3 
 }
 
 table FileSystemRegisterRequest {
     authority: string;
     root: string;
     fileSystemConnection: FileSystemConnection;
-}
+} 
 root_type FileSystemRegisterRequest;
 
 table FileSystemDeregisterRequest {
     authority: string;
-}
+} 
 root_type FileSystemDeregisterRequest;
 
 
@@ -68,17 +68,17 @@ table ParquetFile {
     columnIndices:[int];
 }
 root_type ParquetFile;
-
+ 
 enum FileSchemaType :byte {
     CSV,
-    PARQUET
+    PARQUET 
 }
 
 table FileSystemBlazingTable {
     name: string;
     schemaType: FileSchemaType;
     csv: CsvFile;  //#use this
-    parquet: ParquetFile;     //#either this
+    parquet: ParquetFile;     //#either this   
     files: [string];
 	columnNames: [string];
 }
@@ -90,25 +90,10 @@ table FileSystemTableGroup {
 }
 root_type FileSystemTableGroup;
 
-table CommunicationNode {
-    ip: string;
-    port: ushort;
-}
-
-root_type CommunicationNode;
-
-table CommunicationContext {
-    nodes: [CommunicationNode];
-    masterIndex: int;
-    token: ulong;
-}
-
-root_type CommunicationContext;
-
 table FileSystemDMLRequest {
     statement: string;
     tableGroup: FileSystemTableGroup;
-    communicationContext: CommunicationContext;
 }
 
 root_type FileSystemDMLRequest;
+

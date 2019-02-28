@@ -89,7 +89,7 @@ public:
 
     root = std::string{pointer->root()->c_str()};
     type = (FileSystemType)pointer->fileSystemConnection_type(); // FileSystemType: same as enum blazingdb::protocol::io::FileSystemConnection
-
+    
     if (type ==  FileSystemType_HDFS) {
       auto hdfs_local = pointer->fileSystemConnection_as_HDFS();
       this->hdfs = HDFS{
@@ -98,7 +98,7 @@ public:
         .user = hdfs_local->user()->c_str(),
         .driverType = (DriverType)hdfs_local->driverType(),
         .kerberosTicket = hdfs_local->kerberosTicket()->c_str(),
-      };
+      };       
     }
     else if (type == FileSystemType_S3) {
       auto s3_local = pointer->fileSystemConnection_as_S3();
@@ -108,8 +108,8 @@ public:
         .kmsKeyAmazonResourceName = s3_local->kmsKeyAmazonResourceName()->c_str(),
         .accessKeyId = s3_local->accessKeyId()->c_str(),
         .secretKey = s3_local->secretKey()->c_str(),
-        .sessionToken = s3_local->sessionToken()->c_str(),
-      };
+        .sessionToken = s3_local->sessionToken()->c_str(),        
+      };    
     }
   }
 
@@ -129,13 +129,13 @@ public:
           (blazingdb::protocol::io::EncryptionType)s3.encryptionType,
           s3.kmsKeyAmazonResourceName.c_str(), s3.accessKeyId.c_str(),
           s3.secretKey.c_str(), s3.sessionToken.c_str());
-
+      
       builder.Finish(CreateFileSystemRegisterRequestDirect(
-          builder, authority.c_str(), root.c_str(),
+          builder, authority.c_str(), root.c_str(), 
           blazingdb::protocol::io::FileSystemConnection_S3, union_obj.Union()));
     } else {
       builder.Finish(CreateFileSystemRegisterRequestDirect(
-          builder,  authority.c_str(), root.c_str(),
+          builder,  authority.c_str(), root.c_str(), 
           blazingdb::protocol::io::FileSystemConnection_POSIX, 0));
     }
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
@@ -147,7 +147,7 @@ public:
   std::string getRoot () const {
     return root;
   }
-
+  
   HDFS getHdfs() const {
     return hdfs;
   }
@@ -155,7 +155,7 @@ public:
   S3 getS3() const {
     return s3;
   }
-
+  
   bool isLocal() const {
     return type == FileSystemType_POSIX;
   }
@@ -167,7 +167,7 @@ public:
   bool isS3() const {
     return type == FileSystemType_S3;
   }
-
+  
 
 private:
   std::string authority;
@@ -201,7 +201,7 @@ struct CsvFileSchema {
     std::vector<int> dtypes;
     std::vector<flatbuffers::Offset<flatbuffers::String>>  names = BuildeFlatStringList(builder, data.names);
     // std::vector<int32_t> &dtypes = data.dtypes; ??@todo
-
+     
     return blazingdb::protocol::io::CreateCsvFile(builder, builder.CreateString(data.path.c_str()), builder.CreateString(data.delimiter.c_str()), builder.CreateString(data.line_terminator.c_str()), data.skip_rows, builder.CreateVector(names), builder.CreateVector( data.dtypes.data(),  data.dtypes.size()) );
   }
 
@@ -216,7 +216,7 @@ struct CsvFileSchema {
     auto ColumnNamesFrom = [](const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *rawNames) -> std::vector<std::string> {
       std::vector<std::string> columnNames;
       for (const auto& rawName : *rawNames){
-        auto name = std::string{rawName->c_str()};
+        auto name = std::string{rawName->c_str()};  
         columnNames.push_back(name);
       }
       return columnNames;
@@ -256,7 +256,7 @@ public:
     CsvFileSchema::Deserialize(data, this);
   }
 
-
+  
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
     return nullptr;
   }
@@ -272,17 +272,17 @@ struct ParquetFileSchema {
   std::vector<int> columnIndices;
 
   static flatbuffers::Offset<blazingdb::protocol::io::ParquetFile> Serialize(flatbuffers::FlatBufferBuilder &builder, ParquetFileSchema &data) {
-      //@todo
+      //@todo 
       // copy rowGroupIndices and columnIndices
-      // make sure you can use these data!
+      // make sure you can use these data!  
     return blazingdb::protocol::io::CreateParquetFileDirect(builder, data.path.c_str());
   }
   static void Deserialize (const blazingdb::protocol::io::ParquetFile *pointer, ParquetFileSchema* schema){
       schema->path =  std::string{pointer->path()->c_str()};
 
-      //@todo
+      //@todo 
       // copy rowGroupIndices and columnIndices
-      // make sure you can use these data!
+      // make sure you can use these data!  
   }
 };
 
@@ -311,96 +311,6 @@ public:
   }
 };
 
-class CommunicationNode : public IMessage {
-public:
-  CommunicationNode() = default;
-
-  CommunicationNode(const std::string &ip, const std::uint16_t port)
-      : ip_{ip}, port_{port} {}
-
-  CommunicationNode(
-      const blazingdb::protocol::io::CommunicationNodeT &communicationNodeT)
-      : ip_{communicationNodeT.ip}, port_{communicationNodeT.port} {}
-
-  CommunicationNode(const std::uint8_t *buffer) {
-    flatbuffers::unique_ptr<blazingdb::protocol::io::CommunicationNodeT>
-        communicationNode = flatbuffers::unique_ptr<
-            blazingdb::protocol::io::CommunicationNodeT>(
-            flatbuffers::GetRoot<blazingdb::protocol::io::CommunicationNode>(
-                buffer)
-                ->UnPack());
-    CommunicationNode{communicationNode->ip, communicationNode->port};
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
-    flatbuffers::FlatBufferBuilder builder;
-    builder.Finish(blazingdb::protocol::io::CreateCommunicationNodeDirect(
-        builder, ip_.c_str(), port_));
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
-
-  const std::string &ip() const noexcept { return ip_; }
-  std::uint16_t port() const noexcept { return port_; }
-
-private:
-  std::string ip_;
-  std::uint16_t port_;
-};
-
-class CommunicationContext : public IMessage {
-public:
-  CommunicationContext(const std::vector<CommunicationNode> &nodes,
-                       const std::int32_t masterIndex, const std::int64_t token)
-      : nodes_{nodes}, masterIndex_{masterIndex}, token_{token} {}
-
-  CommunicationContext(const std::uint8_t *buffer) {
-    flatbuffers::unique_ptr<blazingdb::protocol::io::CommunicationContextT>
-        communicationContext = flatbuffers::unique_ptr<
-            blazingdb::protocol::io::CommunicationContextT>(
-            flatbuffers::GetRoot<blazingdb::protocol::io::CommunicationContext>(
-                buffer)
-                ->UnPack());
-    nodes_.resize(communicationContext->nodes.size());
-    std::transform(
-        communicationContext->nodes.cbegin(),
-        communicationContext->nodes.cend(), nodes_.begin(),
-        [](const std::unique_ptr<blazingdb::protocol::io::CommunicationNodeT>
-               &node) { return *node; });
-    masterIndex_ = communicationContext->masterIndex;
-    token_ = communicationContext->token;
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
-    flatbuffers::FlatBufferBuilder builder;
-
-    std::vector<flatbuffers::Offset<blazingdb::protocol::io::CommunicationNode>>
-        nodeOffsets;
-    nodeOffsets.resize(nodes_.size());
-    std::transform(
-        nodes_.cbegin(), nodes_.cend(), nodeOffsets.begin(),
-        [&builder](const CommunicationNode &node) {
-          return blazingdb::protocol::io::CreateCommunicationNodeDirect(
-              builder, node.ip().c_str(), node.port());
-        });
-
-    builder.Finish(blazingdb::protocol::io::CreateCommunicationContextDirect(
-        builder, &nodeOffsets, masterIndex_, token_));
-
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
-
-  const std::vector<CommunicationNode> &nodes() const noexcept {
-    return nodes_;
-  }
-  std::int32_t masterIndex() const noexcept { return masterIndex_; }
-  std::int64_t token() const noexcept { return token_; }
-
-private:
-  std::vector<CommunicationNode> nodes_;
-  std::int32_t masterIndex_;
-  std::int64_t token_;
-};
-
 struct FileSystemBlazingTableSchema {
   std::string name;
   blazingdb::protocol::io::FileSchemaType schemaType;
@@ -417,7 +327,7 @@ struct FileSystemTableGroupSchema {
 
 
 class FileSystemDMLRequestMessage : public IMessage {
-public:
+public: 
   FileSystemDMLRequestMessage(const uint8_t *buffer) : IMessage() {
     auto pointer = flatbuffers::GetRoot<blazingdb::protocol::io::FileSystemDMLRequest>(buffer);
     statement =  std::string{pointer->statement()->c_str()};
@@ -432,7 +342,7 @@ public:
       auto _ListFrom = [](const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *rawNames) {
         std::vector<std::string> columnNames;
         for (const auto& rawName : *rawNames){
-          auto name = std::string{rawName->c_str()};
+          auto name = std::string{rawName->c_str()};  
           columnNames.push_back(name);
         }
         return columnNames;
@@ -478,11 +388,11 @@ public:
     };
     tableGroup = get_table_group(pointer->tableGroup());
   }
-  FileSystemDMLRequestMessage( std::string statement,  FileSystemTableGroupSchema tableGroup)
-    : statement{statement}, tableGroup{tableGroup}, IMessage()
+  FileSystemDMLRequestMessage( std::string statement,  FileSystemTableGroupSchema tableGroup) 
+    : statement{statement}, tableGroup{tableGroup}, IMessage() 
   {
-
-  }
+    
+  } 
 
   flatbuffers::Offset<blazingdb::protocol::io::FileSystemTableGroup> _BuildTableGroup(flatbuffers::FlatBufferBuilder &builder,
                                                         FileSystemTableGroupSchema tableGroup) const {

@@ -9,7 +9,7 @@ add_library(blazingdb-protocol ${SRCS})
 target_link_libraries(blazingdb-protocol Threads::Threads  ${ZEROMQ_STATIC_LIB} ${FLATBUFFERS_STATIC_LIB})
 
 add_custom_command(TARGET blazingdb-protocol
-  COMMAND ${FLATBUFFERS_FLATC_EXECUTABLE} -c --gen-all --gen-object-api
+  COMMAND ${FLATBUFFERS_FLATC_EXECUTABLE} -c --gen-all
     ${PROJECT_SOURCE_DIR}/../messages/all.fbs
   COMMENT "Generate all messages")
 
