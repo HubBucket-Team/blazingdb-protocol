@@ -315,12 +315,11 @@ class CommunicationNode : public IMessage {
 public:
   CommunicationNode() = default;
 
-  CommunicationNode(const std::string &ip, const std::uint16_t port)
-      : ip_{ip}, port_{port} {}
+  CommunicationNode(std::vector<std::int8_t> &buffer) : buffer_{buffer} {}
 
   CommunicationNode(
       const blazingdb::protocol::io::CommunicationNodeT &communicationNodeT)
-      : ip_{communicationNodeT.ip}, port_{communicationNodeT.port} {}
+      : buffer_{communicationNodeT.buffer} {}
 
   CommunicationNode(const std::uint8_t *buffer) {
     flatbuffers::unique_ptr<blazingdb::protocol::io::CommunicationNodeT>
@@ -329,22 +328,20 @@ public:
             flatbuffers::GetRoot<blazingdb::protocol::io::CommunicationNode>(
                 buffer)
                 ->UnPack());
-    CommunicationNode{communicationNode->ip, communicationNode->port};
+    CommunicationNode{communicationNode->buffer};
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
     flatbuffers::FlatBufferBuilder builder;
     builder.Finish(blazingdb::protocol::io::CreateCommunicationNodeDirect(
-        builder, ip_.c_str(), port_));
+        builder, &buffer_));
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
 
-  const std::string &ip() const noexcept { return ip_; }
-  std::uint16_t port() const noexcept { return port_; }
+  const std::vector<std::int8_t> buffer() const noexcept { return buffer_; }
 
 private:
-  std::string ip_;
-  std::uint16_t port_;
+  std::vector<std::int8_t> buffer_;
 };
 
 class CommunicationContext : public IMessage {
@@ -379,8 +376,9 @@ public:
     std::transform(
         nodes_.cbegin(), nodes_.cend(), nodeOffsets.begin(),
         [&builder](const CommunicationNode &node) {
+          const std::vector<std::int8_t> &buffer = node.buffer();
           return blazingdb::protocol::io::CreateCommunicationNodeDirect(
-              builder, node.ip().c_str(), node.port());
+              builder, &buffer);
         });
 
     builder.Finish(blazingdb::protocol::io::CreateCommunicationContextDirect(
