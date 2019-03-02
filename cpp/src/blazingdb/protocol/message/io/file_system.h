@@ -346,6 +346,8 @@ private:
 
 class CommunicationContext : public IMessage {
 public:
+  CommunicationContext() = default;
+
   CommunicationContext(const std::vector<CommunicationNode> &nodes,
                        const std::int32_t masterIndex, const std::int64_t token)
       : nodes_{nodes}, masterIndex_{masterIndex}, token_{token} {}
@@ -476,8 +478,8 @@ public:
     };
     tableGroup = get_table_group(pointer->tableGroup());
   }
-  FileSystemDMLRequestMessage( std::string statement,  FileSystemTableGroupSchema tableGroup)
-    : statement{statement}, tableGroup{tableGroup}, IMessage()
+  FileSystemDMLRequestMessage( std::string statement, FileSystemTableGroupSchema tableGroup, const CommunicationContext &communicationContext)
+    : statement{statement}, tableGroup{tableGroup}, communicationContext_{communicationContext}, IMessage()
   {
 
   }
@@ -507,12 +509,30 @@ public:
        flatbuffers::FlatBufferBuilder builder;
     auto logicalPlan_offset = builder.CreateString(statement);
     auto tableGroupOffset = _BuildTableGroup(builder, tableGroup);
-    builder.Finish(blazingdb::protocol::io::CreateFileSystemDMLRequest(builder, logicalPlan_offset, tableGroupOffset));
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
 
+    std::vector<flatbuffers::Offset<blazingdb::protocol::io::CommunicationNode>>
+        nodeOffsets;
+    nodeOffsets.resize(communicationContext_.nodes().size());
+    std::transform(
+        communicationContext_.nodes().cbegin(),
+        communicationContext_.nodes().cend(), nodeOffsets.begin(),
+        [&builder](const CommunicationNode &node) {
+          const std::vector<std::int8_t> &buffer = node.buffer();
+          return blazingdb::protocol::io::CreateCommunicationNodeDirect(
+              builder, &buffer);
+        });
+
+    auto communicationContextOffset =
+        blazingdb::protocol::io::CreateCommunicationContextDirect(
+            builder, &nodeOffsets, communicationContext_.masterIndex(), communicationContext_.token());
+
+    builder.Finish(blazingdb::protocol::io::CreateFileSystemDMLRequest(builder, logicalPlan_offset, tableGroupOffset, communicationContextOffset));
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
+
   std::string statement;
   FileSystemTableGroupSchema tableGroup;
+  CommunicationContext communicationContext_;
 };
 
 
