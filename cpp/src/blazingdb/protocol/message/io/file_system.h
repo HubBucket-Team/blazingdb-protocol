@@ -482,18 +482,22 @@ public:
             flatbuffers::GetRoot<blazingdb::protocol::io::FileSystemDMLRequest>(
                 buffer)
                 ->UnPack());
-    const std::unique_ptr<blazingdb::protocol::io::CommunicationContextT>
-        &communicationContext = fileSystemDMLRequest->communicationContext;
 
-    std::vector<CommunicationNode> nodes;
-    nodes.reserve(communicationContext->nodes.size());
-    std::transform(
-        communicationContext->nodes.cbegin(),
-        communicationContext->nodes.cend(), std::back_inserter(nodes),
-        [](const std::unique_ptr<blazingdb::protocol::io::CommunicationNodeT>
-               &node) { return CommunicationNode{node->buffer}; });
-    communicationContext_ = CommunicationContext{
-        nodes, communicationContext->masterIndex, communicationContext->token};
+    if (fileSystemDMLRequest->communicationContext) {
+      const std::unique_ptr<blazingdb::protocol::io::CommunicationContextT>
+          &communicationContext = fileSystemDMLRequest->communicationContext;
+
+      std::vector<CommunicationNode> nodes;
+      nodes.reserve(communicationContext->nodes.size());
+      std::transform(
+          communicationContext->nodes.cbegin(),
+          communicationContext->nodes.cend(), std::back_inserter(nodes),
+          [](const std::unique_ptr<blazingdb::protocol::io::CommunicationNodeT>
+                 &node) { return CommunicationNode{node->buffer}; });
+      communicationContext_ =
+          CommunicationContext{nodes, communicationContext->masterIndex,
+                               communicationContext->token};
+    }
   }
 
   FileSystemDMLRequestMessage(std::string statement,
