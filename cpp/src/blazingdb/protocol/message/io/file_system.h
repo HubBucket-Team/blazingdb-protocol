@@ -349,7 +349,7 @@ public:
   CommunicationContext() = default;
 
   CommunicationContext(const std::vector<CommunicationNode> &nodes,
-                       const std::int32_t masterIndex, const std::int64_t token)
+                       const std::int32_t masterIndex, const std::uint64_t token)
       : nodes_{nodes}, masterIndex_{masterIndex}, token_{token} {}
 
   CommunicationContext(const std::uint8_t *buffer) {
@@ -393,12 +393,12 @@ public:
     return nodes_;
   }
   std::int32_t masterIndex() const noexcept { return masterIndex_; }
-  std::int64_t token() const noexcept { return token_; }
+  std::uint64_t token() const noexcept { return token_; }
 
 private:
   std::vector<CommunicationNode> nodes_;
   std::int32_t masterIndex_;
-  std::int64_t token_;
+  std::uint64_t token_;
 };
 
 struct FileSystemBlazingTableSchema {
@@ -420,9 +420,7 @@ class FileSystemDMLRequestMessage : public IMessage {
 public:
   FileSystemDMLRequestMessage(const uint8_t *buffer) : IMessage() {
     auto pointer = flatbuffers::GetRoot<blazingdb::protocol::io::FileSystemDMLRequest>(buffer);
-    statement =  std::string{pointer->statement()->c_str()};
-
-
+    statement_ =  std::string{pointer->statement()->c_str()};
 
     auto get_table_group = [] (const blazingdb::protocol::io::FileSystemTableGroup * tableGroup) {
       std::string name = std::string{tableGroup->name()->c_str()};
@@ -476,13 +474,35 @@ public:
           .name = name,
       };
     };
-    tableGroup = get_table_group(pointer->tableGroup());
-  }
-  FileSystemDMLRequestMessage( std::string statement, FileSystemTableGroupSchema tableGroup, const CommunicationContext &communicationContext)
-    : statement{statement}, tableGroup{tableGroup}, communicationContext_{communicationContext}, IMessage()
-  {
+    tableGroup_ = get_table_group(pointer->tableGroup());
 
+    flatbuffers::unique_ptr<blazingdb::protocol::io::FileSystemDMLRequestT>
+        fileSystemDMLRequest = flatbuffers::unique_ptr<
+            blazingdb::protocol::io::FileSystemDMLRequestT>(
+            flatbuffers::GetRoot<blazingdb::protocol::io::FileSystemDMLRequest>(
+                buffer)
+                ->UnPack());
+    const std::unique_ptr<blazingdb::protocol::io::CommunicationContextT>
+        &communicationContext = fileSystemDMLRequest->communicationContext;
+
+    std::vector<CommunicationNode> nodes;
+    nodes.reserve(communicationContext->nodes.size());
+    std::transform(
+        communicationContext->nodes.cbegin(),
+        communicationContext->nodes.cend(), std::back_inserter(nodes),
+        [](const std::unique_ptr<blazingdb::protocol::io::CommunicationNodeT>
+               &node) { return CommunicationNode{node->buffer}; });
+    communicationContext_ = CommunicationContext{
+        nodes, communicationContext->masterIndex, communicationContext->token};
   }
+
+  FileSystemDMLRequestMessage(std::string statement,
+                              FileSystemTableGroupSchema tableGroup,
+                              const CommunicationContext &communicationContext)
+      : statement_{statement},
+        tableGroup_{tableGroup},
+        communicationContext_{communicationContext},
+        IMessage() {}
 
   flatbuffers::Offset<blazingdb::protocol::io::FileSystemTableGroup> _BuildTableGroup(flatbuffers::FlatBufferBuilder &builder,
                                                         FileSystemTableGroupSchema tableGroup) const {
@@ -507,8 +527,8 @@ public:
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
        flatbuffers::FlatBufferBuilder builder;
-    auto logicalPlan_offset = builder.CreateString(statement);
-    auto tableGroupOffset = _BuildTableGroup(builder, tableGroup);
+    auto logicalPlan_offset = builder.CreateString(statement_);
+    auto tableGroupOffset = _BuildTableGroup(builder, tableGroup_);
 
     std::vector<flatbuffers::Offset<blazingdb::protocol::io::CommunicationNode>>
         nodeOffsets;
@@ -530,8 +550,13 @@ public:
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
 
-  std::string statement;
-  FileSystemTableGroupSchema tableGroup;
+  const std::string &statement() const noexcept { return statement_; }
+  const FileSystemTableGroupSchema &tableGroup() const noexcept { return tableGroup_; }
+  const CommunicationContext &communicationContext() const noexcept { return communicationContext_; }
+
+private:
+  std::string statement_;
+  FileSystemTableGroupSchema tableGroup_;
   CommunicationContext communicationContext_;
 };
 
