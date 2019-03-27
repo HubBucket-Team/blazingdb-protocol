@@ -29,6 +29,7 @@ namespace gdf_dto {
     GDF_TIMESTAMP,	/**< Exact timestamp encoded with int64 since UNIX epoch (Default unit millisecond) */
     GDF_CATEGORY,
     GDF_STRING,
+    GDF_STRING_CATEGORY,
     N_GDF_TYPES, 	/* additional types should go BEFORE N_GDF_TYPES */
   } gdf_dtype;
 
@@ -86,6 +87,7 @@ namespace gdf_dto {
   typedef struct gdf_column_{
     std::basic_string<int8_t> data;                       /**< Pointer to the columns data */
     std::basic_string<int8_t> valid;            /**< Pointer to the columns validity bit mask where the 'i'th bit indicates if the 'i'th row is NULL */
+    std::basic_string<int8_t> custrings_views;            /**< Pointer to the custrings_views where the 'i'th bit indicates if the 'i'th row is NULL */
     gdf_size_type size;               /**< Number of data elements in the columns data buffer*/
     gdf_dtype dtype;                  /**< The datatype of the column's data */
     gdf_size_type null_count;         /**< The number of NULL values in the column's data */
