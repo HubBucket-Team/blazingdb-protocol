@@ -86,6 +86,10 @@ def BuildDMLRequestSchema(query, tableGroupDto):
         valid = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=b'')
       else:
         valid = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['valid'])
+      if c['custrings_membuffer'] is None:
+        custrings_membuffer = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=b'')
+      else:
+        custrings_membuffer = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['custrings_membuffer'])
       if c['custrings_views'] is None:
         custrings_views = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=b'')
       else:
@@ -93,6 +97,7 @@ def BuildDMLRequestSchema(query, tableGroupDto):
 
       dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit=c['dtype_info'])
       gdfColumn = blazingdb.protocol.gdf.gdf_columnSchema(data=data, valid=valid,
+                                custrings_membuffer=custrings_membuffer,
                                 custrings_views=custrings_views, size=c['size'],
                                 dtype=c['dtype'], dtype_info=dtype_info,
                                 null_count=c['null_count'])

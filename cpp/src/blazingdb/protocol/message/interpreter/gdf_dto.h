@@ -87,6 +87,7 @@ namespace gdf_dto {
   typedef struct gdf_column_{
     std::basic_string<int8_t> data;                       /**< Pointer to the columns data */
     std::basic_string<int8_t> valid;            /**< Pointer to the columns validity bit mask where the 'i'th bit indicates if the 'i'th row is NULL */
+    std::basic_string<int8_t> custrings_membuffer;            /**< Pointer to the custrings_membuffer where the 'i'th bit indicates if the 'i'th row is NULL */
     std::basic_string<int8_t> custrings_views;            /**< Pointer to the custrings_views where the 'i'th bit indicates if the 'i'th row is NULL */
     gdf_size_type size;               /**< Number of data elements in the columns data buffer*/
     gdf_dtype dtype;                  /**< The datatype of the column's data */
