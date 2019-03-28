@@ -503,10 +503,12 @@ public:
   FileSystemDMLRequestMessage(std::string statement,
                               FileSystemTableGroupSchema tableGroup,
                               const CommunicationContext &communicationContext)
-      : statement_{statement},
+      :
+        IMessage() ,
+        statement_{statement},
         tableGroup_{tableGroup},
-        communicationContext_{communicationContext},
-        IMessage() {}
+        communicationContext_{communicationContext}
+        {}
 
   flatbuffers::Offset<blazingdb::protocol::io::FileSystemTableGroup> _BuildTableGroup(flatbuffers::FlatBufferBuilder &builder,
                                                         FileSystemTableGroupSchema tableGroup) const {
