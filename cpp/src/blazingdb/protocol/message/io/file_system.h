@@ -311,94 +311,14 @@ public:
   }
 };
 
-class CommunicationNode : public IMessage {
-public:
-  CommunicationNode() = default;
-
-  CommunicationNode(std::vector<std::int8_t> &buffer) : buffer_{buffer} {}
-
-  CommunicationNode(
-      const blazingdb::protocol::io::CommunicationNodeT &communicationNodeT)
-      : buffer_{communicationNodeT.buffer} {}
-
-  CommunicationNode(const std::uint8_t *buffer) {
-    flatbuffers::unique_ptr<blazingdb::protocol::io::CommunicationNodeT>
-        communicationNode = flatbuffers::unique_ptr<
-            blazingdb::protocol::io::CommunicationNodeT>(
-            flatbuffers::GetRoot<blazingdb::protocol::io::CommunicationNode>(
-                buffer)
-                ->UnPack());
-    CommunicationNode{communicationNode->buffer};
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
-    flatbuffers::FlatBufferBuilder builder;
-    builder.Finish(blazingdb::protocol::io::CreateCommunicationNodeDirect(
-        builder, &buffer_));
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
-
-  const std::vector<std::int8_t> buffer() const noexcept { return buffer_; }
-
-private:
-  std::vector<std::int8_t> buffer_;
+struct CommunicationNodeSchema {
+  std::vector<std::int8_t> buffer;
 };
 
-class CommunicationContext : public IMessage {
-public:
-  CommunicationContext() = default;
-
-  CommunicationContext(const std::vector<CommunicationNode> &nodes,
-                       const std::int32_t masterIndex, const std::uint64_t token)
-      : nodes_{nodes}, masterIndex_{masterIndex}, token_{token} {}
-
-  CommunicationContext(const std::uint8_t *buffer) {
-    flatbuffers::unique_ptr<blazingdb::protocol::io::CommunicationContextT>
-        communicationContext = flatbuffers::unique_ptr<
-            blazingdb::protocol::io::CommunicationContextT>(
-            flatbuffers::GetRoot<blazingdb::protocol::io::CommunicationContext>(
-                buffer)
-                ->UnPack());
-    nodes_.resize(communicationContext->nodes.size());
-    std::transform(
-        communicationContext->nodes.cbegin(),
-        communicationContext->nodes.cend(), nodes_.begin(),
-        [](const std::unique_ptr<blazingdb::protocol::io::CommunicationNodeT>
-               &node) { return *node; });
-    masterIndex_ = communicationContext->masterIndex;
-    token_ = communicationContext->token;
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
-    flatbuffers::FlatBufferBuilder builder;
-
-    std::vector<flatbuffers::Offset<blazingdb::protocol::io::CommunicationNode>>
-        nodeOffsets;
-    nodeOffsets.resize(nodes_.size());
-    std::transform(
-        nodes_.cbegin(), nodes_.cend(), nodeOffsets.begin(),
-        [&builder](const CommunicationNode &node) {
-          const std::vector<std::int8_t> &buffer = node.buffer();
-          return blazingdb::protocol::io::CreateCommunicationNodeDirect(
-              builder, &buffer);
-        });
-
-    builder.Finish(blazingdb::protocol::io::CreateCommunicationContextDirect(
-        builder, &nodeOffsets, masterIndex_, token_));
-
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
-
-  const std::vector<CommunicationNode> &nodes() const noexcept {
-    return nodes_;
-  }
-  std::int32_t masterIndex() const noexcept { return masterIndex_; }
-  std::uint64_t token() const noexcept { return token_; }
-
-private:
-  std::vector<CommunicationNode> nodes_;
-  std::int32_t masterIndex_;
-  std::uint64_t token_;
+struct CommunicationContextSchema {
+  std::vector<CommunicationNodeSchema> nodes;
+  std::int32_t masterIndex;
+  std::uint64_t token;
 };
 
 struct FileSystemBlazingTableSchema {
@@ -487,22 +407,22 @@ public:
       const std::unique_ptr<blazingdb::protocol::io::CommunicationContextT>
           &communicationContext = fileSystemDMLRequest->communicationContext;
 
-      std::vector<CommunicationNode> nodes;
+      std::vector<CommunicationNodeSchema> nodes;
       nodes.reserve(communicationContext->nodes.size());
       std::transform(
           communicationContext->nodes.cbegin(),
           communicationContext->nodes.cend(), std::back_inserter(nodes),
           [](const std::unique_ptr<blazingdb::protocol::io::CommunicationNodeT>
-                 &node) { return CommunicationNode{node->buffer}; });
+                 &node) { return CommunicationNodeSchema{node->buffer}; });
       communicationContext_ =
-          CommunicationContext{nodes, communicationContext->masterIndex,
+          CommunicationContextSchema{nodes, communicationContext->masterIndex,
                                communicationContext->token};
     }
   }
 
   FileSystemDMLRequestMessage(std::string statement,
                               FileSystemTableGroupSchema tableGroup,
-                              const CommunicationContext &communicationContext)
+                              const CommunicationContextSchema& communicationContext)
       : statement_{statement},
         tableGroup_{tableGroup},
         communicationContext_{communicationContext},
@@ -536,19 +456,18 @@ public:
 
     std::vector<flatbuffers::Offset<blazingdb::protocol::io::CommunicationNode>>
         nodeOffsets;
-    nodeOffsets.resize(communicationContext_.nodes().size());
+    nodeOffsets.resize(communicationContext_.nodes.size());
     std::transform(
-        communicationContext_.nodes().cbegin(),
-        communicationContext_.nodes().cend(), nodeOffsets.begin(),
-        [&builder](const CommunicationNode &node) {
-          const std::vector<std::int8_t> &buffer = node.buffer();
+        communicationContext_.nodes.cbegin(),
+        communicationContext_.nodes.cend(), nodeOffsets.begin(),
+        [&builder](const CommunicationNodeSchema &node) {
           return blazingdb::protocol::io::CreateCommunicationNodeDirect(
-              builder, &buffer);
+              builder, &node.buffer);
         });
 
     auto communicationContextOffset =
         blazingdb::protocol::io::CreateCommunicationContextDirect(
-            builder, &nodeOffsets, communicationContext_.masterIndex(), communicationContext_.token());
+            builder, &nodeOffsets, communicationContext_.masterIndex, communicationContext_.token);
 
     builder.Finish(blazingdb::protocol::io::CreateFileSystemDMLRequest(builder, logicalPlan_offset, tableGroupOffset, communicationContextOffset));
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
@@ -556,12 +475,12 @@ public:
 
   const std::string &statement() const noexcept { return statement_; }
   const FileSystemTableGroupSchema &tableGroup() const noexcept { return tableGroup_; }
-  const CommunicationContext &communicationContext() const noexcept { return communicationContext_; }
+  const CommunicationContextSchema &communicationContext() const noexcept { return communicationContext_; }
 
 private:
   std::string statement_;
   FileSystemTableGroupSchema tableGroup_;
-  CommunicationContext communicationContext_;
+  CommunicationContextSchema communicationContext_;
 };
 
 
