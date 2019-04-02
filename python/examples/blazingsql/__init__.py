@@ -223,7 +223,7 @@ class Connector:
         return client.send(requestBuffer)
 
 
-     def get_result(self, result_token, interpreter_path):
+    def get_result(self, result_token, interpreter_path):
         getResultRequest = GetResultRequestSchema(resultToken=result_token)
 
         requestBuffer = MakeRequestBuffer(InterpreterMessage.GetResult,
@@ -502,7 +502,7 @@ class Schema:
     def _get_schema_from_parquet(self, path):
         return None
 
-    def _get_schema(self, **kwargs)
+    def _get_schema(self, **kwargs):
         """
         :param table_name:
         :param kwargs:
