@@ -32,6 +32,13 @@ CUDACXX=/usr/local/cuda-9.2/bin/nvcc cmake -DCMAKE_BUILD_TYPE=Debug \
 make -j8
 ```
 
+**NOTE:**
+If you want to build the dependencies using the old C++ ABI, add this cmake argument:
+
+```bash
+-DCXX_OLD_ABI=ON
+```
+
 ## Initialize Services
 
 Initialize blazingsql mock services
