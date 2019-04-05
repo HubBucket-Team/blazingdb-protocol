@@ -87,21 +87,28 @@ def BuildDMLRequestSchema(query, tableGroupDto):
       else:
         valid = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['valid'])
 
-      if c['custrings_views'] is None:
+      if 'custrings_views' not in c['dtype_info']:
         custrings_views = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=b'')
       else:
-        custrings_views = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['custrings_views'])
-      if c['custrings_membuffer'] is None:
+        custrings_views = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['dtype_info']['custrings_views'])
+      if 'custrings_membuffer'not in c['dtype_info']:
         custrings_membuffer = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=b'')
       else:
-        custrings_membuffer = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['custrings_membuffer'])
+        custrings_membuffer = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['dtype_info']['custrings_membuffer'])
 
-      dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit=c['dtype_info'],
+      if 'custrings_views_count' not in c['dtype_info']:
+        c['dtype_info']['custrings_views_count'] = 0
+      if 'custrings_membuffer_size' not in c['dtype_info']:
+        c['dtype_info']['custrings_membuffer_size'] = 0
+      if 'custrings_base_ptr' not in c['dtype_info']:
+        c['dtype_info']['custrings_base_ptr'] = 0
+
+      dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit=0,
                                                                      custrings_views=custrings_views,
-                                                                     custrings_views_count=c['custrings_views_count'],
+                                                                     custrings_views_count=c['dtype_info']['custrings_views_count'],
                                                                      custrings_membuffer=custrings_membuffer,
-                                                                     custrings_membuffer_size=c['custrings_membuffer_size'],
-                                                                     custrings_base_ptr=c['custrings_base_ptr'])
+                                                                     custrings_membuffer_size=c['dtype_info']['custrings_membuffer_size'],
+                                                                     custrings_base_ptr=c['dtype_info']['custrings_base_ptr'])
       gdfColumn = blazingdb.protocol.gdf.gdf_columnSchema(data=data, valid=valid,
                                 size=c['size'],
                                 dtype=c['dtype'], dtype_info=dtype_info,
