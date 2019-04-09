@@ -6,13 +6,6 @@ namespace blazingdb.protocol.gdf;
 table gdf_dtype_extra_info {
     time_unit: gdf_time_unit;
     // here we can also hold info for decimal datatype or any other datatype that requires additional information
-
-    // custring data
-    custrings_views: cudaIpcMemHandle_t;
-    custrings_viewscount: uint;
-    custrings_membuffer: cudaIpcMemHandle_t;
-    custrings_membuffersize: ulong;
-    custrings_baseptr: ulong;
 }
 
 root_type gdf_dtype_extra_info;

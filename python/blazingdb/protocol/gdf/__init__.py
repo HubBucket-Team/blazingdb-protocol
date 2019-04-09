@@ -8,11 +8,6 @@ class cudaIpcMemHandle_tSchema(transport.schema(cudaIpcMemHandle_t)):
 
 class gdf_dtype_extra_infoSchema(transport.schema(gdf_dtype_extra_info)):
   time_unit = transport.NumberSegment()
-  custrings_views = transport.SchemaSegment(cudaIpcMemHandle_tSchema)
-  custrings_viewscount = transport.NumberSegment()
-  custrings_membuffer = transport.SchemaSegment(cudaIpcMemHandle_tSchema)
-  custrings_membuffersize = transport.NumberSegment()
-  custrings_baseptr = transport.NumberSegment()
 
 class gdf_columnSchema(transport.schema(gdf_column_handler)):
   data = transport.SchemaSegment(cudaIpcMemHandle_tSchema)
@@ -21,4 +16,8 @@ class gdf_columnSchema(transport.schema(gdf_column_handler)):
   dtype = transport.NumberSegment()
   dtype_info = transport.SchemaSegment(gdf_dtype_extra_infoSchema)
   null_count = transport.NumberSegment()
-
+  custrings_views = transport.SchemaSegment(cudaIpcMemHandle_tSchema)
+  custrings_viewscount = transport.NumberSegment()
+  custrings_membuffer = transport.SchemaSegment(cudaIpcMemHandle_tSchema)
+  custrings_membuffersize = transport.NumberSegment()
+  custrings_baseptr = transport.NumberSegment()

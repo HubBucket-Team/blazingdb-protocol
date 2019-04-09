@@ -82,13 +82,6 @@ namespace gdf_dto {
   typedef struct {
     gdf_time_unit time_unit;
     // here we can also hold info for decimal datatype or any other datatype that requires additional information
-
-    // custrings_data
-    std::basic_string<int8_t> custrings_views;         /**< Pointer to the custrings_views where the 'i'th bit indicates if the 'i'th row is NULL */
-    gdf_size_type custrings_viewscount;               /**< Number of elements in the views buffer*/
-    std::basic_string<int8_t> custrings_membuffer;     /**< Pointer to the custrings_membuffer where the 'i'th bit indicates if the 'i'th row is NULL */
-    gdf_size_type custrings_membuffersize;            /**< Size of the memory buffer*/
-    unsigned long custrings_baseptr;                  /**< Original address from the memory buffer*/
   } gdf_dtype_extra_info;
 
   typedef struct gdf_column_{
@@ -98,6 +91,13 @@ namespace gdf_dto {
     gdf_dtype dtype;                  /**< The datatype of the column's data */
     gdf_size_type null_count;         /**< The number of NULL values in the column's data */
     gdf_dtype_extra_info dtype_info;
+
+    // custrings_data
+    std::basic_string<int8_t> custrings_views;         /**< Pointer to the custrings_views where the 'i'th bit indicates if the 'i'th row is NULL */
+    gdf_size_type custrings_viewscount;               /**< Number of elements in the views buffer*/
+    std::basic_string<int8_t> custrings_membuffer;     /**< Pointer to the custrings_membuffer where the 'i'th bit indicates if the 'i'th row is NULL */
+    gdf_size_type custrings_membuffersize;            /**< Size of the memory buffer*/
+    unsigned long custrings_baseptr;                  /**< Original address from the memory buffer*/
   } gdf_column;
 
 /* --------------------------------------------------------------------------*/
