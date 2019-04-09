@@ -59,10 +59,10 @@ static std::vector<::gdf_dto::gdf_column>  GdfColumnsFrom(const flatbuffers::Vec
         .dtype_info = gdf_dto::gdf_dtype_extra_info {
             .time_unit = (gdf_dto::gdf_time_unit) c->dtype_info()->time_unit(),
             .custrings_views = custrings_views_valid ? CudaIpcMemHandlerFrom(c->dtype_info()->custrings_views()) : std::basic_string<int8_t>{},
-            .custrings_views_count = c->dtype_info()->custrings_views_count(),
+            .custrings_viewscount = c->dtype_info()->custrings_viewscount(),
             .custrings_membuffer = custrings_membuffer_valid ? CudaIpcMemHandlerFrom(c->dtype_info()->custrings_membuffer()) : std::basic_string<int8_t>{},
-            .custrings_membuffer_size = c->dtype_info()->custrings_membuffer_size(),
-            .custrings_base_ptr = c->dtype_info()->custrings_base_ptr()
+            .custrings_membuffersize = c->dtype_info()->custrings_membuffersize(),
+            .custrings_baseptr = c->dtype_info()->custrings_baseptr()
         },
     };
     columns.push_back(column);
@@ -117,7 +117,7 @@ std::vector<flatbuffers::Offset<gdf::gdf_column_handler>>  BuildFlatColumns(flat
   for (auto & c: columns) {
     auto custrings_membuffer_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildCudaIpcMemHandler(builder, c.dtype_info.custrings_membuffer) );
     auto custrings_views_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildCudaIpcMemHandler(builder, c.dtype_info.custrings_views) );
-    auto dtype_extra_info = gdf::Creategdf_dtype_extra_info (builder, (gdf::gdf_time_unit)c.dtype_info.time_unit, custrings_views_offset, c.dtype_info.custrings_views_count, custrings_membuffer_offset, c.dtype_info.custrings_membuffer_size, c.dtype_info.custrings_base_ptr );
+    auto dtype_extra_info = gdf::Creategdf_dtype_extra_info (builder, (gdf::gdf_time_unit)c.dtype_info.time_unit, custrings_views_offset, c.dtype_info.custrings_viewscount, custrings_membuffer_offset, c.dtype_info.custrings_membuffersize, c.dtype_info.custrings_baseptr );
     auto data_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildCudaIpcMemHandler (builder, c.data) );
     auto valid_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildCudaIpcMemHandler(builder, c.valid) );
     auto column_offset = ::blazingdb::protocol::gdf::Creategdf_column_handler(builder, data_offset, valid_offset, c.size, (gdf::gdf_dtype)c.dtype, dtype_extra_info, c.null_count);
@@ -143,7 +143,7 @@ std::vector<flatbuffers::Offset<gdf::gdf_column_handler>>  BuildDirectFlatColumn
   for (const auto & c: *rawColumns) {
     auto custrings_views_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildDirectCudaIpcMemHandler(builder, c->dtype_info()->custrings_views()->reserved()) );
     auto custrings_membuffer_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildDirectCudaIpcMemHandler(builder, c->dtype_info()->custrings_membuffer()->reserved()) );
-    auto dtype_extra_info = gdf::Creategdf_dtype_extra_info (builder, (gdf::gdf_time_unit)c->dtype_info()->time_unit(), custrings_views_offset, c->dtype_info()->custrings_views_count(), custrings_membuffer_offset, c->dtype_info()->custrings_membuffer_size(), c->dtype_info()->custrings_base_ptr() );
+    auto dtype_extra_info = gdf::Creategdf_dtype_extra_info (builder, (gdf::gdf_time_unit)c->dtype_info()->time_unit(), custrings_views_offset, c->dtype_info()->custrings_viewscount(), custrings_membuffer_offset, c->dtype_info()->custrings_membuffersize(), c->dtype_info()->custrings_baseptr() );
     auto data_offset =  gdf::CreatecudaIpcMemHandle_t(builder, BuildDirectCudaIpcMemHandler(builder, c->data()->reserved()) );
     auto valid_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildDirectCudaIpcMemHandler(builder, c->valid()->reserved()) );
     auto column_offset = ::blazingdb::protocol::gdf::Creategdf_column_handler(builder, data_offset, valid_offset, c->size(), (gdf::gdf_dtype)c->dtype(), dtype_extra_info);

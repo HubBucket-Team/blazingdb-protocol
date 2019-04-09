@@ -96,19 +96,19 @@ def BuildDMLRequestSchema(query, tableGroupDto):
       else:
         custrings_membuffer = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['dtype_info']['custrings_membuffer'])
 
-      if 'custrings_views_count' not in c['dtype_info']:
-        c['dtype_info']['custrings_views_count'] = 0
-      if 'custrings_membuffer_size' not in c['dtype_info']:
-        c['dtype_info']['custrings_membuffer_size'] = 0
-      if 'custrings_base_ptr' not in c['dtype_info']:
-        c['dtype_info']['custrings_base_ptr'] = 0
+      if 'custrings_viewscount' not in c['dtype_info']:
+        c['dtype_info']['custrings_viewscount'] = 0
+      if 'custrings_membuffersize' not in c['dtype_info']:
+        c['dtype_info']['custrings_membuffersize'] = 0
+      if 'custrings_baseptr' not in c['dtype_info']:
+        c['dtype_info']['custrings_baseptr'] = 0
 
       dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit=0,
                                                                      custrings_views=custrings_views,
-                                                                     custrings_views_count=c['dtype_info']['custrings_views_count'],
+                                                                     custrings_viewscount=c['dtype_info']['custrings_viewscount'],
                                                                      custrings_membuffer=custrings_membuffer,
-                                                                     custrings_membuffer_size=c['dtype_info']['custrings_membuffer_size'],
-                                                                     custrings_base_ptr=c['dtype_info']['custrings_base_ptr'])
+                                                                     custrings_membuffersize=c['dtype_info']['custrings_membuffersize'],
+                                                                     custrings_baseptr=c['dtype_info']['custrings_baseptr'])
       gdfColumn = blazingdb.protocol.gdf.gdf_columnSchema(data=data, valid=valid,
                                 size=c['size'],
                                 dtype=c['dtype'], dtype_info=dtype_info,

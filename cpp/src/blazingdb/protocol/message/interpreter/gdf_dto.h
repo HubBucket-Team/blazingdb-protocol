@@ -85,10 +85,10 @@ namespace gdf_dto {
 
     // custrings_data
     std::basic_string<int8_t> custrings_views;         /**< Pointer to the custrings_views where the 'i'th bit indicates if the 'i'th row is NULL */
-    gdf_size_type custrings_views_count;               /**< Number of elements in the views buffer*/
+    gdf_size_type custrings_viewscount;               /**< Number of elements in the views buffer*/
     std::basic_string<int8_t> custrings_membuffer;     /**< Pointer to the custrings_membuffer where the 'i'th bit indicates if the 'i'th row is NULL */
-    gdf_size_type custrings_membuffer_size;            /**< Size of the memory buffer*/
-    unsigned long custrings_base_ptr;                  /**< Original address from the memory buffer*/
+    gdf_size_type custrings_membuffersize;            /**< Size of the memory buffer*/
+    unsigned long custrings_baseptr;                  /**< Original address from the memory buffer*/
   } gdf_dtype_extra_info;
 
   typedef struct gdf_column_{

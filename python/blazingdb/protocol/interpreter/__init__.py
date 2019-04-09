@@ -42,6 +42,12 @@ def _get_bytearray(ipch):
     np_buffer[i] = ipch.Reserved(i)
   return bytearray(np_buffer)
 
+def _get_dtype_info(dtype_info):
+  response = dtype_info
+  response['custrings_views'] = _get_bytearray(dtype_info.custrings_views)
+  response['custrings_membuffer'] = _get_bytearray(dtype_info.custrings_membuffer)
+  return response
+
 def GetQueryResultFrom(payloadBuffer):
   result = GetResultResponseSchema.From(payloadBuffer)
   columns = []
@@ -50,6 +56,7 @@ def GetQueryResultFrom(payloadBuffer):
     column = copy.deepcopy(item)
     column.data = _get_bytearray(item.data)
     column.valid = _get_bytearray(item.valid)
+    column.dtype_info = _get_dtype_info(item.dtype_info)
     columns.append(column)
   return type('obj', (object,), {
     'metadata': result.metadata,
