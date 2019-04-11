@@ -1,4 +1,3 @@
-
 # blazingdb-protocol
 BlazingDB Protocol &amp; Messages
 
@@ -11,16 +10,8 @@ Here are the steps to do so, including the necessary dependencies, just be sure 
 - Java 8+
 - Python 3.5+
 
-### Install dependencies
-
-Install Flatbuffers
-
-```
-git clone https://github.com/google/flatbuffers.git
-cd flatbuffers && mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j8 install
-```
+## Dependencies
+- General dependencies: https://github.com/BlazingDB/blazingdb-toolchain
 
 ## Build and test blazingdb-protocol library
 
@@ -30,12 +21,22 @@ make -j8 install
 ```
 ### Build cpp blazingdb-protocol library
 
+```bash
+cd blazingdb-protocol
+mkdir build
+CUDACXX=/usr/local/cuda-9.2/bin/nvcc cmake -DCMAKE_BUILD_TYPE=Debug \
+      -DBUILD_TESTING=ON \
+      -DBLAZINGDB_DEPENDENCIES_INSTALL_DIR=/foo/blazingsql/dependencies/ \
+      -DCMAKE_INSTALL_PREFIX:PATH=/foo/blazingdb_protocol_install_dir/ \
+      ..
+make -j8
 ```
-cd cpp && mkdir build && cd build
-cmake -DCMAKE_INSTALL_PREFIX=/some_directory/protocol_install \
-      -DFLATBUFFERS_INSTALL_DIR=/home/aocsa/flatbuffers_install \
-      .. 
-make 
+
+**NOTE:**
+If you want to build the dependencies using the old C++ ABI, add this cmake argument:
+
+```bash
+-DCXX_OLD_ABI=ON
 ```
 
 ## Initialize Services
@@ -58,5 +59,4 @@ Initialize blazingsql mock services individually
 ```
 cd python/examples/
 python3 py-connector.py
-
 ```
