@@ -1,8 +1,11 @@
 include "blazingdb/protocol/gdf/gdf_time_unit.fbs";
+include "blazingdb/protocol/gdf/cudaIpcMemHandle_t.fbs";
 
 namespace blazingdb.protocol.gdf;
 
 table gdf_dtype_extra_info {
-    time_unit:gdf_time_unit;
+    time_unit: gdf_time_unit;
     // here we can also hold info for decimal datatype or any other datatype that requires additional information
 }
+
+root_type gdf_dtype_extra_info;

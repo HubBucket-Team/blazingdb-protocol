@@ -87,10 +87,32 @@ def BuildDMLRequestSchema(query, tableGroupDto):
       else:
         valid = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['valid'])
 
-      dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit=c['dtype_info'])
-      gdfColumn = blazingdb.protocol.gdf.gdf_columnSchema(data=data, valid=valid, size=c['size'],
+      if 'custrings_views' not in c:
+        custrings_views = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=b'')
+      else:
+        custrings_views = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['custrings_views'])
+      if 'custrings_membuffer'not in c:
+        custrings_membuffer = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=b'')
+      else:
+        custrings_membuffer = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['custrings_membuffer'])
+
+      if 'custrings_viewscount' not in c:
+        c['custrings_viewscount'] = 0
+      if 'custrings_membuffersize' not in c:
+        c['custrings_membuffersize'] = 0
+      if 'custrings_baseptr' not in c:
+        c['custrings_baseptr'] = 0
+
+      dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit=0)
+      gdfColumn = blazingdb.protocol.gdf.gdf_columnSchema(data=data, valid=valid,
+                                size=c['size'],
                                 dtype=c['dtype'], dtype_info=dtype_info,
-                                null_count=c['null_count'])
+                                null_count=c['null_count'],
+                                custrings_views=custrings_views,
+                                custrings_viewscount=c['custrings_viewscount'],
+                                custrings_membuffer=custrings_membuffer,
+                                custrings_membuffersize=c['custrings_membuffersize'],
+                                custrings_baseptr=c['custrings_baseptr'])
       columns.append(gdfColumn)
     table = blazingdb.protocol.orchestrator.BlazingTableSchema(name=tableName, columns=columns,
                                  columnNames=columnNames, columnTokens=columnTokens, resultToken=resultToken)

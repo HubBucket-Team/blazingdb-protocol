@@ -13,6 +13,13 @@ table gdf_column_handler {
     null_count: ulong;
     //@todo
     // char * col_name; // host-side:	null terminated string
+
+    // custring data
+    custrings_views: cudaIpcMemHandle_t;
+    custrings_viewscount: uint;
+    custrings_membuffer: cudaIpcMemHandle_t;
+    custrings_membuffersize: ulong;
+    custrings_baseptr: ulong;
 }
 
 root_type gdf_column_handler;
