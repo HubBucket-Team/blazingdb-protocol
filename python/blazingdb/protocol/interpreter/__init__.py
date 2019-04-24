@@ -50,6 +50,8 @@ def GetQueryResultFrom(payloadBuffer):
     column = copy.deepcopy(item)
     column.data = _get_bytearray(item.data)
     column.valid = _get_bytearray(item.valid)
+    column.custrings_views = _get_bytearray(item.custrings_views)
+    column.custrings_membuffer = _get_bytearray(item.custrings_membuffer)
     columns.append(column)
   return type('obj', (object,), {
     'metadata': result.metadata,
