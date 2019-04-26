@@ -108,6 +108,21 @@ private:
   char unused_[6];
 };
 
+// Returns -1 in case invalid port was given as arg
+int parse_port(char* port_str) {
+    char *t;
+    const long int port = strtol(port_str, &t, 10);
+    if (*t != '\0') {
+        return -1;
+    } else {
+        if (port > 0) {
+            return port;
+        } else {
+            return -1;
+        }
+    }
+}
+
 }  // namespace protocol
 }  // namespace blazingdb
 
