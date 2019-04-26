@@ -34,8 +34,27 @@ public:
   void operator=(const File &&) = delete;
 };
 
+#ifdef USE_UNIX_SOCKETS
+
+struct ConnectionAddress {
+  std::string unix_socket_path;
+};
+
+#else
+
+struct ConnectionAddress {
+  std::string tcp_host;
+  int tcp_port;
+};
+
+#endif
+
 class Connection : public File {
 public:
+
+#ifdef USE_UNIX_SOCKETS
+
+  //For unix sockets
   Connection(const int fd, const std::string &path)
       : fd_(fd), addr_{0, {}}, unused_{0} {
     bzero(&addr_, sizeof(addr_));
@@ -43,6 +62,19 @@ public:
     std::strncpy(
         static_cast<char *>(addr_.sun_path), path.c_str(), path.size());
   }
+
+#else
+
+  //For TCP
+  Connection(const int fd, int port)
+      : fd_(fd), addr_{0, {}}, unused_{0} {
+    bzero(&addr_, sizeof(addr_));
+    addr_.sin_family      = AF_INET;
+    addr_.sin_addr.s_addr = INADDR_ANY;
+    addr_.sin_port = htons(port);
+  }
+
+#endif
 
   ~Connection() override = default;
 
@@ -65,44 +97,12 @@ public:
 
 protected:
   int                fd_;
+  
+#ifdef USE_UNIX_SOCKETS
   struct sockaddr_un addr_;
-
-private:
-  char unused_[6];
-};
-
-class NetConnection : public File {
-public:
-  NetConnection(const int fd, const std::string &path)
-      : fd_(fd), addr_{0, {}}, unused_{0} {
-    bzero(&addr_, sizeof(addr_));
-    addr_.sin_family      = AF_INET;
-    addr_.sin_addr.s_addr = INADDR_ANY;
-    addr_.sin_port = htons(static_cast<std::uint16_t>(atoi(path.c_str())));
-  }
-
-  ~NetConnection() override = default;
-
-  virtual void initialize() const noexcept = 0;
-
-  int fd() const final { return fd_; }
-
-  __CONST_SOCKADDR_ARG address() const {
-    return reinterpret_cast<__CONST_SOCKADDR_ARG>(&addr_);
-  }
-
-  socklen_t length() const { return sizeof(addr_); }
-
-  const char (&unused() const)[6] { return unused_; }
-
-  NetConnection(const Connection &)  = delete;
-  NetConnection(const Connection &&) = delete;
-  void operator=(const Connection &) = delete;
-  void operator=(const Connection &&) = delete;
-
-protected:
-  int                fd_;
+#else
   struct sockaddr_in addr_;
+#endif
 
 private:
   char unused_[6];

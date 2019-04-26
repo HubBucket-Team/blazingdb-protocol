@@ -12,8 +12,8 @@
 namespace blazingdb {
 namespace protocol {
 
-TCPConnection::TCPConnection(const std::string &ip, const std::string &port)
-    : NetConnection(socket(AF_INET, SOCK_STREAM, 0), port), ip_{ip} {
+TCPConnection::TCPConnection(const ConnectionAddress &connectionAddress)
+    : Connection(socket(AF_INET, SOCK_STREAM, 0), connectionAddress.tcp_port), ip_{connectionAddress.tcp_host} {
   if (fd_ == -1) { throw std::runtime_error("socket error"); }
   int on = 1;
   if (setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {

@@ -6,9 +6,9 @@
 namespace blazingdb {
 namespace protocol {
 
-class TCPConnection : public NetConnection {
+class TCPConnection : public Connection {
 public:
-  explicit TCPConnection(const std::string &ip, const std::string &port);
+  explicit TCPConnection(const ConnectionAddress &connectionAddress);
 
   ~TCPConnection() override;
 

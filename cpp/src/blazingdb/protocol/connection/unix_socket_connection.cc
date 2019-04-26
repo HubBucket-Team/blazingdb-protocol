@@ -1,3 +1,5 @@
+#ifdef USE_UNIX_SOCKETS
+
 #include "unix_socket_connection.h"
 
 #include <stdexcept>
@@ -8,8 +10,8 @@
 namespace blazingdb {
 namespace protocol {
 
-UnixSocketConnection::UnixSocketConnection(const std::string &path)
-    : Connection(socket(AF_UNIX, SOCK_STREAM, 0), path) {
+UnixSocketConnection::UnixSocketConnection(const ConnectionAddress &connectionAddress)
+    : Connection(socket(AF_UNIX, SOCK_STREAM, 0), connectionAddress.unix_socket_path) {
   if (fd_ == -1) { throw std::runtime_error("socket error"); }
 }
 
@@ -19,3 +21,5 @@ void UnixSocketConnection::initialize() const noexcept {}
 
 }  // namespace protocol
 }  // namespace blazingdb
+
+#endif
