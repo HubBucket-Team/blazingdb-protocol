@@ -1,5 +1,6 @@
 set(SRCS
   client/client.cc
+  connection/connection.cc
   connection/unix_socket_connection.cc
   connection/tcp_connection.cc
   server/server.cc
