@@ -71,16 +71,18 @@ root_type ParquetFile;
  
 enum FileSchemaType :byte {
     CSV,
-    PARQUET 
+    PARQUET,
+    GDF
 }
 
 table FileSystemBlazingTable {
     name: string;
     schemaType: FileSchemaType;
     csv: CsvFile;  //#use this
-    parquet: ParquetFile;     //#either this   
+    parquet: ParquetFile;  //#either this
+    gdf: BlazingTable; //#either this
     files: [string];
-	columnNames: [string];
+    columnNames: [string];
 }
 root_type FileSystemBlazingTable;
 
