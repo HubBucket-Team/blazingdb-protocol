@@ -55,8 +55,19 @@ class FileSystemBlazingTable(object):
         return None
 
     # FileSystemBlazingTable
-    def Files(self, j):
+    def Gdf(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
+        if o != 0:
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from .BlazingTable import BlazingTable
+            obj = BlazingTable()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # FileSystemBlazingTable
+    def Files(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             a = self._tab.Vector(o)
             return self._tab.String(a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
@@ -64,14 +75,14 @@ class FileSystemBlazingTable(object):
 
     # FileSystemBlazingTable
     def FilesLength(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # FileSystemBlazingTable
     def ColumnNames(self, j):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             a = self._tab.Vector(o)
             return self._tab.String(a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
@@ -79,18 +90,19 @@ class FileSystemBlazingTable(object):
 
     # FileSystemBlazingTable
     def ColumnNamesLength(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
-def FileSystemBlazingTableStart(builder): builder.StartObject(6)
+def FileSystemBlazingTableStart(builder): builder.StartObject(7)
 def FileSystemBlazingTableAddName(builder, name): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 def FileSystemBlazingTableAddSchemaType(builder, schemaType): builder.PrependInt8Slot(1, schemaType, 0)
 def FileSystemBlazingTableAddCsv(builder, csv): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(csv), 0)
 def FileSystemBlazingTableAddParquet(builder, parquet): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(parquet), 0)
-def FileSystemBlazingTableAddFiles(builder, files): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(files), 0)
+def FileSystemBlazingTableAddGdf(builder, gdf): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(gdf), 0)
+def FileSystemBlazingTableAddFiles(builder, files): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(files), 0)
 def FileSystemBlazingTableStartFilesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def FileSystemBlazingTableAddColumnNames(builder, columnNames): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(columnNames), 0)
+def FileSystemBlazingTableAddColumnNames(builder, columnNames): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(columnNames), 0)
 def FileSystemBlazingTableStartColumnNamesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
 def FileSystemBlazingTableEnd(builder): return builder.EndObject()
