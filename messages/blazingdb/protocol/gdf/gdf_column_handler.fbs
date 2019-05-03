@@ -15,11 +15,7 @@ table gdf_column_handler {
     // char * col_name; // host-side:	null terminated string
 
     // custring data
-    custrings_views: cudaIpcMemHandle_t;
-    custrings_viewscount: uint;
-    custrings_membuffer: cudaIpcMemHandle_t;
-    custrings_membuffersize: ulong;
-    custrings_baseptr: ulong;
+    custrings_data: [byte];
 }
 
 root_type gdf_column_handler;
