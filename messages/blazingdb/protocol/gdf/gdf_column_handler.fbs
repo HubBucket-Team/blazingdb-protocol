@@ -1,6 +1,7 @@
 include "blazingdb/protocol/gdf/gdf_dtype.fbs";
 include "blazingdb/protocol/gdf/gdf_dtype_extra_info.fbs";
 include "blazingdb/protocol/gdf/cudaIpcMemHandle_t.fbs";
+include "blazingdb/protocol/gdf/custringsData_t.fbs";
 
 namespace blazingdb.protocol.gdf;
 
@@ -15,7 +16,7 @@ table gdf_column_handler {
     // char * col_name; // host-side:	null terminated string
 
     // custring data
-    custrings_data: [byte];
+    custrings_data: custringsData_t;
 }
 
 root_type gdf_column_handler;

@@ -73,19 +73,15 @@ class gdf_column_handler(object):
         return 0
 
     # gdf_column_handler
-    def CustringsData(self, j):
+    def CustringsData(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
-            a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Int8Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1))
-        return 0
-
-    # gdf_column_handler
-    def CustringsDataLength(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
-        if o != 0:
-            return self._tab.VectorLen(o)
-        return 0
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from .custringsData_t import custringsData_t
+            obj = custringsData_t()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
 
 def gdf_column_handlerStart(builder): builder.StartObject(7)
 def gdf_column_handlerAddData(builder, data): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0)
@@ -95,5 +91,4 @@ def gdf_column_handlerAddDtype(builder, dtype): builder.PrependInt8Slot(3, dtype
 def gdf_column_handlerAddDtypeInfo(builder, dtypeInfo): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(dtypeInfo), 0)
 def gdf_column_handlerAddNullCount(builder, nullCount): builder.PrependUint64Slot(5, nullCount, 0)
 def gdf_column_handlerAddCustringsData(builder, custringsData): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(custringsData), 0)
-def gdf_column_handlerStartCustringsDataVector(builder, numElems): return builder.StartVector(1, numElems, 1)
 def gdf_column_handlerEnd(builder): return builder.EndObject()

@@ -88,7 +88,9 @@ def BuildDMLRequestSchema(query, tableGroupDto):
         valid = blazingdb.protocol.gdf.cudaIpcMemHandle_tSchema(reserved=c['valid'])
 
       if 'custrings_data' not in c:
-        custrings_data = b''
+        custrings_data = blazingdb.protocol.gdf.custringsData_tSchema(reserved=b'')
+      else:
+        custrings_data = blazingdb.protocol.gdf.custringsData_tSchema(reserved=c['custrings_data'])
 
       dtype_info = blazingdb.protocol.gdf.gdf_dtype_extra_infoSchema(time_unit=0)
       gdfColumn = blazingdb.protocol.gdf.gdf_columnSchema(data=data, valid=valid,

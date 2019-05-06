@@ -44,15 +44,16 @@ static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildDirectCudaIpcMemHan
   return builder.CreateVector(data->data(), data->size());
 }
 
-static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildByteArray (flatbuffers::FlatBufferBuilder &builder, const std::basic_string<int8_t> &data) {
-  return builder.CreateVector(data.data(), data.size());
+static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildCustringsData (flatbuffers::FlatBufferBuilder &builder, const std::basic_string<int8_t> &reserved) {
+  return builder.CreateVector(reserved.data(), reserved.size());
 }
 
-static std::basic_string<int8_t> ByteArrayFrom (const flatbuffers::Vector<int8_t> * data) {
-  return std::basic_string<int8_t>{data->data(), data->size()};
+static std::basic_string<int8_t> CustringsDataFrom (const gdf::custringsData_t *handler) {
+  auto vector_bytes = handler->reserved();
+  return std::basic_string<int8_t>{vector_bytes->data(), vector_bytes->size()};
 }
 
-static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildDirectByteArray (flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<int8_t> * data) {
+static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildDirectCustringsData (flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<int8_t> * data) {
   return builder.CreateVector(data->data(), data->size());
 }
 
@@ -69,7 +70,7 @@ static std::vector<::gdf_dto::gdf_column>  GdfColumnsFrom(const flatbuffers::Vec
         .dtype_info = gdf_dto::gdf_dtype_extra_info {
             .time_unit = (gdf_dto::gdf_time_unit) c->dtype_info()->time_unit(),
         },
-        .custrings_data = ByteArrayFrom(c->custrings_data())
+        .custrings_data = CustringsDataFrom(c->custrings_data())
     };
     columns.push_back(column);
   }
@@ -124,7 +125,7 @@ std::vector<flatbuffers::Offset<gdf::gdf_column_handler>>  BuildFlatColumns(flat
     auto dtype_extra_info = gdf::Creategdf_dtype_extra_info (builder, (gdf::gdf_time_unit)c.dtype_info.time_unit );
     auto data_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildCudaIpcMemHandler (builder, c.data) );
     auto valid_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildCudaIpcMemHandler(builder, c.valid) );
-    auto custrings_data_offset = BuildByteArray(builder, c.custrings_data);
+    auto custrings_data_offset = gdf::CreatecustringsData_t(builder, BuildCustringsData(builder, c.custrings_data) );
     auto column_offset = ::blazingdb::protocol::gdf::Creategdf_column_handler(builder, data_offset, valid_offset, c.size, (gdf::gdf_dtype)c.dtype, dtype_extra_info, c.null_count, custrings_data_offset );
     offsets.push_back(column_offset);
   }
@@ -149,7 +150,7 @@ std::vector<flatbuffers::Offset<gdf::gdf_column_handler>>  BuildDirectFlatColumn
     auto dtype_extra_info = gdf::Creategdf_dtype_extra_info (builder, (gdf::gdf_time_unit)c->dtype_info()->time_unit() );
     auto data_offset =  gdf::CreatecudaIpcMemHandle_t(builder, BuildDirectCudaIpcMemHandler(builder, c->data()->reserved()) );
     auto valid_offset = gdf::CreatecudaIpcMemHandle_t(builder, BuildDirectCudaIpcMemHandler(builder, c->valid()->reserved()) );
-    auto custrings_data_offset = BuildDirectByteArray(builder, c->custrings_data());
+    auto custrings_data_offset = gdf::CreatecustringsData_t(builder, BuildDirectCustringsData(builder, c->custrings_data()->reserved()) );
     auto column_offset = ::blazingdb::protocol::gdf::Creategdf_column_handler(builder, data_offset, valid_offset, c->size(), (gdf::gdf_dtype)c->dtype(), dtype_extra_info, c->null_count(), custrings_data_offset);
     offsets.push_back(column_offset);
   }
