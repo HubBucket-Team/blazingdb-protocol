@@ -25,32 +25,41 @@ Server::Server(const Connection &connection) : connection_(connection) {
   }
 }
 
+
+
 void Server::_Start(const __HandlerBaseType &handler) const {
   for (;;) {
     int fd = accept4(connection_.fd(), nullptr, nullptr, SOCK_CLOEXEC);
 
     if (fd == -1) { throw std::runtime_error("accept error"); }
 
-    uint32_t length;
-    ssize_t  nread = read(fd, (void *) &length, sizeof(uint32_t));
 
-    std::uint8_t buffer[length];
-    nread = read(fd, buffer, length);
-    auto responseBuffer =
-        handler->call(Buffer(buffer, static_cast<std::size_t>(nread)));
+    std::thread t([fd](){
 
-    uint32_t responseBufferLength = responseBuffer.size();
+    	 uint32_t length;
+    	 ssize_t  nread = read(fd, (void *) &length, sizeof(uint32_t));
 
-    ssize_t written_bytes =
-        write(fd, (void *) &responseBufferLength, sizeof(uint32_t));
-    written_bytes = write(fd, responseBuffer.data(), responseBuffer.size());
+    	 std::uint8_t buffer[length];
+    	 nread = read(fd, buffer, length);
+    	 auto responseBuffer =
+    			 handler->call(Buffer(buffer, static_cast<std::size_t>(nread)));
 
-    if (static_cast<std::size_t>(written_bytes) != responseBuffer.size()) {
-      throw std::runtime_error("write error");
-    }
+    	 uint32_t responseBufferLength = responseBuffer.size();
 
-    if (nread == -1) { throw std::runtime_error("error read"); }
-    close(fd);
+    	 ssize_t written_bytes =
+    			 write(fd, (void *) &responseBufferLength, sizeof(uint32_t));
+    	 written_bytes = write(fd, responseBuffer.data(), responseBuffer.size());
+
+    	 if (static_cast<std::size_t>(written_bytes) != responseBuffer.size()) {
+    		 throw std::runtime_error("write error");
+    	 }
+
+    	 if (nread == -1) { throw std::runtime_error("error read"); }
+    	 close(fd);
+
+    });
+    t.detach();
+
   }
 }
 
