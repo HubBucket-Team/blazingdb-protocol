@@ -30,14 +30,15 @@ class UnixSocketConnection:
     def connect_sync(self):
         try:
             self.socket_.connect(self.address_)
-        except self.socket.error:
-            raise RuntimeError("Communication error: connection to " + self.address_ + " was lost")
+        except Exception as e:
+            raise RuntimeError("Communication error connecting to {0}: {1}".format(self.address_, str(e)))
 
-    def connect_async(self):
+    async def connect_async(self):
         try:
-            return asyncio.open_unix_connection(path=self.address_)
-        except e:
-            raise RuntimeError("Communication error: connection to " + self.address_ + " was lost")
+            return await asyncio.open_unix_connection(path=self.address_)
+            return (reader, writer)
+        except Exception as e:
+            raise RuntimeError("Communication error connecting to {0}: {1}".format(self.address_, str(e)))
 
 
 class Client:
@@ -53,8 +54,8 @@ class Client:
             self.connection_.socket_.sendall(_buffer)
             length = struct.unpack('I', self.connection_.socket_.recv(4))[0]
             return self.connection_.socket_.recv(length)
-        except Exception:
-            raise RuntimeError("Communication error: when sending data to " + self.connection_.address())
+        except Exception as e:
+            raise RuntimeError("Communication error sending data to {0}: {1}".format(self.connection_.address(), str(e)))
 
 class AsyncClient:
 
@@ -74,5 +75,5 @@ class AsyncClient:
             while not reader.at_eof():
                 await reader.read()
             return response_buffer
-        except Exception:
-            raise RuntimeError("Communication error: when sending data to " + self.connection_.address())
+        except Exception as e:
+            raise RuntimeError("Communication error sending data to {0}: {1}".format(self.connection_.address(), str(e)))
