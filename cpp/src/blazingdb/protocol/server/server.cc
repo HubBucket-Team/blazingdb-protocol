@@ -34,7 +34,7 @@ void Server::_Start(const __HandlerBaseType &handler) const {
     if (fd == -1) { throw std::runtime_error("accept error"); }
 
 
-    std::thread t([fd](){
+    std::thread t([fd, &handler](){
 
     	 uint32_t length;
     	 ssize_t  nread = read(fd, (void *) &length, sizeof(uint32_t));
