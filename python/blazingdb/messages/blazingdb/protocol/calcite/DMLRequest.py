@@ -23,7 +23,7 @@ class DMLRequest(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return ""
+        return None
 
 def DMLRequestStart(builder): builder.StartObject(1)
 def DMLRequestAddQuery(builder, query): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(query), 0)
