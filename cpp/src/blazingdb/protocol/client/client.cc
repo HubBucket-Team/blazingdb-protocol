@@ -26,13 +26,14 @@ Buffer Client::send(const Buffer &buffer) {
   uint32_t responseBufferLength;
   ssize_t nread =
       read(connection_.fd(), (void*)&responseBufferLength, sizeof(uint32_t));
+  if (nread == -1) { throw std::runtime_error("error read buffer length in Client::send"); }
 
   Buffer responseBuffer;
   responseBuffer.resize(responseBufferLength);
   nread =
       read(connection_.fd(), (void*)responseBuffer.data(), responseBufferLength);
 
-  if (nread == -1) { throw std::runtime_error("error read"); }
+  if (nread == -1) { throw std::runtime_error("error read in Client::send"); }
 
   return responseBuffer;
 }
