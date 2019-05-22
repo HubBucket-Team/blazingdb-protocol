@@ -25,27 +25,20 @@ Server::Server(const Connection &connection) : connection_(connection) {
   }
 }
 
-
-
 void Server::_Start(const __HandlerBaseType &handler) const {
   for (;;) {
     int fd = accept4(connection_.fd(), nullptr, nullptr, SOCK_CLOEXEC);
 
     if (fd == -1) { throw std::runtime_error("accept error"); }
 
-    std::thread t([fd, &handler](){
+    Buffer temp_buffer;
+    util::read_buffer(fd, temp_buffer);
 
-      Buffer temp_buffer;
-      util::read_buffer(fd, temp_buffer);
+    Buffer response_buffer = handler->call(temp_buffer);
 
-      Buffer response_buffer = handler->call(temp_buffer);
+    util::write_buffer(fd, response_buffer);
 
-    	util::write_buffer(fd, response_buffer);
-
-  	  close(fd);
-
-    });
-    t.detach();
+    close(fd);    
   }
 }
 
