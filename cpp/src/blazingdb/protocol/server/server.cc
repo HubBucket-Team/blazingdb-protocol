@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <thread>
 
-#include <unistd.h>
+#include "../utilities/io_util.h"
 
 namespace blazingdb {
 namespace protocol {

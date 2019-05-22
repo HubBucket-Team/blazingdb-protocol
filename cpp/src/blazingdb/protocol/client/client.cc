@@ -3,8 +3,6 @@
 #include <string>
 #include <stdexcept>
 
-#include <unistd.h>
-
 #include "../utilities/io_util.h"
 
 namespace blazingdb {

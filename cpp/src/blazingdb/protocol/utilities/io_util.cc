@@ -1,20 +1,23 @@
+#include "io_util.h"
+
 #include <iostream>
 #include <exception>
 #include <string>
+#include <unistd.h>
 
 namespace blazingdb {
 namespace protocol {
 namespace util {
 
     void read_all(int descriptor, void * buffer, size_t size){
-        char * buffer_position = static_cast<char*>buffer;
+        char * buffer_position = static_cast<char*>(buffer);
         size_t position = 0;
         size_t read_size = 1024 * 1024;
         while(position < size){
             if(position + read_size > size){
                 read_size = size - position;
             }
-            n = read(descriptor, buffer_position, read_size);
+            int n = read(descriptor, buffer_position, read_size);
             position += n;
             buffer_position += n;
             if(n == 0){
@@ -24,14 +27,14 @@ namespace util {
     }
 
     void write_all(int descriptor, void * buffer, size_t size){
-        char * buffer_position = static_cast<char*>buffer;
+        char * buffer_position = static_cast<char*>(buffer);
         size_t position = 0;
         size_t read_size = 1024 * 1024;
         while(position < size){
             if(position + read_size > size){
                 read_size = size - position;
             }
-            n = write(descriptor, buffer_position, read_size);
+            int n = write(descriptor, buffer_position, read_size);
             position += n;
             buffer_position += n;
             if(n == 0){
@@ -45,7 +48,7 @@ namespace util {
         read_all(descriptor, (void*)&response_buffer_length, sizeof(uint32_t));
         
         buffer.resize(response_buffer_length);
-        read_all(connection_.fd(), (void*)buffer.data(), response_buffer_length);
+        read_all(descriptor, (void*)buffer.data(), response_buffer_length);
     }
     void write_buffer(int descriptor, const Buffer & buffer){
         int buffer_length = buffer.size();
