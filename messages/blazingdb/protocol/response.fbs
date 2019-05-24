@@ -1,6 +1,7 @@
 include "blazingdb/protocol/calcite/DMLResponse.fbs";
 include "blazingdb/protocol/calcite/DDLResponse.fbs";
 include "blazingdb/protocol/orchestrator/AuthResponse.fbs";
+include "blazingdb/protocol/orchestrator/DDLCreateTableResponse.fbs";
 include "blazingdb/protocol/orchestrator/DMLResponse.fbs";
 include "blazingdb/protocol/orchestrator/DDLResponse.fbs";
 include "blazingdb/protocol/interpreter/ExecutePlanResponse.fbs";

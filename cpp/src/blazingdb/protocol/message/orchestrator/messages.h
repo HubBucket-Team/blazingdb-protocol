@@ -4,8 +4,11 @@
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
 
+#include "../../all_generated.h"
+
 #include "../messages.h"
 #include "../interpreter/messages.h"
+#include "blazingdb/protocol/message/utils.h"
 
 namespace blazingdb {
 namespace protocol {
@@ -160,6 +163,15 @@ public:
     for (const auto &item : (*type_list)) {
       columnTypes.push_back(std::string{item->c_str()});
     }
+
+    schemaType = pointer->schemaType();
+
+    blazingdb::protocol::BlazingTableSchema::Deserialize(pointer->gdf(), &gdf);
+
+    auto files_list = pointer->files();
+    for (const auto &file : (*files_list)) {
+      files.push_back(std::string{file->c_str()});
+    }
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
@@ -168,7 +180,16 @@ public:
     auto vectorOfColumnNames = builder.CreateVectorOfStrings(columnNames);
     auto vectorOfColumnTypes = builder.CreateVectorOfStrings(columnTypes);
     auto dbname_offset = builder.CreateString(dbName);
-    builder.Finish(orchestrator::CreateDDLCreateTableRequest(builder, name_offset,vectorOfColumnNames, vectorOfColumnTypes, dbname_offset));
+    auto gdf_offset = blazingdb::protocol::BlazingTableSchema::Serialize(builder, gdf);
+    auto files_offset = builder.CreateVectorOfStrings(files);
+    builder.Finish(orchestrator::CreateDDLCreateTableRequest(builder,
+                                                            name_offset,
+                                                            vectorOfColumnNames,
+                                                            vectorOfColumnTypes,
+                                                            dbname_offset,
+                                                            schemaType,
+                                                            gdf_offset,
+                                                            files_offset));
 
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
@@ -177,7 +198,9 @@ public:
   std::vector<std::string> columnNames;
   std::vector<std::string> columnTypes;
   std::string dbName;
-
+  blazingdb::protocol::FileSchemaType schemaType;
+	blazingdb::protocol::BlazingTableSchema gdf;
+	std::vector<std::string> files;
 };
 
 // authorization

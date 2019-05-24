@@ -1,0 +1,11 @@
+namespace blazingdb.protocol;
+
+table TableSchema {
+	names: [string];
+	calciteToFileIndices: [ulong];
+	types: [int];
+	numRowGroups: [ulong];
+	files: [string];
+}
+
+root_type TableSchema;

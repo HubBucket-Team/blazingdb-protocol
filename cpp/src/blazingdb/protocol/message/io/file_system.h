@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../messages.h"
-#include "../interpreter/utils.h"
+#include "blazingdb/protocol/message/utils.h"
 
 namespace blazingdb {
 namespace message {
@@ -234,27 +234,6 @@ struct CsvFileSchema {
   }
 };
 
-struct BlazingTable {
-  std::vector<::gdf_dto::gdf_column> columns;
-  std::vector<uint64_t> columnTokens;
-  uint64_t resultToken;
-};
-
-struct BlazingTableSchema {
-  std::vector<::gdf_dto::gdf_column> columns;
-  std::vector<uint64_t> columnTokens;
-  uint64_t resultToken;
-
-  static flatbuffers::Offset<blazingdb::protocol::BlazingTable> Serialize(flatbuffers::FlatBufferBuilder &builder, BlazingTableSchema &data) {
-    auto columns = BuildFlatColumns(builder, data.columns);
-    auto columnTokens = BuildFlatColumnTokens(builder, data.columnTokens);
-    return blazingdb::protocol::CreateBlazingTable(builder, builder.CreateVector(columns), columnTokens, data.resultToken);
-  }
-  static void Deserialize (const blazingdb::protocol::BlazingTable *pointer, BlazingTableSchema* schema){
-      //@todo 
-  }
-};
-
 class LoadCsvFileRequestMessage : public IMessage, CsvFileSchema {
 public:
   LoadCsvFileRequestMessage(const std::string path,
@@ -335,12 +314,11 @@ public:
 
 struct FileSystemBlazingTableSchema {
   std::string name;
-  blazingdb::protocol::io::FileSchemaType schemaType;
+  blazingdb::protocol::FileSchemaType schemaType;
   CsvFileSchema csv;
   ParquetFileSchema parquet;
-  BlazingTableSchema gdf;
-  std::vector<std::string> files;
-  std::vector<std::string> columnNames;
+  blazingdb::protocol::BlazingTableSchema gdf;
+  blazingdb::protocol::TableSchemaSTL tableSchema;
 };
 
 struct FileSystemTableGroupSchema {
@@ -354,8 +332,6 @@ public:
   FileSystemDMLRequestMessage(const uint8_t *buffer) : IMessage() {
     auto pointer = flatbuffers::GetRoot<blazingdb::protocol::io::FileSystemDMLRequest>(buffer);
     statement =  std::string{pointer->statement()->c_str()};
-
-
 
     auto get_table_group = [] (const blazingdb::protocol::io::FileSystemTableGroup * tableGroup) {
       std::string name = std::string{tableGroup->name()->c_str()};
@@ -375,10 +351,11 @@ public:
       for (const auto& table : *rawTables) {
 
         std::string name = std::string{table->name()->c_str()};
-        blazingdb::protocol::io::FileSchemaType schemaType = table->schemaType();
-        std::vector<std::string> files = _ListFrom(table->files());
-        std::vector<std::string> columnNames = _ListFrom(table->columnNames());
-        if (schemaType == blazingdb::protocol::io::FileSchemaType::FileSchemaType_CSV) {
+        blazingdb::protocol::FileSchemaType schemaType = table->schemaType();
+        blazingdb::protocol::TableSchemaSTL tableSchema;
+        blazingdb::protocol::TableSchemaSTL::Deserialize(table->tableSchema(), &tableSchema);
+
+        if (schemaType == blazingdb::protocol::FileSchemaType::FileSchemaType_CSV) {
           CsvFileSchema csv;
           CsvFileSchema::Deserialize(table->csv(), &csv);
 
@@ -387,11 +364,10 @@ public:
               .schemaType = schemaType,
               .csv = csv,
               .parquet = ParquetFileSchema{},
-              .gdf = BlazingTableSchema{},
-              .files = files,
-              .columnNames = columnNames,
+              .gdf = blazingdb::protocol::BlazingTableSchema{},
+              .tableSchema = tableSchema
           });
-        } else if (schemaType == blazingdb::protocol::io::FileSchemaType::FileSchemaType_PARQUET) {
+        } else if (schemaType == blazingdb::protocol::FileSchemaType::FileSchemaType_PARQUET) {
           ParquetFileSchema parquet;
           ParquetFileSchema::Deserialize(table->parquet(), &parquet);
 
@@ -400,13 +376,12 @@ public:
               .schemaType = schemaType,
               .csv = CsvFileSchema{},
               .parquet = parquet,
-              .gdf = BlazingTableSchema{},
-              .files = files,
-              .columnNames = columnNames,
+              .gdf = blazingdb::protocol::BlazingTableSchema{},
+              .tableSchema = tableSchema
           });
         } else {
-          BlazingTableSchema gdf;
-          BlazingTableSchema::Deserialize(table->gdf(), &gdf);
+          blazingdb::protocol::BlazingTableSchema gdf;
+          blazingdb::protocol::BlazingTableSchema::Deserialize(table->gdf(), &gdf);
 
           tables.push_back(FileSystemBlazingTableSchema{
               .name = name,
@@ -414,8 +389,7 @@ public:
               .csv = CsvFileSchema{},
               .parquet = ParquetFileSchema{},
               .gdf = gdf,
-              .files = files,
-              .columnNames = columnNames,
+              .tableSchema = tableSchema
           });
         }
       }
@@ -438,16 +412,13 @@ public:
     std::vector<flatbuffers::Offset<blazingdb::protocol::io::FileSystemBlazingTable>> tablesOffset;
 
     for (FileSystemBlazingTableSchema& table : tableGroup.tables) {
-      auto columnNames = BuildeFlatStringList(builder, table.columnNames);
-      auto filesNames = BuildeFlatStringList(builder, table.files);
       flatbuffers::Offset<flatbuffers::String> nameOffset = builder.CreateString(table.name);
-      blazingdb::protocol::io::FileSchemaType schemaType = table.schemaType;
+      blazingdb::protocol::FileSchemaType schemaType = table.schemaType;
       flatbuffers::Offset<blazingdb::protocol::io::CsvFile> csvOffset = CsvFileSchema::Serialize(builder, table.csv);
       flatbuffers::Offset<blazingdb::protocol::io::ParquetFile> parquetOffset = ParquetFileSchema::Serialize(builder, table.parquet);
       flatbuffers::Offset<blazingdb::protocol::BlazingTable> gdfOffset = BlazingTableSchema::Serialize(builder, table.gdf);
-      flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> filesOffset = builder.CreateVector(filesNames);
-      flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> columnNamesOffset = builder.CreateVector(columnNames);
-      tablesOffset.push_back( blazingdb::protocol::io::CreateFileSystemBlazingTable(builder, nameOffset, schemaType, csvOffset, parquetOffset, gdfOffset, filesOffset, columnNamesOffset));
+      flatbuffers::Offset<blazingdb::protocol::TableSchema> tableSchemaOffset = blazingdb::protocol::TableSchemaSTL::Serialize(builder, table.tableSchema);
+      tablesOffset.push_back( blazingdb::protocol::io::CreateFileSystemBlazingTable(builder, nameOffset, schemaType, csvOffset, parquetOffset, gdfOffset, tableSchemaOffset));
     }
 
     auto tables = builder.CreateVector(tablesOffset);

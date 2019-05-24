@@ -12,8 +12,8 @@
 #include <blazingdb/protocol/api.h>
 #include <iostream>
 #include "flatbuffers/flatbuffers.h"
-#include "../../all_generated.h"
-#include "gdf_dto.h"
+#include "blazingdb/protocol/all_generated.h"
+#include "interpreter/gdf_dto.h"
 
 namespace blazingdb {
 namespace protocol {
@@ -196,6 +196,79 @@ static flatbuffers::Offset<TableGroup> BuildDirectTableGroup(flatbuffers::FlatBu
   auto tables = builder.CreateVector(tablesOffset);
   return CreateTableGroup(builder, tables, tableNameOffset);
 }
+
+struct BlazingTableSchema {
+  std::vector<::gdf_dto::gdf_column> columns;
+  std::vector<uint64_t> columnTokens;
+  uint64_t resultToken;
+
+  static flatbuffers::Offset<blazingdb::protocol::BlazingTable> Serialize(flatbuffers::FlatBufferBuilder &builder, const BlazingTableSchema &data) {
+    auto columnsOffset = BuildFlatColumns(builder, data.columns);
+    auto columnTokensOffset = BuildFlatColumnTokens(builder, data.columnTokens);
+    return blazingdb::protocol::CreateBlazingTable(builder, builder.CreateVector(columnsOffset), columnTokensOffset, data.resultToken);
+  }
+
+  static void Deserialize (const blazingdb::protocol::BlazingTable *pointer, BlazingTableSchema* schema){
+      schema->columns = GdfColumnsFrom(pointer->columns());
+      
+      schema->columnTokens.clear();
+      auto tokens_list = pointer->columnTokens();
+      for (const auto &item : (*tokens_list)) {
+        schema->columnTokens.push_back(item);
+      }
+
+      schema->resultToken = pointer->resultToken();
+  }
+};
+
+struct TableSchemaSTL {
+	std::vector<std::string> names;
+	std::vector<uint64_t> calciteToFileIndices;
+	std::vector<int> types;
+	std::vector<uint64_t> numRowGroups;
+  std::vector<std::string> files;
+
+  static flatbuffers::Offset<blazingdb::protocol::TableSchema> Serialize(flatbuffers::FlatBufferBuilder &builder, const TableSchemaSTL &data) {
+    auto namesOffset = builder.CreateVectorOfStrings(data.names);
+    auto calciteToFileIndicesOffset = builder.CreateVector(data.calciteToFileIndices);
+    auto typesOffset = builder.CreateVector(data.types);
+    auto numRowGroupsOffset = builder.CreateVector(data.numRowGroups);
+    auto filesOffset = builder.CreateVectorOfStrings(data.files);
+
+    return blazingdb::protocol::CreateTableSchema(builder, namesOffset, calciteToFileIndicesOffset, typesOffset, numRowGroupsOffset, filesOffset);
+  }
+  static void Deserialize (const blazingdb::protocol::TableSchema *pointer, TableSchemaSTL* schema){
+      schema->names.clear();
+      auto names_list = pointer->names();
+      for (const auto &item : (*names_list)) {
+        schema->names.push_back(std::string{item->c_str()});
+      }
+
+      schema->calciteToFileIndices.clear();
+      auto calciteToFileIndices_list = pointer->calciteToFileIndices();
+      for (const auto &item : (*calciteToFileIndices_list)) {
+        schema->calciteToFileIndices.push_back(item);
+      }
+
+      schema->types.clear();
+      auto types_list = pointer->types();
+      for (const auto &item : (*types_list)) {
+        schema->types.push_back(item);
+      }
+
+      schema->numRowGroups.clear();
+      auto numRowGroups_list = pointer->numRowGroups();
+      for (const auto &item : (*numRowGroups_list)) {
+        schema->numRowGroups.push_back(item);
+      }
+
+      schema->files.clear();
+      auto files_list = pointer->files();
+      for (const auto &item : (*files_list)) {
+        schema->files.push_back(std::string{item->c_str()});
+      }
+  }
+};
 
 }
 }

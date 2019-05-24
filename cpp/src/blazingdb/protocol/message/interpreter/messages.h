@@ -4,7 +4,7 @@
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
 #include "../messages.h"
-#include "utils.h"
+#include "blazingdb/protocol/message/utils.h"
 #include "gdf_dto.h"
 
 namespace blazingdb {
@@ -215,6 +215,37 @@ public:
   std::vector<std::string> columnNames;
   std::vector<uint64_t> columnTokens;
   std::vector<::gdf_dto::gdf_column> columns;
+};
+
+
+class  CreateTableResponseMessage : public IMessage {
+public:
+  CreateTableResponseMessage (const blazingdb::protocol::TableSchemaSTL& tableSchema)
+    : IMessage(), tableSchema{tableSchema}
+  {
+
+  }
+
+  CreateTableResponseMessage (const uint8_t* buffer)
+      :   IMessage()
+  {
+    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DDLCreateTableResponse>(buffer);
+    blazingdb::protocol::TableSchemaSTL::Deserialize(pointer->tableSchema(), &tableSchema);
+  };
+
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override  {
+    flatbuffers::FlatBufferBuilder builder{0};
+    auto tableSchemaOffset = blazingdb::protocol::TableSchemaSTL::Serialize(builder, tableSchema);
+    builder.Finish(orchestrator::CreateDDLCreateTableResponse(builder, tableSchemaOffset));
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+  }
+
+  const blazingdb::protocol::TableSchemaSTL& getTableSchema() {
+    return tableSchema;
+  }
+
+private:
+  blazingdb::protocol::TableSchemaSTL tableSchema;
 };
 
 
