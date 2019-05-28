@@ -227,6 +227,9 @@ struct TableSchemaSTL {
 	std::vector<int> types;
 	std::vector<uint64_t> numRowGroups;
   std::vector<std::string> files;
+  std::string csvDelimiter;
+  std::string csvLineTerminator;
+  uint32_t csvSkipRows;
 
   static flatbuffers::Offset<blazingdb::protocol::TableSchema> Serialize(flatbuffers::FlatBufferBuilder &builder, const TableSchemaSTL &data) {
     auto namesOffset = builder.CreateVectorOfStrings(data.names);
@@ -234,8 +237,10 @@ struct TableSchemaSTL {
     auto typesOffset = builder.CreateVector(data.types);
     auto numRowGroupsOffset = builder.CreateVector(data.numRowGroups);
     auto filesOffset = builder.CreateVectorOfStrings(data.files);
+    auto csvDelimiterOffset = builder.CreateString(data.csvDelimiter);
+    auto csvLineTerminatorOffset = builder.CreateString(data.csvLineTerminator);
 
-    return blazingdb::protocol::CreateTableSchema(builder, namesOffset, calciteToFileIndicesOffset, typesOffset, numRowGroupsOffset, filesOffset);
+    return blazingdb::protocol::CreateTableSchema(builder, namesOffset, calciteToFileIndicesOffset, typesOffset, numRowGroupsOffset, filesOffset, csvDelimiterOffset, csvLineTerminatorOffset, data.csvSkipRows);
   }
   static void Deserialize (const blazingdb::protocol::TableSchema *pointer, TableSchemaSTL* schema){
       schema->names.clear();
@@ -267,6 +272,12 @@ struct TableSchemaSTL {
       for (const auto &item : (*files_list)) {
         schema->files.push_back(std::string{item->c_str()});
       }
+
+      schema->csvDelimiter = std::string{pointer->csvDelimiter()->c_str()};
+
+      schema->csvLineTerminator = std::string{pointer->csvLineTerminator()->c_str()};
+
+      schema->csvSkipRows = pointer->csvSkipRows();
   }
 };
 

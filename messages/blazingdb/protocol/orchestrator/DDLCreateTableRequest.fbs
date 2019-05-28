@@ -11,6 +11,9 @@ table DDLCreateTableRequest {
 	schemaType: FileSchemaType;
 	gdf: BlazingTable;
 	files: [string];
+	csvDelimiter: string;
+  csvLineTerminator: string;
+  csvSkipRows: int;
 }
 
 root_type DDLCreateTableRequest;

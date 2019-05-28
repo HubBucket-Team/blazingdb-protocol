@@ -172,6 +172,12 @@ public:
     for (const auto &file : (*files_list)) {
       files.push_back(std::string{file->c_str()});
     }
+
+    csvDelimiter = std::string{pointer->csvDelimiter()->c_str()};
+
+    csvLineTerminator = std::string{pointer->csvLineTerminator()->c_str()};
+
+    csvSkipRows = pointer->csvSkipRows();
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
@@ -182,6 +188,9 @@ public:
     auto dbname_offset = builder.CreateString(dbName);
     auto gdf_offset = blazingdb::protocol::BlazingTableSchema::Serialize(builder, gdf);
     auto files_offset = builder.CreateVectorOfStrings(files);
+    auto csvDelimiterOffset = builder.CreateString(csvDelimiter);
+    auto csvLineTerminatorOffset = builder.CreateString(csvLineTerminator);
+
     builder.Finish(orchestrator::CreateDDLCreateTableRequest(builder,
                                                             name_offset,
                                                             vectorOfColumnNames,
@@ -189,7 +198,10 @@ public:
                                                             dbname_offset,
                                                             schemaType,
                                                             gdf_offset,
-                                                            files_offset));
+                                                            files_offset,
+                                                            csvDelimiterOffset,
+                                                            csvLineTerminatorOffset,
+                                                            csvSkipRows));
 
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
@@ -201,6 +213,9 @@ public:
   blazingdb::protocol::FileSchemaType schemaType;
 	blazingdb::protocol::BlazingTableSchema gdf;
 	std::vector<std::string> files;
+  std::string csvDelimiter;
+  std::string csvLineTerminator;
+  uint32_t csvSkipRows;
 };
 
 // authorization

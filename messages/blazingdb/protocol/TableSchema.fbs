@@ -6,6 +6,9 @@ table TableSchema {
 	types: [int];
 	numRowGroups: [ulong];
 	files: [string];
+	csvDelimiter: string;
+  csvLineTerminator: string;
+  csvSkipRows: int;
 }
 
 root_type TableSchema;
