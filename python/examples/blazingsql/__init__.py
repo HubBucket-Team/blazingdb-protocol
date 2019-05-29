@@ -536,15 +536,13 @@ def gdf_column_type_to_str(dtype):
         4: 'GDF_INT64',
         5: 'GDF_FLOAT32',
         6: 'GDF_FLOAT64',
-        7: 'GDF_DATE32',
-        8: 'GDF_DATE64',
-        9: 'GDF_TIMESTAMP',
-        10: 'GDF_CATEGORY',
-        11: 'GDF_STRING',
-        12: 'GDF_UINT8',
-        13: 'GDF_UINT16',
-        14: 'GDF_UINT32',
-        15: 'GDF_UINT64',
-        16: 'N_GDF_TYPES'
+        7: 'GDF_BOOL8',
+        8: 'GDF_DATE32',
+        9: 'GDF_DATE64',
+        10: 'GDF_TIMESTAMP',
+        11: 'GDF_CATEGORY',
+        12: 'GDF_STRING',
+        13: 'GDF_STRING_CATEGORY',
+        14: 'N_GDF_TYPES'
     }
     return str_dtype[dtype]
