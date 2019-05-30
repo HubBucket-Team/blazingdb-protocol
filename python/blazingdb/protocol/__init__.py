@@ -5,7 +5,7 @@ import socket
 import struct
 import threading
 
-__all__ = ['UnixSocketConnection', 'Server', 'Client']
+__all__ = ['UnixSocketConnection', 'Server', 'Client', 'TcpSocketConnection']
 
 
 class Buffer(abc.ABC):
