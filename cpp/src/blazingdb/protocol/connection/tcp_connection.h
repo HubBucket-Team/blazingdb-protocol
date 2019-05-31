@@ -1,6 +1,8 @@
 #ifndef BLAZINGDB_PROTOCOL_CONNECTION_TCP_CONNECTION_H_
 #define BLAZINGDB_PROTOCOL_CONNECTION_TCP_CONNECTION_H_
 
+#ifndef USE_UNIX_SOCKETS
+
 #include "connection.h"
 
 namespace blazingdb {
@@ -25,5 +27,7 @@ private:
 
 }  // namespace protocol
 }  // namespace blazingdb
+
+#else
 
 #endif

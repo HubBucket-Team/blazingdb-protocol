@@ -1,3 +1,5 @@
+#ifndef USE_UNIX_SOCKETS
+
 #include "tcp_connection.h"
 
 #include <stdexcept>
@@ -30,3 +32,5 @@ void TCPConnection::initialize() const noexcept {
 
 }  // namespace protocol
 }  // namespace blazingdb
+
+#endif
