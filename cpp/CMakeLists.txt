@@ -39,6 +39,9 @@ include(ConfigureFlatBuffers)
 include(ConfigureGoogleTest)
 
 # BEGIN MAIN #
+
+add_definitions(${CXX_DEFINES})
+
 find_package(Threads)
 
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src)
