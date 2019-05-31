@@ -28,6 +28,6 @@ private:
 }  // namespace protocol
 }  // namespace blazingdb
 
-#else
+#endif
 
 #endif
