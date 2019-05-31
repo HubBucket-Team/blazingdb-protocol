@@ -40,7 +40,10 @@ include(ConfigureGoogleTest)
 
 # BEGIN MAIN #
 
+# TODO percy move this to tool-chain
 add_definitions(${CXX_DEFINES})
+get_directory_property(CXX_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_SOURCE_DIR} COMPILE_DEFINITIONS)
+message("C++ compiler definitions: ${CXX_COMPILE_DEFINITIONS}")
 
 find_package(Threads)
 
