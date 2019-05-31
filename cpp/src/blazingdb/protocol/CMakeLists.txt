@@ -4,6 +4,7 @@ set(SRCS
   connection/unix_socket_connection.cc
   connection/tcp_connection.cc
   server/server.cc
+  utilities/io_util.cc
 )
 find_package(Threads)
 

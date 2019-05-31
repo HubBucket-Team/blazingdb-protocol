@@ -3,7 +3,7 @@
 #include <string>
 #include <stdexcept>
 
-#include <unistd.h>
+#include "../utilities/io_util.h"
 
 namespace blazingdb {
 namespace protocol {
@@ -16,25 +16,12 @@ Client::Client(const Connection &connection) : connection_(connection) {
 }
 
 Buffer Client::send(const Buffer &buffer) {
-  int bufferLength = buffer.size();
-  ssize_t written_bytes = write(connection_.fd(), (void*)&bufferLength, sizeof(int));
-  written_bytes = write(connection_.fd(), (void*)buffer.data(), bufferLength);
-  if (static_cast<std::size_t>(written_bytes) != buffer.size()) {
-    throw std::runtime_error("write error");
-  }
+  util::write_buffer(connection_.fd(), buffer);
+  
+  Buffer response_buffer;
+  util::read_buffer(connection_.fd(), response_buffer);
 
-  uint32_t responseBufferLength;
-  ssize_t nread =
-      read(connection_.fd(), (void*)&responseBufferLength, sizeof(uint32_t));
-
-  Buffer responseBuffer;
-  responseBuffer.resize(responseBufferLength);
-  nread =
-      read(connection_.fd(), (void*)responseBuffer.data(), responseBufferLength);
-
-  if (nread == -1) { throw std::runtime_error("error read"); }
-
-  return responseBuffer;
+  return response_buffer;
 }
 
 Buffer Client::send(std::shared_ptr<flatbuffers::DetachedBuffer> &buffer) {
