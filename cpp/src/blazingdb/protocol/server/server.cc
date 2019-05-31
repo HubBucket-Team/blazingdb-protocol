@@ -27,7 +27,7 @@ Server::Server(const Connection &connection) : connection_(connection) {
 
 // This assumes buffer is at least x bytes long,
 // and that the socket is blocking.
-void ReadXBytes(int socket, unsigned int x, std::uint8_t* buffer)
+void ReadXBytes(int socket, uint32_t x, void* buffer)
 {
     int bytesRead = 0;
     int result;
@@ -82,10 +82,10 @@ void Server::_Start(const __HandlerBaseType &handler) const {
     if (fd == -1) { throw std::runtime_error("accept error"); }
 
     uint32_t length = 0;
-    std::uint8_t buffer[length];
     // we assume that sizeof(length) will return 4 here.
     ReadXBytes(fd, sizeof(length), (void*)(&length));
-    buffer = new char[length];
+    
+    std::uint8_t buffer[length];
     ReadXBytes(fd, length, (void*)buffer);
     
     auto responseBuffer =
