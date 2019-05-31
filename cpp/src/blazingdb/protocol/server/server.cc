@@ -89,7 +89,7 @@ void Server::_Start(const __HandlerBaseType &handler) const {
     ReadXBytes(fd, length, (void*)buffer);
     
     auto responseBuffer =
-        handler->call(Buffer(buffer, static_cast<std::size_t>(nread)));
+        handler->call(Buffer(buffer, static_cast<std::size_t>(length)));
 
     uint32_t responseBufferLength = responseBuffer.size();
 
