@@ -84,9 +84,9 @@ void Server::_Start(const __HandlerBaseType &handler) const {
     unsigned int length = 0;
     char* buffer = 0;
     // we assume that sizeof(length) will return 4 here.
-    ReadXBytes(socketFileDescriptor, sizeof(length), (void*)(&length));
+    ReadXBytes(fd, sizeof(length), (void*)(&length));
     buffer = new char[length];
-    ReadXBytes(socketFileDescriptor, length, (void*)buffer);
+    ReadXBytes(fd, length, (void*)buffer);
     
     auto responseBuffer =
         handler->call(Buffer(buffer, static_cast<std::size_t>(nread)));
