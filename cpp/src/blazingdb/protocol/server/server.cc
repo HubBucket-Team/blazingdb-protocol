@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <thread>
 
-#include <unistd.h>
+#include "../utilities/io_util.h"
 
 namespace blazingdb {
 namespace protocol {
@@ -31,26 +31,14 @@ void Server::_Start(const __HandlerBaseType &handler) const {
 
     if (fd == -1) { throw std::runtime_error("accept error"); }
 
-    uint32_t length;
-    ssize_t  nread = read(fd, (void *) &length, sizeof(uint32_t));
+    Buffer temp_buffer;
+    util::read_buffer(fd, temp_buffer);
 
-    std::uint8_t buffer[length];
-    nread = read(fd, buffer, length);
-    auto responseBuffer =
-        handler->call(Buffer(buffer, static_cast<std::size_t>(nread)));
+    Buffer response_buffer = handler->call(temp_buffer);
 
-    uint32_t responseBufferLength = responseBuffer.size();
+    util::write_buffer(fd, response_buffer);
 
-    ssize_t written_bytes =
-        write(fd, (void *) &responseBufferLength, sizeof(uint32_t));
-    written_bytes = write(fd, responseBuffer.data(), responseBuffer.size());
-
-    if (static_cast<std::size_t>(written_bytes) != responseBuffer.size()) {
-      throw std::runtime_error("write error");
-    }
-
-    if (nread == -1) { throw std::runtime_error("error read"); }
-    close(fd);
+    close(fd);    
   }
 }
 

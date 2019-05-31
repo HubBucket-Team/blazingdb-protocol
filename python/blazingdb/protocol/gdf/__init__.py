@@ -1,9 +1,12 @@
 import blazingdb.protocol.transport as transport
 
 from blazingdb.messages.blazingdb.protocol.gdf \
-  import gdf_column_handler, cudaIpcMemHandle_t, gdf_dtype_extra_info
+  import gdf_column_handler, cudaIpcMemHandle_t, custringsData_t, gdf_dtype_extra_info
 
 class cudaIpcMemHandle_tSchema(transport.schema(cudaIpcMemHandle_t)):
+  reserved = transport.BytesSegment()
+
+class custringsData_tSchema(transport.schema(custringsData_t)):
   reserved = transport.BytesSegment()
 
 class gdf_dtype_extra_infoSchema(transport.schema(gdf_dtype_extra_info)):
@@ -16,8 +19,4 @@ class gdf_columnSchema(transport.schema(gdf_column_handler)):
   dtype = transport.NumberSegment()
   dtype_info = transport.SchemaSegment(gdf_dtype_extra_infoSchema)
   null_count = transport.NumberSegment()
-  custrings_views = transport.SchemaSegment(cudaIpcMemHandle_tSchema)
-  custrings_viewscount = transport.NumberSegment()
-  custrings_membuffer = transport.SchemaSegment(cudaIpcMemHandle_tSchema)
-  custrings_membuffersize = transport.NumberSegment()
-  custrings_baseptr = transport.NumberSegment()
+  custrings_data = transport.SchemaSegment(custringsData_tSchema)
