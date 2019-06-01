@@ -18,8 +18,13 @@ Client::Client(const Connection &connection) : connection_(connection) {
 Buffer Client::send(const Buffer &buffer) {
   util::write_buffer(connection_.fd(), buffer);
   
+  std::cout << "escribiiooooooooooo " << buffer.size() <<std::endl;
+  
+  
   Buffer response_buffer;
   util::read_buffer(connection_.fd(), response_buffer);
+
+  std::cout << "leyyyyooo decalcite " << response_buffer.size() << std::endl;
 
   return response_buffer;
 }
