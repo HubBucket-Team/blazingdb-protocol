@@ -21,7 +21,7 @@ namespace util {
             position += n;
             buffer_position += n;
             if(n == 0){
-                //throw std::runtime_error{"ERROR: was not able to read the total amount of " + std::to_string(size)};                
+                throw std::runtime_error{"ERROR: was not able to read the total amount of " + std::to_string(size)};                
             }
         }
     }
@@ -38,7 +38,7 @@ namespace util {
             position += n;
             buffer_position += n;
             if(n == 0){
-                //throw std::runtime_error{"ERROR: was not able to write the total amount of " + std::to_string(size)};                
+                throw std::runtime_error{"ERROR: was not able to write the total amount of " + std::to_string(size)};                
             }
         }
     }
