@@ -10,11 +10,12 @@ class gdf_dtype(object):
     GDF_INT64 = 4
     GDF_FLOAT32 = 5
     GDF_FLOAT64 = 6
-    GDF_DATE32 = 7
-    GDF_DATE64 = 8
-    GDF_TIMESTAMP = 9
-    GDF_CATEGORY = 10
-    GDF_STRING = 11
-    GDF_STRING_CATEGORY = 12
-    N_GDF_TYPES = 13
+    GDF_BOOL8 = 7
+    GDF_DATE32 = 8
+    GDF_DATE64 = 9
+    GDF_TIMESTAMP = 10
+    GDF_CATEGORY = 11
+    GDF_STRING = 12
+    GDF_STRING_CATEGORY = 13
+    N_GDF_TYPES = 14
 
