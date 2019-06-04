@@ -72,6 +72,11 @@ public:
     addr_.sin_family      = AF_INET;
     addr_.sin_addr.s_addr = INADDR_ANY;
     addr_.sin_port = htons(port);
+    
+    in_addr_t ip = addr_.sin_addr.s_addr;
+    std::string socketAddress(std::to_string(ip));
+    
+    std::cout << "el ip del es: " << socketAddress << std::endl;
   }
 
 #endif
