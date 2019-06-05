@@ -1,0 +1,5 @@
+namespace blazingdb.protocol.gdf;
+
+table custringsData_t {
+    reserved:[byte];
+}

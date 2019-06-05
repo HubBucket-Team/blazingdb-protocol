@@ -12,11 +12,9 @@ typedef	long	gdf_date64;
 typedef	int		gdf_date32;
 typedef	int		gdf_category;
 
-/* --------------------------------------------------------------------------*/
  /**
- * @Synopsis  These enums indicate the possible data types for a gdf_column
+ * @brief  These enums indicate the possible data types for a gdf_column
  */
-/* ----------------------------------------------------------------------------*/
 typedef enum {
     GDF_invalid=0,
     GDF_INT8,
@@ -25,16 +23,14 @@ typedef enum {
     GDF_INT64,
     GDF_FLOAT32,
     GDF_FLOAT64,
-    GDF_DATE32,   	/**< int32_t days since the UNIX epoch */
-    GDF_DATE64,   	/**< int64_t milliseconds since the UNIX epoch */
-    GDF_TIMESTAMP,	/**< Exact timestamp encoded with int64 since UNIX epoch (Default unit millisecond) */
+    GDF_BOOL8,      ///< Boolean stored in 8 bits per Boolean. zero==false, nonzero==true.
+    GDF_DATE32,     ///< int32_t days since the UNIX epoch
+    GDF_DATE64,     ///< int64_t milliseconds since the UNIX epoch
+    GDF_TIMESTAMP,  ///< Exact timestamp encoded with int64 since UNIX epoch (Default unit millisecond)
     GDF_CATEGORY,
     GDF_STRING,
-    GDF_UINT8,
-    GDF_UINT16,
-    GDF_UINT32,
-    GDF_UINT64,
-    N_GDF_TYPES, 	/* additional types should go BEFORE N_GDF_TYPES */
+    GDF_STRING_CATEGORY, ///< Stores indices of an NVCategory in data and in extra col info a reference to the nv_category
+    N_GDF_TYPES,   ///< additional types should go BEFORE N_GDF_TYPES
 } gdf_dtype;
 
 

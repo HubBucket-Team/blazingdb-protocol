@@ -73,58 +73,22 @@ class gdf_column_handler(object):
         return 0
 
     # gdf_column_handler
-    def CustringsViews(self):
+    def CustringsData(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
-            from .cudaIpcMemHandle_t import cudaIpcMemHandle_t
-            obj = cudaIpcMemHandle_t()
+            from .custringsData_t import custringsData_t
+            obj = custringsData_t()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-    # gdf_column_handler
-    def CustringsViewscount(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
-        return 0
-
-    # gdf_column_handler
-    def CustringsMembuffer(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
-        if o != 0:
-            x = self._tab.Indirect(o + self._tab.Pos)
-            from .cudaIpcMemHandle_t import cudaIpcMemHandle_t
-            obj = cudaIpcMemHandle_t()
-            obj.Init(self._tab.Bytes, x)
-            return obj
-        return None
-
-    # gdf_column_handler
-    def CustringsMembuffersize(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(22))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
-        return 0
-
-    # gdf_column_handler
-    def CustringsBaseptr(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(24))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
-        return 0
-
-def gdf_column_handlerStart(builder): builder.StartObject(11)
+def gdf_column_handlerStart(builder): builder.StartObject(7)
 def gdf_column_handlerAddData(builder, data): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0)
 def gdf_column_handlerAddValid(builder, valid): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(valid), 0)
 def gdf_column_handlerAddSize(builder, size): builder.PrependUint64Slot(2, size, 0)
 def gdf_column_handlerAddDtype(builder, dtype): builder.PrependInt8Slot(3, dtype, 0)
 def gdf_column_handlerAddDtypeInfo(builder, dtypeInfo): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(dtypeInfo), 0)
 def gdf_column_handlerAddNullCount(builder, nullCount): builder.PrependUint64Slot(5, nullCount, 0)
-def gdf_column_handlerAddCustringsViews(builder, custringsViews): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(custringsViews), 0)
-def gdf_column_handlerAddCustringsViewscount(builder, custringsViewscount): builder.PrependUint32Slot(7, custringsViewscount, 0)
-def gdf_column_handlerAddCustringsMembuffer(builder, custringsMembuffer): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(custringsMembuffer), 0)
-def gdf_column_handlerAddCustringsMembuffersize(builder, custringsMembuffersize): builder.PrependUint64Slot(9, custringsMembuffersize, 0)
-def gdf_column_handlerAddCustringsBaseptr(builder, custringsBaseptr): builder.PrependUint64Slot(10, custringsBaseptr, 0)
+def gdf_column_handlerAddCustringsData(builder, custringsData): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(custringsData), 0)
 def gdf_column_handlerEnd(builder): return builder.EndObject()
