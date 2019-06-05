@@ -313,12 +313,12 @@ public:
 };
 
 struct FileSystemBlazingTableSchema {
-  std::string name;
-  blazingdb::protocol::FileSchemaType schemaType;
-  CsvFileSchema csv;
-  ParquetFileSchema parquet;
-  blazingdb::protocol::BlazingTableSchema gdf;
-  blazingdb::protocol::TableSchemaSTL tableSchema;
+  std::string name; //ok
+  blazingdb::protocol::FileSchemaType schemaType; //ok
+  CsvFileSchema csv; //deprecated
+  ParquetFileSchema parquet; //deprecated
+  blazingdb::protocol::BlazingTableSchema gdf; //ok
+  blazingdb::protocol::TableSchemaSTL tableSchema; //ok
 };
 
 struct FileSystemTableGroupSchema {
