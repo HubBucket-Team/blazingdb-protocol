@@ -1,5 +1,7 @@
 #include "client.h"
 
+#include <unistd.h>
+
 #include <string>
 #include <stdexcept>
 #include <iostream>
