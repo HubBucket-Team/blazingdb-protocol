@@ -9,6 +9,8 @@
 #include <cstdint>
 #include <thread>
 
+#include "../connection/tcp_connection.h"
+
 #include "../utilities/io_util.h"
 
 namespace blazingdb {
