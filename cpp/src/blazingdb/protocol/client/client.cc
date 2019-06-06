@@ -1,15 +1,7 @@
 #include "client.h"
 
-#include <unistd.h>
-
 #include <string>
 #include <stdexcept>
-#include <iostream>
-#include <cassert>
-#include <cstdint>
-#include <thread>
-
-#include "../connection/tcp_connection.h"
 
 #include "../utilities/io_util.h"
 
@@ -17,30 +9,8 @@ namespace blazingdb {
 namespace protocol {
 
 Client::Client(const Connection &connection) : connection_(connection) {
-
-#ifdef USE_UNIX_SOCKETS
-
-  int result = connect(connection.fd(), connection.address(), connection.length());
-
-#else
-
-  // TCP
-
-  unlink(static_cast<const char *>(connection_.address()->sa_data));
-
-  if (bind(connection_.fd(), connection_.address(), connection_.length()) == -1) {
-    throw std::runtime_error("TCP client: bind error");
-  }
-
-  // Connect to the remote server
-  struct sockaddr_in remoteaddr;
-  remoteaddr.sin_family = AF_INET;
-  remoteaddr.sin_addr.s_addr = inet_addr(static_cast<TCPConnection>(connection_).ip_.c_str());
-  remoteaddr.sin_port = htons(server_port);
-
-  int result = connect(connection.fd(), (struct sockaddr *)&remoteaddr, sizeof(remoteaddr));
-
-#endif
+  int result =
+      connect(connection.fd(), connection.address(), connection.length());
 
   if (result == -1) { throw std::runtime_error("connect error"); }
 }

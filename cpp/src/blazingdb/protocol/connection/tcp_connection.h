@@ -21,7 +21,7 @@ public:
   void operator=(const TCPConnection &) = delete;
   void operator=(const TCPConnection &&) = delete;
 
-public:
+private:
   const std::string ip_;
 };
 
