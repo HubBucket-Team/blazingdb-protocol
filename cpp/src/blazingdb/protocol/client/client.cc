@@ -9,6 +9,19 @@ namespace blazingdb {
 namespace protocol {
 
 Client::Client(const Connection &connection) : connection_(connection) {
+
+#ifdef USE_UNIX_SOCKETS
+
+#else
+
+//  TCP
+
+  if (bind(connection_.fd(), connection_.address(), connection_.length()) == -1) {
+    throw std::runtime_error("TCP client: bind error");
+  }
+
+#endif
+
   int result =
       connect(connection.fd(), connection.address(), connection.length());
 
