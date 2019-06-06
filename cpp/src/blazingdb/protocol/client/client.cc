@@ -35,7 +35,7 @@ Client::Client(const Connection &connection) : connection_(connection) {
   // Connect to the remote server
   struct sockaddr_in remoteaddr;
   remoteaddr.sin_family = AF_INET;
-  remoteaddr.sin_addr.s_addr = inet_addr(const_cast<TCPConnection>(connection_).ip_.c_str());
+  remoteaddr.sin_addr.s_addr = inet_addr(static_cast<TCPConnection>(connection_).ip_.c_str());
   remoteaddr.sin_port = htons(server_port);
 
   int result = connect(connection.fd(), (struct sockaddr *)&remoteaddr, sizeof(remoteaddr));
