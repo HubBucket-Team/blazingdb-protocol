@@ -28,15 +28,12 @@ TCPConnection::TCPConnection(const ConnectionAddress &connectionAddress)
 
   in_addr_t ip = addr_.sin_addr.s_addr;
   std::string socketAddress(std::to_string(ip));
-    
-  std::cout << "el ip del es: " << socketAddress << std::endl;
+
 }
 
 TCPConnection::~TCPConnection() { close(fd_); }
 
 void TCPConnection::initialize() const noexcept {
-  const_cast<TCPConnection *>(this)->addr_.sin_addr.s_addr =
-      inet_addr(ip_.c_str());
 }
 
 }  // namespace protocol
