@@ -3,7 +3,7 @@
 #include <string>
 #include <stdexcept>
 
-#include "../utilities/io_util.h"
+#include <blazingdb/protocol/utilities/io_util.h>
 
 namespace blazingdb {
 namespace protocol {

@@ -1,11 +1,12 @@
-#pragma once
+#ifndef BLAZINGDB_PROTOCOL_MESSAGE_INTERPRETER_MESSAGES_H
+#define BLAZINGDB_PROTOCOL_MESSAGE_INTERPRETER_MESSAGES_H
 
 #include <string>
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
-#include "../messages.h"
-#include "utils.h"
-#include "gdf_dto.h"
+#include <blazingdb/protocol/message/messages.h>
+#include <blazingdb/protocol/message/interpreter/utils.h>
+#include <blazingdb/protocol/message/interpreter/gdf_dto.h>
 
 namespace blazingdb {
 namespace protocol {
@@ -137,3 +138,5 @@ private:
 } // interpreter
 } // protocol
 } // blazingdb
+
+#endif  // BLAZINGDB_PROTOCOL_MESSAGE_INTERPRETER_MESSAGES_H

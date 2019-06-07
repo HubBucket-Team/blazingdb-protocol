@@ -7,7 +7,7 @@
 #include <blazingdb/protocol/api.h>
 #include <iostream>
 #include "flatbuffers/flatbuffers.h"
-#include "gdf_dto.h"
+#include <blazingdb/protocol/message/interpreter/gdf_dto.h>
 
 namespace blazingdb {
 namespace protocol {

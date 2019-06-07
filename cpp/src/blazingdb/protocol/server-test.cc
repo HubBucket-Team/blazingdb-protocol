@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "api.h"
+#include <blazingdb/protocol/api.h>
 
 TEST(ServerTest, API) {
   // TODO(gcca): mock connection to test server

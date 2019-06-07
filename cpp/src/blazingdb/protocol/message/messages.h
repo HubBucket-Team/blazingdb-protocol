@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BLAZINGDB_PROTOCOL_MESSAGE_MESSAGES_H
+#define BLAZINGDB_PROTOCOL_MESSAGE_MESSAGES_H
 
 #include <string>
 #include <functional>
@@ -153,3 +154,5 @@ ResponseType MakeResponse (Buffer &responseBuffer);
 
 } // namespace protocol
 } // namespace blazingdb
+
+#endif  // BLAZINGDB_PROTOCOL_MESSAGE_MESSAGES_H

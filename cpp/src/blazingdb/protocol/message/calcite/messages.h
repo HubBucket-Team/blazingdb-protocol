@@ -1,9 +1,10 @@
-#pragma once
+#ifndef BLAZINGDB_PROTOCOL_MESSAGE_CALCITE_MESSAGES_H
+#define BLAZINGDB_PROTOCOL_MESSAGE_CALCITE_MESSAGES_H
 
 #include <string>
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
-#include "../messages.h"
+#include <blazingdb/protocol/message/messages.h>
 
 namespace blazingdb {
 namespace protocol {
@@ -102,3 +103,4 @@ private:
 }
 }
 }
+#endif  // BLAZINGDB_PROTOCOL_MESSAGE_CALCITE_MESSAGES_H

@@ -1,12 +1,12 @@
-#pragma once
+#ifndef BLAZINGDB_PROTOCOL_MESSAGE_ORCHESTRATOR_MESSAGES_H
+#define BLAZINGDB_PROTOCOL_MESSAGE_ORCHESTRATOR_MESSAGES_H
 
 #include <string>
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
 
-#include "../messages.h"
-#include "../interpreter/messages.h"
-
+#include <blazingdb/protocol/message/messages.h>
+#include <blazingdb/protocol/message/interpreter/messages.h>
 
 namespace blazingdb {
 namespace protocol {
@@ -255,3 +255,5 @@ private:
 } // orchestrator
 } // protocol
 } // blazingdb
+
+#endif  // BLAZINGDB_PROTOCOL_MESSAGE_ORCHESTRATOR_MESSAGES_H

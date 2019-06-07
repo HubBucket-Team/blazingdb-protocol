@@ -1,7 +1,8 @@
-#pragma once
-
-#include "../messages.h"
-#include "../interpreter/messages.h"
+#ifndef BLAZINGDB_PROTOCOL_MESSAGE_IO_FILE_SYSTEM_H
+#define BLAZINGDB_PROTOCOL_MESSAGE_IO_FILE_SYSTEM_H
+ 
+#include <blazingdb/protocol/message/messages.h>
+#include <blazingdb/protocol/message/interpreter/utils.h>
 
 namespace blazingdb {
 namespace message {
@@ -185,3 +186,5 @@ public:
 }  // namespace io
 }  // namespace message
 }  // namespace blazingdb
+
+#endif BLAZINGDB_PROTOCOL_MESSAGE_IO_FILE_SYSTEM_H
