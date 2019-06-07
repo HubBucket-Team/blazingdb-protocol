@@ -20,45 +20,15 @@ struct IMessage {
 
 class ResponseMessage  : public IMessage {
 public:  
-  ResponseMessage (const uint8_t* buffer) 
-      : IMessage()
-  {
-      auto pointer = flatbuffers::GetRoot<blazingdb::protocol::Response>(buffer);
-      status_ = pointer->status();
-      payloadBuffer = (uint8_t*)pointer->payload()->data();
-      payloadBufferSize = pointer->payload()->size();
-  }
+  ResponseMessage (const uint8_t* buffer);
 
-  ResponseMessage(Status status, std::shared_ptr<flatbuffers::DetachedBuffer>& buffer) : IMessage() {
-      status_ = status;
-      _copy_payload = buffer;
+  ResponseMessage(Status status, std::shared_ptr<flatbuffers::DetachedBuffer>& buffer);
 
-      payloadBuffer = _copy_payload->data();
-      payloadBufferSize = _copy_payload->size();
-  }
+  ResponseMessage(Status status, IMessage& payload);
 
-  ResponseMessage(Status status, IMessage& payload) : IMessage() {
-    status_ = status;
-    _copy_payload = payload.getBufferData();
-
-    payloadBuffer = _copy_payload->data();
-    payloadBufferSize = _copy_payload->size();
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override  {
-    flatbuffers::FlatBufferBuilder builder{0};
-
-    auto payload_offset = builder.CreateVector(payloadBuffer, payloadBufferSize);
-    auto root_offset = CreateResponse(builder, status_, payload_offset);
-    builder.Finish(root_offset);
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
-  Status getStatus() {
-    return status_;
-  } 
-  const uint8_t* getPayloadBuffer() {
-    return payloadBuffer;
-  }
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override;
+  Status getStatus();
+  const uint8_t* getPayloadBuffer();
 private:
     Status            status_;
     uint8_t*          payloadBuffer;
@@ -70,81 +40,35 @@ private:
 class ResponseErrorMessage : public IMessage {
 public:  
 
-  ResponseErrorMessage(const std::string& error) : IMessage(), error (error)
-  {
-  }
+  ResponseErrorMessage(const std::string& error);
   
-  ResponseErrorMessage (const uint8_t* buffer) : IMessage() {
-    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::ResponseError>(buffer);
-    
-    error = std::string{pointer->errors()->c_str()};
-  }
+  ResponseErrorMessage (const uint8_t* buffer);
 
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override  {
-    flatbuffers::FlatBufferBuilder builder{1024};
-    auto string_offset = builder.CreateString(error);
-    auto root_offset = CreateResponseError(builder, string_offset);
-    builder.Finish(root_offset);
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override;
 
-  std::string getMessage () {
-    return error;
-  }
+  std::string getMessage ();
   
 private:
   std::string error;
 };
 
-static inline const Header * GetHeaderPtr (const uint8_t* buffer) {
-  return flatbuffers::GetRoot<blazingdb::protocol::Request>(buffer)->header();
-}
+static inline const Header * GetHeaderPtr (const uint8_t* buffer);
 
 class RequestMessage : public IMessage {
 public:  
-  RequestMessage (const uint8_t* buffer) 
-    : IMessage(), header{GetHeaderPtr(buffer)->messageType(),
-                         GetHeaderPtr(buffer)->accessToken() } 
-  {
-      auto pointer = flatbuffers::GetRoot<blazingdb::protocol::Request>(buffer);
-      auto payloadBuffer = (uint8_t*)pointer->payload()->data();
-      auto payloadBufferSize = pointer->payload()->size();
-      this->payload = Buffer{payloadBuffer, payloadBufferSize};
-  }
+  RequestMessage (const uint8_t* buffer);
 
-  RequestMessage(Header &&_header, Buffer& payload) 
-      : IMessage(), header{_header} 
-  {
-      // _copy_payload = payload.getBufferData(); 
-      auto payloadBuffer = payload.data();
-      auto payloadBufferSize = payload.size();
+  RequestMessage(Header &&_header, Buffer& payload);
 
-      this->payload = Buffer{payloadBuffer, payloadBufferSize};
-  }
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override;
 
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
-    flatbuffers::FlatBufferBuilder builder{0};
-    auto payload_offset = builder.CreateVector(this->payload.data(), this->payload.size());
-    auto root_offset = CreateRequest(builder, &header, payload_offset);
-    builder.Finish(root_offset);
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
+  Buffer getPayloadBuffer();
 
-  Buffer getPayloadBuffer() {
-    return payload;
-  }
+  size_t getPayloadBufferSize();
 
-  size_t getPayloadBufferSize() {
-    return  payload.size();
-  }
+  int8_t  messageType() const;
 
-  int8_t  messageType() const { 
-    return header.messageType();
-  }
-
-  uint64_t  accessToken() const {
-    return header.accessToken();
-  }
+  uint64_t  accessToken() const;
 
 private:
     Header            header;
@@ -214,47 +138,18 @@ protected:
 class  ZeroMessage : public IMessage {
 public:
 
-  ZeroMessage()
-      : IMessage()
-  {
-  }
+  ZeroMessage();
 
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    flatbuffers::FlatBufferBuilder builder{};
-    auto root_offset = builder.CreateString("");
-    builder.Finish(root_offset);
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override;
 };
 
  
-auto MakeRequest(int8_t message_type, uint64_t sessionToken, Buffer& payload) -> Buffer {
-  RequestMessage request{ Header{message_type, sessionToken}, payload}; 
-  auto bufferedData = request.getBufferData();
-  return Buffer{bufferedData->data(), bufferedData->size()};
-} 
-
+auto MakeRequest(int8_t message_type, uint64_t sessionToken, Buffer& payload) -> Buffer;
  
-auto MakeRequest(int8_t message_type, uint64_t sessionToken, IMessage& message) -> Buffer {
-  auto payload = Buffer{message.getBufferData()};
-  RequestMessage request(Header{message_type, sessionToken}, payload); 
-  auto bufferedData = request.getBufferData();
-  return Buffer{bufferedData->data(), bufferedData->size()};
-} 
-
-
-
+auto MakeRequest(int8_t message_type, uint64_t sessionToken, IMessage& message) -> Buffer;
 
 template <typename ResponseType>
-ResponseType MakeResponse (Buffer &responseBuffer) {
-  ResponseMessage response{responseBuffer.data()};
-  if (response.getStatus() == Status_Error) {
-    ResponseErrorMessage errorMessage{response.getPayloadBuffer()};
-    throw std::runtime_error(errorMessage.getMessage());
-  }
-  ResponseType responsePayload(response.getPayloadBuffer());
-  return responsePayload;
-}
+ResponseType MakeResponse (Buffer &responseBuffer);
 
 } // namespace protocol
 } // namespace blazingdb

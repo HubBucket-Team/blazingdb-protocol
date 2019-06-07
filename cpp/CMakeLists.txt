@@ -41,7 +41,7 @@ include(ConfigureGoogleTest)
 # BEGIN MAIN #
 find_package(Threads)
 
-include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src)
 
 ## NOTE Each time we build the target blazingdb-protocol we will compile the flatbuffer schemas
 # add_dependencies(blazingdb-protocol FlatBuffersSchemas)

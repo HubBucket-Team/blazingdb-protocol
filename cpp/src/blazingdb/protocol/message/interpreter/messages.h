@@ -4,7 +4,7 @@
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
 #include "../messages.h"
-#include "blazingdb/protocol/message/utils.h"
+#include "utils.h"
 #include "gdf_dto.h"
 
 namespace blazingdb {
@@ -16,19 +16,9 @@ namespace interpreter {
 class ExecutePlanDirectRequestMessage  : public IMessage {
 public:
 
-  ExecutePlanDirectRequestMessage(const std::string &logicalPlan, const blazingdb::protocol::TableGroup *tableGroup)
-      : IMessage(), logicalPlan{logicalPlan}, tableGroup{tableGroup}
-  {
+  ExecutePlanDirectRequestMessage(const std::string &logicalPlan, const blazingdb::protocol::TableGroup *tableGroup);
 
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    flatbuffers::FlatBufferBuilder builder;
-    auto logicalPlan_offset = builder.CreateString(logicalPlan);
-    auto tableGroupOffset = ::blazingdb::protocol::BuildDirectTableGroup(builder, tableGroup);
-    builder.Finish(interpreter::CreateDMLRequest(builder, logicalPlan_offset, tableGroupOffset));
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override ;
 
 private:
   std::string logicalPlan;
@@ -38,35 +28,14 @@ private:
 class ExecutePlanRequestMessage  : public IMessage {
 public:
 
-  ExecutePlanRequestMessage(const std::string &logicalPlan, const  ::blazingdb::protocol::TableGroupDTO &tableGroup)
-      : IMessage(), logicalPlan{logicalPlan}, tableGroup{tableGroup}
-  {
+  ExecutePlanRequestMessage(const std::string &logicalPlan, const  ::blazingdb::protocol::TableGroupDTO &tableGroup);
+  ExecutePlanRequestMessage (const uint8_t* buffer);
 
-  }
-  ExecutePlanRequestMessage (const uint8_t* buffer)
-      : IMessage()
-  {
-    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::interpreter::DMLRequest>(buffer);
-    logicalPlan = std::string{pointer->logicalPlan()->c_str()};
-    std::cout << "query-stirng-log>>" << logicalPlan << std::endl;
-    tableGroup =  ::blazingdb::protocol::TableGroupDTOFrom(pointer->tableGroup());
-  }
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override;
 
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    flatbuffers::FlatBufferBuilder builder;
-    auto logicalPlan_offset = builder.CreateString(logicalPlan);
-    auto tableGroupOffset = ::blazingdb::protocol::BuildTableGroup(builder, tableGroup);
-    builder.Finish(interpreter::CreateDMLRequest(builder, logicalPlan_offset, tableGroupOffset));
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
+  std::string getLogicalPlan() ;
 
-  std::string getLogicalPlan() {
-    return logicalPlan;
-  }
-
-  ::blazingdb::protocol::TableGroupDTO getTableGroup() {
-    return tableGroup;
-  }
+  ::blazingdb::protocol::TableGroupDTO getTableGroup() ;
 
 private:
   std::string logicalPlan;
@@ -107,38 +76,14 @@ struct NodeConnectionDTO {
 
 class  ExecutePlanResponseMessage : public IMessage {
 public:
-  ExecutePlanResponseMessage (uint64_t resultToken, const NodeConnectionDTO &nodeInfo)
-    : IMessage(), resultToken{resultToken}, nodeInfo{nodeInfo}
-  {
+  ExecutePlanResponseMessage (uint64_t resultToken, const NodeConnectionDTO &nodeInfo);
 
-  }
+  ExecutePlanResponseMessage (const uint8_t* buffer);
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override ;
 
-  ExecutePlanResponseMessage (const uint8_t* buffer)
-      :   IMessage()
-  {
-    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::interpreter::ExecutePlanResponse>(buffer);
-    resultToken = pointer->resultToken();
-    nodeInfo = NodeConnectionDTO {
-      .port = pointer->nodeConnection()->port(),
-      .path = std::string{pointer->nodeConnection()->path()->c_str()},
-      .type = pointer->nodeConnection()->type()
-    };
-  };
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    flatbuffers::FlatBufferBuilder builder{0};
-    auto nodeInfo_offset = CreateNodeConnectionDirect(builder, nodeInfo.port, nodeInfo.path.data(), nodeInfo.type);
-    auto root = interpreter::CreateExecutePlanResponse(builder, resultToken, nodeInfo_offset);
-    builder.Finish(root);
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
+  uint64_t getResultToken();
 
-  uint64_t getResultToken() {
-    return resultToken;
-  }
-
-  NodeConnectionDTO getNodeInfo() {
-    return nodeInfo;
-  }
+  NodeConnectionDTO getNodeInfo() ;
 public:
   uint64_t resultToken;
   NodeConnectionDTO nodeInfo;
@@ -155,61 +100,19 @@ struct BlazingMetadataDTO{
 
 class GetResultResponseMessage : public IMessage {
 public:
-  GetResultResponseMessage (const BlazingMetadataDTO&  metadata, const std::vector<std::string>& columnNames, const std::vector<uint64_t>& columnTokens, const std::vector<::gdf_dto::gdf_column>& columns)
-      : IMessage(), metadata{metadata}, columnNames{columnNames}, columnTokens{columnTokens}, columns{columns}
-  {
+  GetResultResponseMessage (const BlazingMetadataDTO&  metadata, const std::vector<std::string>& columnNames, const std::vector<uint64_t>& columnTokens, const std::vector<::gdf_dto::gdf_column>& columns);
 
-  }
+  GetResultResponseMessage (const uint8_t* buffer);
 
-  GetResultResponseMessage (const uint8_t* buffer)
-      : IMessage()
-  {
-    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::interpreter::GetResultResponse>(buffer);
-    metadata = BlazingMetadataDTO {
-        .status = std::string{pointer->metadata()->status()->c_str()},
-        .message = std::string{pointer->metadata()->message()->c_str()},
-        .time = pointer->metadata()->time(),
-        .rows = pointer->metadata()->rows()
-    };
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override ;
 
-    columnNames = ColumnNamesFrom(pointer->columnNames());
-    columnTokens = ColumnTokensFrom(pointer->columnTokens());
-    columns = GdfColumnsFrom(pointer->columns());
-  }
+  BlazingMetadataDTO getMetadata();
 
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    flatbuffers::FlatBufferBuilder builder{0};
-    auto metadata_offset = blazingdb::protocol::interpreter::CreateBlazingMetadataDirect(builder, metadata.status.data(), metadata.message.data(), metadata.time, metadata.rows);
+  std::vector<std::string> getColumnNames();
 
-    auto names_offset = BuildFlatColumnNames(builder, columnNames);
-    auto values_offset = BuildFlatColumns(builder, columns);
-    auto tokens_offset = BuildFlatColumnTokens(builder, columnTokens);
+  std::vector<uint64_t> getColumnTokens();
 
-    auto root = interpreter::CreateGetResultResponse(builder, metadata_offset, builder.CreateVector(values_offset), builder.CreateVector(names_offset), tokens_offset);
-    builder.Finish(root);
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
-
-  BlazingMetadataDTO getMetadata()
-  {
-    return metadata;
-  }
-
-  std::vector<std::string> getColumnNames()
-  {
-    return columnNames;
-  }
-
-  std::vector<uint64_t> getColumnTokens()
-  {
-    return columnTokens;
-  }
-
-  std::vector<::gdf_dto::gdf_column> getColumns()
-  {
-    return columns;
-  }
-
+  std::vector<::gdf_dto::gdf_column> getColumns();
 public:
   BlazingMetadataDTO  metadata;
   std::vector<std::string> columnNames;
@@ -220,29 +123,11 @@ public:
 
 class  CreateTableResponseMessage : public IMessage {
 public:
-  CreateTableResponseMessage (const blazingdb::protocol::TableSchemaSTL& tableSchema)
-    : IMessage(), tableSchema{tableSchema}
-  {
+  CreateTableResponseMessage (const blazingdb::protocol::TableSchemaSTL& tableSchema);
 
-  }
-
-  CreateTableResponseMessage (const uint8_t* buffer)
-      :   IMessage()
-  {
-    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DDLCreateTableResponse>(buffer);
-    blazingdb::protocol::TableSchemaSTL::Deserialize(pointer->tableSchema(), &tableSchema);
-  };
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override  {
-    flatbuffers::FlatBufferBuilder builder{0};
-    auto tableSchemaOffset = blazingdb::protocol::TableSchemaSTL::Serialize(builder, tableSchema);
-    builder.Finish(orchestrator::CreateDDLCreateTableResponse(builder, tableSchemaOffset));
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
-
-  const blazingdb::protocol::TableSchemaSTL& getTableSchema() {
-    return tableSchema;
-  }
+  CreateTableResponseMessage (const uint8_t* buffer);
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override;
+  const blazingdb::protocol::TableSchemaSTL& getTableSchema();
 
 private:
   blazingdb::protocol::TableSchemaSTL tableSchema;

@@ -4,11 +4,9 @@
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
 
-#include "../../all_generated.h"
-
 #include "../messages.h"
 #include "../interpreter/messages.h"
-#include "blazingdb/protocol/message/utils.h"
+
 
 namespace blazingdb {
 namespace protocol {

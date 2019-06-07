@@ -1,9 +1,4 @@
-//
-// Created by aocsa on 10/15/18.
-//
-
-#ifndef BLAZINGDB_PROTOCOL_DTO_CUH_H
-#define BLAZINGDB_PROTOCOL_DTO_CUH_H
+#include <blazingdb/protocol/message/interpreter/utils.h>
 
 #include <string>
 #include <functional>
@@ -12,50 +7,38 @@
 #include <blazingdb/protocol/api.h>
 #include <iostream>
 #include "flatbuffers/flatbuffers.h"
-#include "blazingdb/protocol/all_generated.h"
-#include "interpreter/gdf_dto.h"
+#include "gdf_dto.h"
 
 namespace blazingdb {
 namespace protocol {
 
-struct BlazingTableDTO {
-  std::vector<::gdf_dto::gdf_column> columns;
-  std::vector<uint64_t> columnTokens;
-  uint64_t resultToken;
-};
-
-struct TableGroupDTO {
-  std::vector<BlazingTableDTO> tables;
-  std::string name;
-};
-
-static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildCudaIpcMemHandler (flatbuffers::FlatBufferBuilder &builder, const std::basic_string<int8_t> &reserved) {
+flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildCudaIpcMemHandler (flatbuffers::FlatBufferBuilder &builder, const std::basic_string<int8_t> &reserved) {
   return builder.CreateVector(reserved.data(), reserved.size());
 }
 
-static std::basic_string<int8_t> CudaIpcMemHandlerFrom (const gdf::cudaIpcMemHandle_t *handler) {
+std::basic_string<int8_t> CudaIpcMemHandlerFrom (const gdf::cudaIpcMemHandle_t *handler) {
   auto vector_bytes = handler->reserved();
   return std::basic_string<int8_t>{vector_bytes->data(), vector_bytes->size()};
 }
 
-static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildDirectCudaIpcMemHandler (flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<int8_t> * data) {
+flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildDirectCudaIpcMemHandler (flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<int8_t> * data) {
   return builder.CreateVector(data->data(), data->size());
 }
 
-static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildCustringsData (flatbuffers::FlatBufferBuilder &builder, const std::basic_string<int8_t> &reserved) {
+flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildCustringsData (flatbuffers::FlatBufferBuilder &builder, const std::basic_string<int8_t> &reserved) {
   return builder.CreateVector(reserved.data(), reserved.size());
 }
 
-static std::basic_string<int8_t> CustringsDataFrom (const gdf::custringsData_t *handler) {
+std::basic_string<int8_t> CustringsDataFrom (const gdf::custringsData_t *handler) {
   auto vector_bytes = handler->reserved();
   return std::basic_string<int8_t>{vector_bytes->data(), vector_bytes->size()};
 }
 
-static flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildDirectCustringsData (flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<int8_t> * data) {
+flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildDirectCustringsData (flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<int8_t> * data) {
   return builder.CreateVector(data->data(), data->size());
 }
 
-static std::vector<::gdf_dto::gdf_column>  GdfColumnsFrom(const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *rawColumns) {
+std::vector<::gdf_dto::gdf_column>  GdfColumnsFrom(const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *rawColumns) {
   std::vector<::gdf_dto::gdf_column>  columns;
   for (const auto& c : *rawColumns){
     bool valid_valid = (c->valid()->reserved()->size() == 64);
@@ -75,7 +58,7 @@ static std::vector<::gdf_dto::gdf_column>  GdfColumnsFrom(const flatbuffers::Vec
   return columns;
 }
 
-static std::vector<std::string> ColumnNamesFrom(const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *rawNames) {
+std::vector<std::string> ColumnNamesFrom(const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *rawNames) {
   std::vector<std::string> columnNames;
   for (const auto& rawName : *rawNames){
     auto name = std::string{rawName->c_str()};  
@@ -84,7 +67,7 @@ static std::vector<std::string> ColumnNamesFrom(const flatbuffers::Vector<flatbu
   return columnNames;
 }
 
-static std::vector<uint64_t> ColumnTokensFrom(const flatbuffers::Vector<uint64_t> *rawColumnTokens) {
+std::vector<uint64_t> ColumnTokensFrom(const flatbuffers::Vector<uint64_t> *rawColumnTokens) {
   std::vector<uint64_t> columnTokens;
   for (const auto& rawColumnToken : *rawColumnTokens){
     auto columnToken = rawColumnToken;
@@ -93,7 +76,7 @@ static std::vector<uint64_t> ColumnTokensFrom(const flatbuffers::Vector<uint64_t
   return columnTokens;
 }
 
-static TableGroupDTO TableGroupDTOFrom(const blazingdb::protocol::TableGroup * tableGroup) {
+TableGroupDTO TableGroupDTOFrom(const blazingdb::protocol::TableGroup * tableGroup) {
   std::string name = std::string{tableGroup->name()->c_str()};
   std::vector<BlazingTableDTO> tables;
 
@@ -168,7 +151,7 @@ flatbuffers::Offset<flatbuffers::Vector<uint64_t>>  BuildDirectFlatColumnTokens(
   return builder.CreateVector(values.data(), values.size());
 }
 
-static flatbuffers::Offset<TableGroup> BuildTableGroup(flatbuffers::FlatBufferBuilder &builder,
+flatbuffers::Offset<TableGroup> BuildTableGroup(flatbuffers::FlatBufferBuilder &builder,
                                                        const TableGroupDTO &tableGroup) {
   auto tableNameOffset = builder.CreateString(tableGroup.name);
   std::vector<flatbuffers::Offset<BlazingTable>> tablesOffset;
@@ -184,7 +167,7 @@ static flatbuffers::Offset<TableGroup> BuildTableGroup(flatbuffers::FlatBufferBu
 }
 
 
-static flatbuffers::Offset<TableGroup> BuildDirectTableGroup(flatbuffers::FlatBufferBuilder &builder,
+flatbuffers::Offset<TableGroup> BuildDirectTableGroup(flatbuffers::FlatBufferBuilder &builder,
                                                        const blazingdb::protocol::TableGroup *tableGroup) { 
   auto tableNameOffset = builder.CreateString(tableGroup->name()->c_str());
   std::vector<flatbuffers::Offset<BlazingTable>> tablesOffset;
@@ -202,18 +185,14 @@ static flatbuffers::Offset<TableGroup> BuildDirectTableGroup(flatbuffers::FlatBu
   return CreateTableGroup(builder, tables, tableNameOffset);
 }
 
-struct BlazingTableSchema {
-  std::vector<::gdf_dto::gdf_column> columns;
-  std::vector<uint64_t> columnTokens;
-  uint64_t resultToken;
 
-  static flatbuffers::Offset<blazingdb::protocol::BlazingTable> Serialize(flatbuffers::FlatBufferBuilder &builder, const BlazingTableSchema &data) {
+  flatbuffers::Offset<blazingdb::protocol::BlazingTable> BlazingTableSchema::Serialize(flatbuffers::FlatBufferBuilder &builder, const BlazingTableSchema &data) {
     auto columnsOffset = BuildFlatColumns(builder, data.columns);
     auto columnTokensOffset = BuildFlatColumnTokens(builder, data.columnTokens);
     return blazingdb::protocol::CreateBlazingTable(builder, builder.CreateVector(columnsOffset), columnTokensOffset, data.resultToken);
   }
 
-  static void Deserialize (const blazingdb::protocol::BlazingTable *pointer, BlazingTableSchema* schema){
+  void BlazingTableSchema::Deserialize (const blazingdb::protocol::BlazingTable *pointer, BlazingTableSchema* schema){
       schema->columns = GdfColumnsFrom(pointer->columns());
       
       schema->columnTokens.clear();
@@ -224,19 +203,10 @@ struct BlazingTableSchema {
 
       schema->resultToken = pointer->resultToken();
   }
-};
 
-struct TableSchemaSTL {
-	std::vector<std::string> names;
-	std::vector<uint64_t> calciteToFileIndices;
-	std::vector<int> types;
-	std::vector<uint64_t> numRowGroups;
-  std::vector<std::string> files;
-  std::string csvDelimiter;
-  std::string csvLineTerminator;
-  uint32_t csvSkipRows;
 
-  static flatbuffers::Offset<blazingdb::protocol::TableSchema> Serialize(flatbuffers::FlatBufferBuilder &builder, const TableSchemaSTL &data) {
+
+  flatbuffers::Offset<blazingdb::protocol::TableSchema> TableSchemaSTL::Serialize(flatbuffers::FlatBufferBuilder &builder, const TableSchemaSTL &data) {
     auto namesOffset = builder.CreateVectorOfStrings(data.names);
     auto calciteToFileIndicesOffset = builder.CreateVector(data.calciteToFileIndices);
     auto typesOffset = builder.CreateVector(data.types);
@@ -247,7 +217,7 @@ struct TableSchemaSTL {
 
     return blazingdb::protocol::CreateTableSchema(builder, namesOffset, calciteToFileIndicesOffset, typesOffset, numRowGroupsOffset, filesOffset, csvDelimiterOffset, csvLineTerminatorOffset, data.csvSkipRows);
   }
-  static void Deserialize (const blazingdb::protocol::TableSchema *pointer, TableSchemaSTL* schema){
+  void TableSchemaSTL::Deserialize (const blazingdb::protocol::TableSchema *pointer, TableSchemaSTL* schema){
       schema->names.clear();
       auto names_list = pointer->names();
       for (const auto &item : (*names_list)) {
@@ -284,8 +254,7 @@ struct TableSchemaSTL {
 
       schema->csvSkipRows = pointer->csvSkipRows();
   }
-};
+
 
 }
 }
-#endif //BLAZINGDB_PROTOCOL_DTO_CUH_H
