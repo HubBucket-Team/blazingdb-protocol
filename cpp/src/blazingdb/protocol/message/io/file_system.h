@@ -187,4 +187,4 @@ public:
 }  // namespace message
 }  // namespace blazingdb
 
-#endif BLAZINGDB_PROTOCOL_MESSAGE_IO_FILE_SYSTEM_H
+#endif // BLAZINGDB_PROTOCOL_MESSAGE_IO_FILE_SYSTEM_H
