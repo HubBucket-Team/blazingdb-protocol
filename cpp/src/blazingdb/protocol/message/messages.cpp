@@ -163,5 +163,6 @@ auto MakeRequest(int8_t message_type, uint64_t sessionToken, IMessage& message) 
 
 
 
+
 } // namespace protocol
 } // namespace blazingdb

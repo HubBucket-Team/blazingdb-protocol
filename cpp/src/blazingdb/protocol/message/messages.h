@@ -150,7 +150,15 @@ auto MakeRequest(int8_t message_type, uint64_t sessionToken, Buffer& payload) ->
 auto MakeRequest(int8_t message_type, uint64_t sessionToken, IMessage& message) -> Buffer;
 
 template <typename ResponseType>
-ResponseType MakeResponse (Buffer &responseBuffer);
+ResponseType MakeResponse (Buffer &responseBuffer) {
+  ResponseMessage response{responseBuffer.data()};
+  if (response.getStatus() == Status_Error) {
+    ResponseErrorMessage errorMessage{response.getPayloadBuffer()};
+    throw std::runtime_error(errorMessage.getMessage());
+  }
+  ResponseType responsePayload(response.getPayloadBuffer());
+  return responsePayload;
+}
 
 } // namespace protocol
 } // namespace blazingdb
