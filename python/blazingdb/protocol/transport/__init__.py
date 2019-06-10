@@ -128,6 +128,7 @@ class Schema(metaclass=MetaSchema):
     return _object
 
   def _set_segments(self, builder):
+
     pairs = [(segment._name, segment._bytes(builder, self))
              for segment in self._nested]
 
