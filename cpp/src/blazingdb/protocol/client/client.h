@@ -11,14 +11,17 @@ namespace protocol {
 
 class Client {
 public:
-  explicit Client(const Connection &connection);
+  explicit Client(const ConnectionAddress &connectionAddress);
 
   Buffer send(const Buffer &buffer);
 
   Buffer send(std::shared_ptr<flatbuffers::DetachedBuffer> &buffer);
 
 private:
-  const Connection &connection_;
+  int sock;
+  std::string address;
+  int port;
+  struct sockaddr_in server;
 };
 
 }  // namespace protocol

@@ -70,7 +70,7 @@ public:
       : fd_(fd), addr_{0, {}}, unused_{0} {
     bzero(&addr_, sizeof(addr_));
     addr_.sin_family      = AF_INET;
-    addr_.sin_addr.s_addr = INADDR_ANY;
+    addr_.sin_addr.s_addr = htonl(INADDR_ANY);
     addr_.sin_port = htons(port);
   }
 
