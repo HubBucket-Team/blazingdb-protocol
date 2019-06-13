@@ -9,6 +9,11 @@ from blazingdb.messages.blazingdb.protocol.io import DriverType, EncryptionType,
 
 from blazingdb.messages.blazingdb.protocol.io import FileSystemDMLRequest, FileSystemTableGroup, FileSystemBlazingTable
 
+from blazingdb.messages.blazingdb.protocol \
+  import BlazingTable
+
+from blazingdb.protocol.gdf import gdf_columnSchema
+
 DriverType = DriverType.DriverType
 EncryptionType = EncryptionType.EncryptionType
 FileSystemType = FileSystemConnection.FileSystemConnection
@@ -111,11 +116,18 @@ class ParquetFileSchema(transport.schema(ParquetFile)):
     columnIndices = transport.VectorSegment(transport.NumberSegment)
 
 
+class GdfSchema(transport.schema(BlazingTable)):
+    columns = transport.VectorSchemaSegment(gdf_columnSchema)
+    columnTokens = transport.VectorSegment(transport.NumberSegment)
+    resultToken = transport.NumberSegment()
+
+
 class FileSystemBlazingTableSchema(transport.schema(FileSystemBlazingTable)):
     name = transport.StringSegment()
     schemaType = transport.NumberSegment()
     csv = transport.SchemaSegment(CsvFileSchema)
     parquet = transport.SchemaSegment(ParquetFileSchema)
+    gdf = transport.SchemaSegment(GdfSchema)
     files = transport.VectorStringSegment(transport.StringSegment)
     columnNames = transport.VectorStringSegment(transport.StringSegment)
 
@@ -148,6 +160,13 @@ def _GetCsvSchema(kwargs):
                          dtypes=dtypes)
 
 
+def _GetGdfSchema(kwargs):
+    columns = kwargs.get('columns', [])
+    columnTokens = kwargs.get('columnTokens', [])
+    resultToken = kwargs.get('resultToken', 0)
+    return GdfSchema(columns=columns, columnTokens=columnTokens, resultToken=resultToken)
+
+
 def BuildFileSystemDMLRequestSchema(statement, tableGroupDto):
     tableGroupName = tableGroupDto['name']
     tables = []
@@ -160,11 +179,17 @@ def BuildFileSystemDMLRequestSchema(statement, tableGroupDto):
         if schemaType == FileSchemaType.PARQUET:
             parquet = _GetParquetSchema(t['parquet'])
             csv = _GetCsvSchema({})
-        else:
+            gdf = _GetGdfSchema({})
+        elif schemaType == FileSchemaType.CSV:
             csv = _GetCsvSchema(t['csv'])
             parquet = _GetParquetSchema({})
+            gdf = _GetGdfSchema({})
+        else:
+            csv = _GetCsvSchema({})
+            parquet = _GetParquetSchema({})
+            gdf = _GetGdfSchema(t['gdf'])
 
-        table = FileSystemBlazingTableSchema(name=tableName, schemaType=schemaType, parquet=parquet, csv=csv,
+        table = FileSystemBlazingTableSchema(name=tableName, schemaType=schemaType, parquet=parquet, csv=csv, gdf=gdf,
                                              files=files, columnNames=columnNames)
 
         tables.append(table)

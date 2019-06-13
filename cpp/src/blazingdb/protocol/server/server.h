@@ -6,8 +6,8 @@
 #include <stdexcept>
 #include <utility>
 
-#include "../buffer/buffer.h"
-#include "../connection/connection.h"
+#include <blazingdb/protocol/buffer/buffer.h>
+#include <blazingdb/protocol/connection/connection.h>
 
 namespace blazingdb {
 namespace protocol {

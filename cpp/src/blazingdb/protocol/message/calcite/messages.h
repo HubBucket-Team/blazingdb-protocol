@@ -1,9 +1,10 @@
-#pragma once
+#ifndef BLAZINGDB_PROTOCOL_MESSAGE_CALCITE_MESSAGES_H
+#define BLAZINGDB_PROTOCOL_MESSAGE_CALCITE_MESSAGES_H
 
 #include <string>
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
-#include "../messages.h"
+#include <blazingdb/protocol/message/messages.h>
 
 namespace blazingdb {
 namespace protocol {
@@ -69,36 +70,7 @@ private:
   std::string query;
 };
 
-
-
-class DDLRequestMessage : public IMessage {
-public:
-
-  DDLRequestMessage(const std::string& query) : IMessage(), query (query){
-  }
-
-  DDLRequestMessage (const uint8_t* buffer) : IMessage() {
-    auto pointer = flatbuffers::GetRoot<blazingdb::protocol::calcite::DMLRequest>(buffer);
-    query = std::string{pointer->query()->c_str()};
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
-    flatbuffers::FlatBufferBuilder builder{1024};
-    auto string_offset = builder.CreateString(query);
-    auto root_offset = calcite::CreateDMLRequest(builder, string_offset);
-    builder.Finish(root_offset);
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
-  }
-
-  std::string getQuery() const {
-    return query;
-  }
-
-private:
-  std::string query;
-};
-
-
 }
 }
 }
+#endif  // BLAZINGDB_PROTOCOL_MESSAGE_CALCITE_MESSAGES_H

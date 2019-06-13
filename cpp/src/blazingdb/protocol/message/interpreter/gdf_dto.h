@@ -1,4 +1,5 @@
-#pragma once 
+#ifndef BLAZINGDB_PROTOCOL_GDF_UTIL_GDF_DTO_H
+#define BLAZINGDB_PROTOCOL_GDF_UTIL_GDF_DTO_H
 
 #include <typeinfo>
 #include <string>
@@ -220,3 +221,5 @@ typedef struct {
     GDF_WINDOW_VAR //variance
   } window_reduction_type;
 }
+
+#endif  // BLAZINGDB_PROTOCOL_GDF_UTIL_GDF_DTO_H

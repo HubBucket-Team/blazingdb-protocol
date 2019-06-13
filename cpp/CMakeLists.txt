@@ -32,7 +32,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 ###### OPTIONAL BUILDS
 option(SIMPLE_BUILD_TESTS "Build SIMPLE Tests" FALSE)
-option(SIMPLE_BUILD_EXAMPLES "Build SIMPLE Examples" FALSE)
 
 # Configure dependencies
 include(ConfigureFlatBuffers)
@@ -41,7 +40,7 @@ include(ConfigureGoogleTest)
 # BEGIN MAIN #
 find_package(Threads)
 
-include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src)
 
 ## NOTE Each time we build the target blazingdb-protocol we will compile the flatbuffer schemas
 # add_dependencies(blazingdb-protocol FlatBuffersSchemas)
@@ -58,11 +57,6 @@ if (${SIMPLE_BUILD_TESTS})
 endif()
 
 add_subdirectory(src)
-
-# Examples.
-if (${SIMPLE_BUILD_EXAMPLES})
-  add_subdirectory(examples)
-endif()
 
 # Print the project summary
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

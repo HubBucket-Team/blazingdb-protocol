@@ -1,7 +1,7 @@
 #ifndef BLAZINGDB_PROTOCOL_CALCITE_ERRORS_H_
 #define BLAZINGDB_PROTOCOL_CALCITE_ERRORS_H_
 
-#include "../errors.h"
+#include <blazingdb/protocol/message/errors.h>
 
 namespace blazingdb {
 namespace protocol {

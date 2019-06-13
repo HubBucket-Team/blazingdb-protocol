@@ -1,9 +1,10 @@
-#pragma once
+#ifndef BLAZINGDB_PROTOCOL_UTILITIES_IO_UTIL_H
+#define BLAZINGDB_PROTOCOL_UTILITIES_IO_UTIL_H
 
 #include <iostream>
 #include <exception>
 
-#include "../buffer/buffer.h"
+#include <blazingdb/protocol/buffer/buffer.h>
 
 namespace blazingdb {
 namespace protocol {
@@ -18,3 +19,5 @@ namespace util {
 }
 }
 }
+
+#endif  // BLAZINGDB_PROTOCOL_UTILITIES_IO_UTIL_H
