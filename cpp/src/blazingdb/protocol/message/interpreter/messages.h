@@ -14,38 +14,6 @@ namespace protocol {
 namespace interpreter {
 
 
-class ExecutePlanDirectRequestMessage  : public IMessage {
-public:
-
-  ExecutePlanDirectRequestMessage(const std::string &logicalPlan, const blazingdb::protocol::TableGroup *tableGroup);
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override ;
-
-private:
-  std::string logicalPlan;
-  const blazingdb::protocol::TableGroup * tableGroup;
-};
-
-class ExecutePlanRequestMessage  : public IMessage {
-public:
-
-  ExecutePlanRequestMessage(const std::string &logicalPlan, const  ::blazingdb::protocol::TableGroupDTO &tableGroup);
-  ExecutePlanRequestMessage (const uint8_t* buffer);
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override;
-
-  std::string getLogicalPlan() ;
-
-  ::blazingdb::protocol::TableGroupDTO getTableGroup() ;
-
-private:
-  std::string logicalPlan;
-  ::blazingdb::protocol::TableGroupDTO tableGroup;
-};
-
-
-
-
 class  GetResultRequestMessage :  public TypedMessage<uint64_t, interpreter::GetResultRequest> {
   public:
 

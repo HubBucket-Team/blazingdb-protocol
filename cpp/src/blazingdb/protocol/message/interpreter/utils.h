@@ -39,15 +39,11 @@ flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildCustringsData (flatbuffers
 
 std::basic_string<int8_t> CustringsDataFrom (const gdf::custringsData_t *handler);
 
-flatbuffers::Offset<flatbuffers::Vector<int8_t>> BuildDirectCustringsData (flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<int8_t> * data);
-
 std::vector<::gdf_dto::gdf_column>  GdfColumnsFrom(const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *rawColumns);
 
 std::vector<std::string> ColumnNamesFrom(const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *rawNames);
 
 std::vector<uint64_t> ColumnTokensFrom(const flatbuffers::Vector<uint64_t> *rawColumnTokens);
-
-TableGroupDTO TableGroupDTOFrom(const blazingdb::protocol::TableGroup * tableGroup);
 
 std::vector<flatbuffers::Offset<gdf::gdf_column_handler>>  BuildFlatColumns(flatbuffers::FlatBufferBuilder &builder, const std::vector<::gdf_dto::gdf_column> &columns);
 
@@ -55,18 +51,9 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildFlatColumnNames(flat
 
 flatbuffers::Offset<flatbuffers::Vector<uint64_t>>  BuildFlatColumnTokens(flatbuffers::FlatBufferBuilder &builder, const std::vector<uint64_t> &columnTokens);
 
-std::vector<flatbuffers::Offset<gdf::gdf_column_handler>>  BuildDirectFlatColumns(flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<flatbuffers::Offset<blazingdb::protocol::gdf::gdf_column_handler>> *rawColumns);
-
-std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildDirectFlatColumnNames(flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *rawNames);
-
-flatbuffers::Offset<flatbuffers::Vector<uint64_t>>  BuildDirectFlatColumnTokens(flatbuffers::FlatBufferBuilder &builder, const flatbuffers::Vector<uint64_t> *rawTokens);
-
 flatbuffers::Offset<TableGroup> BuildTableGroup(flatbuffers::FlatBufferBuilder &builder,
                                                        const TableGroupDTO &tableGroup);
 
-
-flatbuffers::Offset<TableGroup> BuildDirectTableGroup(flatbuffers::FlatBufferBuilder &builder,
-                                                       const blazingdb::protocol::TableGroup *tableGroup);
 
 struct BlazingTableSchema {
   std::vector<::gdf_dto::gdf_column> columns;

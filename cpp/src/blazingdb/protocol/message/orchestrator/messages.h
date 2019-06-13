@@ -84,27 +84,6 @@ public:
   std::int64_t      calciteTime_;
 };
 
-class DDLRequestMessage : public StringTypeMessage<orchestrator::DDLRequest> {
-public:
-  DDLRequestMessage(const std::string& string_value)
-      : StringTypeMessage<orchestrator::DDLRequest>(string_value)
-  {
-  }
-
-  DDLRequestMessage (const uint8_t* buffer)
-      :  StringTypeMessage<orchestrator::DDLRequest>(buffer, &orchestrator::DDLRequest::query)
-  {
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(orchestrator::CreateDDLRequestDirect);
-  }
-
-  std::string getQuery () {
-    return string_value;
-  }
-};
-
 
 class DDLDropTableRequestMessage : public IMessage {
 public:
