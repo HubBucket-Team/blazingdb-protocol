@@ -9,7 +9,7 @@ from blazingdb.messages.blazingdb.protocol \
   import TableGroup, BlazingTable
 
 from blazingdb.messages.blazingdb.protocol.orchestrator \
-  import DMLRequest, DMLResponse, DDLRequest, DDLResponse, DDLCreateTableRequest, DDLDropTableRequest
+  import DMLRequest, DMLResponse, DDLResponse, DDLCreateTableRequest, DDLDropTableRequest
 
 from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
   import MessageType as OrchestratorMessageType
@@ -35,9 +35,6 @@ class TableGroupSchema(transport.schema(TableGroup)):
 class DMLRequestSchema(transport.schema(DMLRequest)):
   query = transport.StringSegment()
   tableGroup = transport.SchemaSegment(TableGroupSchema)
-
-class DDLRequestSchema(transport.schema(DDLRequest)):
-  query = transport.StringSegment()
 
 class DDLCreateTableRequestSchema(transport.schema(DDLCreateTableRequest)):
   name = transport.StringSegment()
