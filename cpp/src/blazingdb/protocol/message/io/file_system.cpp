@@ -395,7 +395,7 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
 
   const std::string & FileSystemDMLRequestMessage::statement() const noexcept { return statement_; }
   const FileSystemTableGroupSchema & FileSystemDMLRequestMessage::tableGroup() const noexcept { return tableGroup_; }
-  const CommunicationContextSchema &c FileSystemDMLRequestMessage::ommunicationContext() const noexcept { return communicationContext_; }
+  const CommunicationContextSchema & FileSystemDMLRequestMessage::communicationContext() const noexcept { return communicationContext_; }
 
 
 
