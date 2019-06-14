@@ -251,7 +251,7 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
 
   FileSystemDMLRequestMessage::FileSystemDMLRequestMessage(const uint8_t *buffer) : IMessage() {
     auto pointer = flatbuffers::GetRoot<blazingdb::protocol::io::FileSystemDMLRequest>(buffer);
-    statement =  std::string{pointer->statement()->c_str()};
+    statement_ =  std::string{pointer->statement()->c_str()};
 
     auto get_table_group = [] (const blazingdb::protocol::io::FileSystemTableGroup * tableGroup) {
       std::string name = std::string{tableGroup->name()->c_str()};
@@ -318,7 +318,7 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
           .name = name,
       };
     };
-    tableGroup = get_table_group(pointer->tableGroup());
+    tableGroup_ = get_table_group(pointer->tableGroup());
 
     flatbuffers::unique_ptr<blazingdb::protocol::io::FileSystemDMLRequestT>
         fileSystemDMLRequest = flatbuffers::unique_ptr<
@@ -345,7 +345,7 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
   }
   FileSystemDMLRequestMessage::FileSystemDMLRequestMessage( std::string statement,  FileSystemTableGroupSchema tableGroup,
                                                               const CommunicationContextSchema &communicationContext) 
-    : IMessage(), statement{statement}, tableGroup{tableGroup}, communicationContext_{communicationContext}
+    : IMessage(), statement_{statement}, tableGroup_{tableGroup}, communicationContext_{communicationContext}
   {
     
   } 
