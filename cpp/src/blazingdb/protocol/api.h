@@ -1,11 +1,11 @@
 #ifndef BLAZINGDB_PROTOCOL_API_H_
 #define BLAZINGDB_PROTOCOL_API_H_
 
-#include "buffer/buffer.h"
-#include "client/client.h"
-#include "connection/unix_socket_connection.h"
-#include "server/server.h"
-#include "message/messages.h"
+#include <blazingdb/protocol/buffer/buffer.h>
+#include <blazingdb/protocol/client/client.h>
+#include <blazingdb/protocol/connection/unix_socket_connection.h>
+#include <blazingdb/protocol/server/server.h>
+#include <blazingdb/protocol/message/messages.h>
 
 namespace blazingdb {
 namespace protocol {

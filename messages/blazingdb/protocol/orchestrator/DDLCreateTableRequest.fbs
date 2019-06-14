@@ -1,10 +1,19 @@
+include "blazingdb/protocol/FileSchema.fbs";
+include "blazingdb/protocol/BlazingTable.fbs";
+
 namespace blazingdb.protocol.orchestrator;
 
 table DDLCreateTableRequest {
 	name: string;
 	columnNames: [string];
 	columnTypes: [string];
-	dbName: string; 
+	dbName: string;
+	schemaType: FileSchemaType;
+	gdf: BlazingTable;
+	files: [string];
+	csvDelimiter: string;
+  	csvLineTerminator: string;
+  	csvSkipRows: int;
 }
 
 root_type DDLCreateTableRequest;

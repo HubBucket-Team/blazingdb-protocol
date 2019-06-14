@@ -2,9 +2,7 @@ include "blazingdb/protocol/gdf/gdf_column_handler.fbs";
 namespace blazingdb.protocol;
 
 table BlazingTable {
-  name: string;
   columns: [gdf.gdf_column_handler];
-  columnNames: [string];
   columnTokens: [ulong];
   resultToken: ulong;
 }
