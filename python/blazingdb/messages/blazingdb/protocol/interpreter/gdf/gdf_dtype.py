@@ -8,14 +8,14 @@ class gdf_dtype(object):
     GDF_INT16 = 2
     GDF_INT32 = 3
     GDF_INT64 = 4
-    GDF_UINT8 = 5
-    GDF_UINT16 = 6
-    GDF_UINT32 = 7
-    GDF_UINT64 = 8
-    GDF_FLOAT32 = 9
-    GDF_FLOAT64 = 10
-    GDF_DATE32 = 11
-    GDF_DATE64 = 12
-    GDF_TIMESTAMP = 13
+    GDF_FLOAT32 = 5
+    GDF_FLOAT64 = 6
+    GDF_BOOL8 = 7
+    GDF_DATE32 = 8
+    GDF_DATE64 = 9
+    GDF_TIMESTAMP = 10
+    GDF_CATEGORY = 11
+    GDF_STRING = 12
+    GDF_STRING_CATEGORY = 13
     N_GDF_TYPES = 14
 

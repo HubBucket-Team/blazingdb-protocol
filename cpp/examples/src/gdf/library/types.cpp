@@ -30,18 +30,12 @@ namespace library {
                 return "GDF_INT32";
             case GDF_INT64:
                 return "GDF_INT64";
-            case GDF_UINT8:
-                return "GDF_UINT8";
-            case GDF_UINT16:
-                return "GDF_UINT16";
-            case GDF_UINT32:
-                return "GDF_UINT32";
-            case GDF_UINT64:
-                return "GDF_UINT64";
             case GDF_FLOAT32:
                 return "GDF_FLOAT32";
             case GDF_FLOAT64:
                 return "GDF_FLOAT64";
+            case GDF_BOOL8:
+                return "GDF_BOOL8";
             case GDF_DATE32:
                 return "GDF_DATE32";
             case GDF_DATE64:
