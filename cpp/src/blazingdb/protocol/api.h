@@ -4,7 +4,7 @@
 #include <blazingdb/protocol/buffer/buffer.h>
 #include <blazingdb/protocol/client/client.h>
 #include <blazingdb/protocol/connection/unix_socket_connection.h>
-#include <blazingdb/protocol/tcp_connection.h>
+#include <blazingdb/protocol/connection/tcp_connection.h>
 #include <blazingdb/protocol/server/server.h>
 #include <blazingdb/protocol/message/messages.h>
 
