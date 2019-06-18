@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-#include "../utilities/io_util.h"
+#include <blazingdb/protocol/utilities/io_util.h>
 
 namespace blazingdb {
 namespace protocol {

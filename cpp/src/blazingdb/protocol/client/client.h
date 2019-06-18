@@ -2,8 +2,8 @@
 #define BLAZINGDB_PROTOCOL_CLIENT_CLIENT_H_
 
 #include <memory>
-#include "../buffer/buffer.h"
-#include "../connection/connection.h"
+#include <blazingdb/protocol/buffer/buffer.h>
+#include <blazingdb/protocol/connection/connection.h>
 #include "flatbuffers/flatbuffers.h"
 
 namespace blazingdb {

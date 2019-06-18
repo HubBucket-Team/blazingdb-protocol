@@ -1,3 +1,5 @@
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 set(SRCS
   client/client.cc
   connection/connection.cc
@@ -5,13 +7,18 @@ set(SRCS
   connection/tcp_connection.cc
   server/server.cc
   utilities/io_util.cc
+  message/interpreter/utils.cpp
+  message/interpreter/messages.cpp
+  message/messages.cpp
+  message/io/file_system.cpp
 )
 find_package(Threads)
 
 add_library(blazingdb-protocol ${SRCS})
 target_link_libraries(blazingdb-protocol Threads::Threads  ${ZEROMQ_STATIC_LIB} ${FLATBUFFERS_STATIC_LIB})
 
-add_custom_command(TARGET blazingdb-protocol
+add_custom_target("generate-flatbuffers-messages")
+add_custom_command(TARGET "generate-flatbuffers-messages"
   COMMAND ${FLATBUFFERS_FLATC_EXECUTABLE} -c --gen-all --gen-object-api
     ${PROJECT_SOURCE_DIR}/../messages/all.fbs
   COMMENT "Generate all messages")
@@ -33,7 +40,7 @@ install(TARGETS blazingdb-protocol
     DESTINATION include
     COMPONENT API)
 
-# add_dependencies(blazingdb-protocol FlatBuffersSchemas)
+add_dependencies(blazingdb-protocol "generate-flatbuffers-messages")
 
 if (GTEST_FOUND)
   add_executable(server-test EXCLUDE_FROM_ALL server-test.cc)

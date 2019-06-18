@@ -1,0 +1,9 @@
+include "blazingdb/protocol/TableSchema.fbs";
+
+namespace blazingdb.protocol.orchestrator;
+
+table DDLCreateTableResponse {
+	tableSchema: TableSchema;
+}
+
+root_type DDLCreateTableResponse;

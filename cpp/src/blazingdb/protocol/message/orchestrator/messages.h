@@ -1,11 +1,12 @@
-#pragma once
+#ifndef BLAZINGDB_PROTOCOL_MESSAGE_ORCHESTRATOR_MESSAGES_H
+#define BLAZINGDB_PROTOCOL_MESSAGE_ORCHESTRATOR_MESSAGES_H
 
 #include <string>
 #include <blazingdb/protocol/api.h>
 #include "flatbuffers/flatbuffers.h"
 
-#include "../messages.h"
-#include "../interpreter/messages.h"
+#include <blazingdb/protocol/message/messages.h>
+#include <blazingdb/protocol/message/interpreter/messages.h>
 
 namespace blazingdb {
 namespace protocol {
@@ -83,27 +84,6 @@ public:
   std::int64_t      calciteTime_;
 };
 
-class DDLRequestMessage : public StringTypeMessage<orchestrator::DDLRequest> {
-public:
-  DDLRequestMessage(const std::string& string_value)
-      : StringTypeMessage<orchestrator::DDLRequest>(string_value)
-  {
-  }
-
-  DDLRequestMessage (const uint8_t* buffer)
-      :  StringTypeMessage<orchestrator::DDLRequest>(buffer, &orchestrator::DDLRequest::query)
-  {
-  }
-
-  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(orchestrator::CreateDDLRequestDirect);
-  }
-
-  std::string getQuery () {
-    return string_value;
-  }
-};
-
 
 class DDLDropTableRequestMessage : public IMessage {
 public:
@@ -160,6 +140,21 @@ public:
     for (const auto &item : (*type_list)) {
       columnTypes.push_back(std::string{item->c_str()});
     }
+
+    schemaType = pointer->schemaType();
+
+    blazingdb::protocol::BlazingTableSchema::Deserialize(pointer->gdf(), &gdf);
+
+    auto files_list = pointer->files();
+    for (const auto &file : (*files_list)) {
+      files.push_back(std::string{file->c_str()});
+    }
+
+    csvDelimiter = std::string{pointer->csvDelimiter()->c_str()};
+
+    csvLineTerminator = std::string{pointer->csvLineTerminator()->c_str()};
+
+    csvSkipRows = pointer->csvSkipRows();
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
@@ -168,7 +163,22 @@ public:
     auto vectorOfColumnNames = builder.CreateVectorOfStrings(columnNames);
     auto vectorOfColumnTypes = builder.CreateVectorOfStrings(columnTypes);
     auto dbname_offset = builder.CreateString(dbName);
-    builder.Finish(orchestrator::CreateDDLCreateTableRequest(builder, name_offset,vectorOfColumnNames, vectorOfColumnTypes, dbname_offset));
+    auto gdf_offset = blazingdb::protocol::BlazingTableSchema::Serialize(builder, gdf);
+    auto files_offset = builder.CreateVectorOfStrings(files);
+    auto csvDelimiterOffset = builder.CreateString(csvDelimiter);
+    auto csvLineTerminatorOffset = builder.CreateString(csvLineTerminator);
+
+    builder.Finish(orchestrator::CreateDDLCreateTableRequest(builder,
+                                                            name_offset,
+                                                            vectorOfColumnNames,
+                                                            vectorOfColumnTypes,
+                                                            dbname_offset,
+                                                            schemaType,
+                                                            gdf_offset,
+                                                            files_offset,
+                                                            csvDelimiterOffset,
+                                                            csvLineTerminatorOffset,
+                                                            csvSkipRows));
 
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
@@ -177,7 +187,12 @@ public:
   std::vector<std::string> columnNames;
   std::vector<std::string> columnTypes;
   std::string dbName;
-
+  blazingdb::protocol::FileSchemaType schemaType;
+	blazingdb::protocol::BlazingTableSchema gdf;
+	std::vector<std::string> files;
+  std::string csvDelimiter;
+  std::string csvLineTerminator;
+  uint32_t csvSkipRows;
 };
 
 // authorization
@@ -269,3 +284,5 @@ public:
 } // orchestrator
 } // protocol
 } // blazingdb
+
+#endif  // BLAZINGDB_PROTOCOL_MESSAGE_ORCHESTRATOR_MESSAGES_H

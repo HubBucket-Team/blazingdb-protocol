@@ -1,3 +1,5 @@
+include "blazingdb/protocol/FileSchema.fbs";
+include "blazingdb/protocol/TableSchema.fbs";
 
 namespace blazingdb.protocol.io;
 
@@ -69,18 +71,14 @@ table ParquetFile {
 }
 root_type ParquetFile;
 
-enum FileSchemaType :byte {
-    CSV,
-    PARQUET
-}
 
 table FileSystemBlazingTable {
     name: string;
     schemaType: FileSchemaType;
     csv: CsvFile;  //#use this
-    parquet: ParquetFile;     //#either this
-    files: [string];
-	columnNames: [string];
+    parquet: ParquetFile;  //#either this
+    gdf: BlazingTable; //#either this
+    tableSchema: TableSchema;
 }
 root_type FileSystemBlazingTable;
 
@@ -111,4 +109,3 @@ table FileSystemDMLRequest {
 }
 
 root_type FileSystemDMLRequest;
-

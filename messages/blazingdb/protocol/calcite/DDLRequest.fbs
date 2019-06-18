@@ -1,7 +1,0 @@
-namespace blazingdb.protocol.calcite;
-
-table DDLRequest {
-	query: string;
-}
-
-root_type DDLRequest;
