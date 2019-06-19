@@ -60,19 +60,13 @@ Client::Client(const ConnectionAddress &connectionAddress) {
 
 Buffer Client::send(const Buffer &buffer) {
   if(sock == -1) {
-      std::cout << "Q MAL SOCKET DE CLIENTE!!!" << buffer.size() <<std::endl;
+      std::cout << "ERROR: Invalid socket for buffer size:" << buffer.size() <<std::endl;
   }
 
-  std::cout << "ENVIANDO EN CLIENTEEE!! " << buffer.size() <<std::endl;
-  
   util::write_buffer(sock, buffer);
-  
-  std::cout << "escribiiooooooooooo " << buffer.size() <<std::endl;
   
   Buffer response_buffer;
   util::read_buffer(sock, response_buffer);
-  
-  std::cout << "leyyyyooo decalcite " << response_buffer.size() << std::endl;
   
   return response_buffer;
 }
