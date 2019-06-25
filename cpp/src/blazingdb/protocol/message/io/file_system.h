@@ -172,7 +172,6 @@ struct FileSystemBlazingTableSchema {
   CsvFileSchema csv; //deprecated
   ParquetFileSchema parquet; //deprecated
   blazingdb::protocol::BlazingTableSchema gdf; //ok
-  blazingdb::protocol::BlazingTableNode distributed_gdf;
   blazingdb::protocol::TableSchemaSTL tableSchema; //ok
 };
 
