@@ -14,6 +14,7 @@ table DDLCreateTableRequest {
 	csvDelimiter: string;
   	csvLineTerminator: string;
   	csvSkipRows: int;
+  	resultToken: uint64;
 }
 
 root_type DDLCreateTableRequest;

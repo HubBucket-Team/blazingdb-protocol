@@ -3,5 +3,6 @@ namespace blazingdb.protocol;
 enum FileSchemaType :byte {
     CSV,
     PARQUET,
-    GDF
+    GDF,
+    DISTRIBUTED
 }

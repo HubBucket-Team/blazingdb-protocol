@@ -164,12 +164,15 @@ struct CommunicationContextSchema {
   std::uint64_t token;
 };
 
+
+
 struct FileSystemBlazingTableSchema {
   std::string name; //ok
   blazingdb::protocol::FileSchemaType schemaType; //ok
   CsvFileSchema csv; //deprecated
   ParquetFileSchema parquet; //deprecated
   blazingdb::protocol::BlazingTableSchema gdf; //ok
+  blazingdb::protocol::BlazingTableNode distributed_gdf;
   blazingdb::protocol::TableSchemaSTL tableSchema; //ok
 };
 
