@@ -344,8 +344,8 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
     }
   }
   FileSystemDMLRequestMessage::FileSystemDMLRequestMessage( std::string statement,  FileSystemTableGroupSchema tableGroup,
-                                                              const CommunicationContextSchema &communicationContext) 
-    : IMessage(), statement_{statement}, tableGroup_{tableGroup}, communicationContext_{communicationContext}
+                                                              const CommunicationContextSchema &communicationContext, uint64_t resultToken)
+    : IMessage(), statement_{statement}, tableGroup_{tableGroup}, communicationContext_{communicationContext}, resultToken_{resultToken}
   {
     
   } 
@@ -366,6 +366,7 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
     }
 
     auto tables = builder.CreateVector(tablesOffset);
+
     return blazingdb::protocol::io::CreateFileSystemTableGroup(builder, tables, tableNameOffset);
   }
 
@@ -389,14 +390,15 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
         blazingdb::protocol::io::CreateCommunicationContextDirect(
             builder, &nodeOffsets, communicationContext_.masterIndex, communicationContext_.token);
 
-    builder.Finish(blazingdb::protocol::io::CreateFileSystemDMLRequest(builder, logicalPlan_offset, tableGroupOffset, communicationContextOffset));
+
+    builder.Finish(blazingdb::protocol::io::CreateFileSystemDMLRequest(builder, logicalPlan_offset, tableGroupOffset, communicationContextOffset,resultToken_));
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
 
   const std::string & FileSystemDMLRequestMessage::statement() const noexcept { return statement_; }
   const FileSystemTableGroupSchema & FileSystemDMLRequestMessage::tableGroup() const noexcept { return tableGroup_; }
   const CommunicationContextSchema & FileSystemDMLRequestMessage::communicationContext() const noexcept { return communicationContext_; }
-
+  const uint64_t & FileSystemDMLRequestMessage::resultToken() const noexcept { return resultToken_; }
 
 
 }  // namespace io
