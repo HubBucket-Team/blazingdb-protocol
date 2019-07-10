@@ -252,7 +252,7 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
   FileSystemDMLRequestMessage::FileSystemDMLRequestMessage(const uint8_t *buffer) : IMessage() {
     auto pointer = flatbuffers::GetRoot<blazingdb::protocol::io::FileSystemDMLRequest>(buffer);
     statement_ =  std::string{pointer->statement()->c_str()};
-
+    resultToken_ = pointer->resultToken();
     auto get_table_group = [] (const blazingdb::protocol::io::FileSystemTableGroup * tableGroup) {
       std::string name = std::string{tableGroup->name()->c_str()};
       std::vector<FileSystemBlazingTableSchema> tables;
