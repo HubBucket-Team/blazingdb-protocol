@@ -2,7 +2,9 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(SRCS
   client/client.cc
+  connection/connection.cc
   connection/unix_socket_connection.cc
+  connection/tcp_connection.cc
   server/server.cc
   utilities/io_util.cc
   message/interpreter/utils.cpp
@@ -17,7 +19,7 @@ target_link_libraries(blazingdb-protocol Threads::Threads  ${ZEROMQ_STATIC_LIB} 
 
 add_custom_target("generate-flatbuffers-messages")
 add_custom_command(TARGET "generate-flatbuffers-messages"
-  COMMAND ${FLATBUFFERS_FLATC_EXECUTABLE} -c --gen-all
+  COMMAND ${FLATBUFFERS_FLATC_EXECUTABLE} -c --gen-all --gen-object-api
     ${PROJECT_SOURCE_DIR}/../messages/all.fbs
   COMMENT "Generate all messages")
 

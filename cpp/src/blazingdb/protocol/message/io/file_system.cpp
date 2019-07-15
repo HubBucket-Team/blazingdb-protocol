@@ -251,8 +251,8 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
 
   FileSystemDMLRequestMessage::FileSystemDMLRequestMessage(const uint8_t *buffer) : IMessage() {
     auto pointer = flatbuffers::GetRoot<blazingdb::protocol::io::FileSystemDMLRequest>(buffer);
-    statement =  std::string{pointer->statement()->c_str()};
-
+    statement_ =  std::string{pointer->statement()->c_str()};
+    resultToken_ = pointer->resultToken();
     auto get_table_group = [] (const blazingdb::protocol::io::FileSystemTableGroup * tableGroup) {
       std::string name = std::string{tableGroup->name()->c_str()};
       std::vector<FileSystemBlazingTableSchema> tables;
@@ -318,10 +318,34 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
           .name = name,
       };
     };
-    tableGroup = get_table_group(pointer->tableGroup());
+    tableGroup_ = get_table_group(pointer->tableGroup());
+
+    flatbuffers::unique_ptr<blazingdb::protocol::io::FileSystemDMLRequestT>
+        fileSystemDMLRequest = flatbuffers::unique_ptr<
+            blazingdb::protocol::io::FileSystemDMLRequestT>(
+            flatbuffers::GetRoot<blazingdb::protocol::io::FileSystemDMLRequest>(
+                buffer)
+                ->UnPack());
+
+    if (fileSystemDMLRequest->communicationContext) {
+      const std::unique_ptr<blazingdb::protocol::io::CommunicationContextT>
+          &communicationContext = fileSystemDMLRequest->communicationContext;
+
+      std::vector<CommunicationNodeSchema> nodes;
+      nodes.reserve(communicationContext->nodes.size());
+      std::transform(
+          communicationContext->nodes.cbegin(),
+          communicationContext->nodes.cend(), std::back_inserter(nodes),
+          [](const std::unique_ptr<blazingdb::protocol::io::CommunicationNodeT>
+                 &node) { return CommunicationNodeSchema{node->buffer}; });
+      communicationContext_ =
+          CommunicationContextSchema{nodes, communicationContext->masterIndex,
+                               communicationContext->token};
+    }
   }
-  FileSystemDMLRequestMessage::FileSystemDMLRequestMessage( std::string statement,  FileSystemTableGroupSchema tableGroup) 
-    : statement{statement}, tableGroup{tableGroup}, IMessage() 
+  FileSystemDMLRequestMessage::FileSystemDMLRequestMessage( std::string statement,  FileSystemTableGroupSchema tableGroup,
+                                                              const CommunicationContextSchema &communicationContext, uint64_t resultToken)
+    : IMessage(), statement_{statement}, tableGroup_{tableGroup}, communicationContext_{communicationContext}, resultToken_{resultToken}
   {
     
   } 
@@ -342,18 +366,39 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
     }
 
     auto tables = builder.CreateVector(tablesOffset);
+
     return blazingdb::protocol::io::CreateFileSystemTableGroup(builder, tables, tableNameOffset);
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> FileSystemDMLRequestMessage::getBufferData() const  {
-       flatbuffers::FlatBufferBuilder builder;
-    auto logicalPlan_offset = builder.CreateString(statement);
-    auto tableGroupOffset = _BuildTableGroup(builder, tableGroup);
-    builder.Finish(blazingdb::protocol::io::CreateFileSystemDMLRequest(builder, logicalPlan_offset, tableGroupOffset));
-    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+    flatbuffers::FlatBufferBuilder builder;
+    auto logicalPlan_offset = builder.CreateString(statement_);
+    auto tableGroupOffset = _BuildTableGroup(builder, tableGroup_);
 
+    std::vector<flatbuffers::Offset<blazingdb::protocol::io::CommunicationNode>>
+        nodeOffsets;
+    nodeOffsets.resize(communicationContext_.nodes.size());
+    std::transform(
+        communicationContext_.nodes.cbegin(),
+        communicationContext_.nodes.cend(), nodeOffsets.begin(),
+        [&builder](const CommunicationNodeSchema &node) {
+          return blazingdb::protocol::io::CreateCommunicationNodeDirect(
+              builder, &node.buffer);
+        });
+
+    auto communicationContextOffset =
+        blazingdb::protocol::io::CreateCommunicationContextDirect(
+            builder, &nodeOffsets, communicationContext_.masterIndex, communicationContext_.token);
+
+
+    builder.Finish(blazingdb::protocol::io::CreateFileSystemDMLRequest(builder, logicalPlan_offset, tableGroupOffset, communicationContextOffset,resultToken_));
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
 
+  const std::string & FileSystemDMLRequestMessage::statement() const noexcept { return statement_; }
+  const FileSystemTableGroupSchema & FileSystemDMLRequestMessage::tableGroup() const noexcept { return tableGroup_; }
+  const CommunicationContextSchema & FileSystemDMLRequestMessage::communicationContext() const noexcept { return communicationContext_; }
+  const uint64_t & FileSystemDMLRequestMessage::resultToken() const noexcept { return resultToken_; }
 
 
 }  // namespace io

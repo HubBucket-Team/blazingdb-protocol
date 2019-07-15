@@ -1,9 +1,10 @@
-#ifndef BLAZINGDB_PROTOCOL_API_H_
-#define BLAZINGDB_PROTOCOL_API_H_
+#ifndef _BLAZINGDB_PROTOCOL_API_H_
+#define _BLAZINGDB_PROTOCOL_API_H_
 
 #include <blazingdb/protocol/buffer/buffer.h>
 #include <blazingdb/protocol/client/client.h>
 #include <blazingdb/protocol/connection/unix_socket_connection.h>
+#include <blazingdb/protocol/connection/tcp_connection.h>
 #include <blazingdb/protocol/server/server.h>
 #include <blazingdb/protocol/message/messages.h>
 
@@ -23,37 +24,6 @@ public:
   const Buffer payloadFrom(const Buffer &buffer) const {
     return buffer.slice(static_cast<std::ptrdiff_t>(sizeof(Frame)));
   }
-};
-
-template <class Frame>
-class ProtocolRoutingServer : public Server {
-  using Protocol_ = Protocol<Frame>;
-
-public:
-  explicit ProtocolRoutingServer(const Connection &connection,
-                                 const Protocol_ &protocol)
-      : Server(connection), protocol_(protocol) {}
-
-  template <class Callable>
-  void handle(Callable &&callback) const {
-    Server::handle([this, &callback](const Buffer &buffer) -> void {
-      const Frame &frame = protocol_.frameFrom(buffer);
-
-      if (frame.kind < 0) { return; }
-
-      const Buffer payloadBuffer = protocol_.payloadFrom(buffer);
-
-      callback(payloadBuffer);
-    });
-  }
-
-  template <class RequestFB, class Callable>
-  void Register(Callable &callback) {
-    callback(nullptr);
-  }
-
-private:
-  const Protocol_ &protocol_;
 };
 
 }  // namespace protocol

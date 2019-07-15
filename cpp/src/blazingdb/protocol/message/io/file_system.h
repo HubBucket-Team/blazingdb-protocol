@@ -154,6 +154,18 @@ public:
   ParquetFileSchema* fileSchema() ;
 };
 
+struct CommunicationNodeSchema {
+  std::vector<std::int8_t> buffer;
+};
+
+struct CommunicationContextSchema {
+  std::vector<CommunicationNodeSchema> nodes;
+  std::int32_t masterIndex;
+  std::uint64_t token;
+};
+
+
+
 struct FileSystemBlazingTableSchema {
   std::string name; //ok
   blazingdb::protocol::FileSchemaType schemaType; //ok
@@ -172,14 +184,25 @@ struct FileSystemTableGroupSchema {
 class FileSystemDMLRequestMessage : public IMessage {
 public: 
   FileSystemDMLRequestMessage(const uint8_t *buffer);
-  FileSystemDMLRequestMessage( std::string statement,  FileSystemTableGroupSchema tableGroup) ;
+  FileSystemDMLRequestMessage(std::string statement, FileSystemTableGroupSchema tableGroup,  	                              
+                                  const CommunicationContextSchema &communicationContext,
+                                  uint64_t resultToken);
 
   flatbuffers::Offset<blazingdb::protocol::io::FileSystemTableGroup> _BuildTableGroup(flatbuffers::FlatBufferBuilder &builder,
                                                         FileSystemTableGroupSchema tableGroup) const ;
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override ;
-  std::string statement;
-  FileSystemTableGroupSchema tableGroup;
+
+  const std::string &statement() const noexcept;
+  const FileSystemTableGroupSchema &tableGroup() const noexcept;
+  const CommunicationContextSchema &communicationContext() const noexcept;
+  const uint64_t &resultToken() const noexcept;
+
+private:
+  std::string statement_;
+  FileSystemTableGroupSchema tableGroup_;
+  CommunicationContextSchema communicationContext_;
+  uint64_t resultToken_;
 };
 
 

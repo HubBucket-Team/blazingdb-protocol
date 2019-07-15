@@ -9,7 +9,7 @@ from blazingdb.messages.blazingdb.protocol \
   import TableGroup, BlazingTable
 
 from blazingdb.messages.blazingdb.protocol.orchestrator \
-  import DMLRequest, DMLResponse, DDLResponse, DDLCreateTableRequest, DDLDropTableRequest
+  import DMLRequest, DMLResponse, DDLResponse, DDLCreateTableRequest, DDLDropTableRequest, DMLDistributedResponse
 
 from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
   import MessageType as OrchestratorMessageType
@@ -47,6 +47,7 @@ class DDLCreateTableRequestSchema(transport.schema(DDLCreateTableRequest)):
   csvDelimiter = transport.StringSegment()
   csvLineTerminator = transport.StringSegment()
   csvSkipRows = transport.NumberSegment()
+  resultToken = transport.NumberSegment()
 
 class DDLDropTableRequestSchema(transport.schema(DDLDropTableRequest)):
   name = transport.StringSegment()
@@ -61,6 +62,11 @@ class DMLResponseSchema(transport.schema(DMLResponse)):
   resultToken = transport.NumberSegment()
   nodeConnection = transport.SchemaSegment(NodeConnectionSchema)
   calciteTime = transport.NumberSegment()
+
+
+class DMLDistributedResponseSchema(transport.schema(DMLDistributedResponse)):
+    responses = transport.VectorSchemaSegment(DMLResponseSchema)
+
 
 class AuthResponseSchema(transport.schema(AuthResponse)):
   accessToken = transport.NumberSegment()
@@ -106,9 +112,9 @@ def BuildDMLRequestSchema(query, tableGroupDto):
   tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=tables, name=tableGroupName)
   return blazingdb.protocol.orchestrator.DMLRequestSchema(query=query, tableGroup=tableGroup)
 
-def BuildDDLCreateTableRequestSchema(name, columnNames, columnTypes, dbName, schemaType, gdf, files, csvDelimiter, csvLineTerminator, csvSkipRows):
-  
-  resultToken = gdf['resultToken']
+def BuildDDLCreateTableRequestSchema(name, columnNames, columnTypes, dbName, schemaType, gdf, files, csvDelimiter, csvLineTerminator, csvSkipRows,resultToken):
+  if(resultToken == 0):
+    resultToken = gdf['resultToken']	
   columnTokens = gdf['columnTokens']
   columns = []
   for i, c in enumerate(gdf['columns']):
@@ -144,4 +150,5 @@ def BuildDDLCreateTableRequestSchema(name, columnNames, columnTypes, dbName, sch
                                                                                        files=files,
                                                                                        csvDelimiter=csvDelimiter,
                                                                                        csvLineTerminator=csvLineTerminator,
-                                                                                       csvSkipRows=csvSkipRows)
+                                                                                       csvSkipRows=csvSkipRows,
+                                                                                       resultToken=resultToken,)

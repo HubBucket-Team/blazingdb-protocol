@@ -38,19 +38,19 @@ table S3 {
 }
 
 union FileSystemConnection {
-    POSIX, HDFS, S3 
+    POSIX, HDFS, S3
 }
 
 table FileSystemRegisterRequest {
     authority: string;
     root: string;
     fileSystemConnection: FileSystemConnection;
-} 
+}
 root_type FileSystemRegisterRequest;
 
 table FileSystemDeregisterRequest {
     authority: string;
-} 
+}
 root_type FileSystemDeregisterRequest;
 
 
@@ -88,9 +88,25 @@ table FileSystemTableGroup {
 }
 root_type FileSystemTableGroup;
 
+table CommunicationNode {
+    buffer: [byte];
+}
+
+root_type CommunicationNode;
+
+table CommunicationContext {
+    nodes: [CommunicationNode];
+    masterIndex: int;
+    token: ulong;
+}
+
+root_type CommunicationContext;
+
 table FileSystemDMLRequest {
     statement: string;
     tableGroup: FileSystemTableGroup;
+    communicationContext: CommunicationContext;
+    resultToken: ulong;
 }
 
 root_type FileSystemDMLRequest;

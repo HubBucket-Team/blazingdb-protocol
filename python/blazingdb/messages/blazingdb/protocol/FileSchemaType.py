@@ -6,4 +6,5 @@ class FileSchemaType(object):
     CSV = 0
     PARQUET = 1
     GDF = 2
+    DISTRIBUTED = 3
 

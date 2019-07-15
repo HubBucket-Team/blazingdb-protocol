@@ -3,7 +3,11 @@
 
 #include <cstring>
 #include <string>
+#include <arpa/inet.h>
+#include <cstdio>
+#include <netinet/in.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <sys/un.h>
 
 namespace blazingdb {
@@ -30,8 +34,27 @@ public:
   void operator=(const File &&) = delete;
 };
 
+#ifdef USE_UNIX_SOCKETS
+
+struct ConnectionAddress {
+  std::string unix_socket_path;
+};
+
+#else
+
+struct ConnectionAddress {
+  std::string tcp_host;
+  int tcp_port;
+};
+
+#endif
+
 class Connection : public File {
 public:
+
+#ifdef USE_UNIX_SOCKETS
+
+  //For unix sockets
   Connection(const int fd, const std::string &path)
       : fd_(fd), addr_{0, {}}, unused_{0} {
     bzero(&addr_, sizeof(addr_));
@@ -39,6 +62,19 @@ public:
     std::strncpy(
         static_cast<char *>(addr_.sun_path), path.c_str(), path.size());
   }
+
+#else
+
+  //For TCP
+  Connection(const int fd, int port)
+      : fd_(fd), addr_{0, {}}, unused_{0} {
+    bzero(&addr_, sizeof(addr_));
+    addr_.sin_family      = AF_INET;
+    addr_.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr_.sin_port = htons(port);
+  }
+
+#endif
 
   ~Connection() override = default;
 
@@ -61,10 +97,21 @@ public:
 
 protected:
   int                fd_;
+  
+#ifdef USE_UNIX_SOCKETS
   struct sockaddr_un addr_;
+#else
+  struct sockaddr_in addr_;
+#endif
 
 private:
   char unused_[6];
+};
+
+class ConnectionUtils {
+public:
+  // Returns -1 in case invalid port was given as arg
+  static int parsePort(const char* port_str);
 };
 
 }  // namespace protocol

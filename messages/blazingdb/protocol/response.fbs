@@ -4,6 +4,7 @@ include "blazingdb/protocol/orchestrator/AuthResponse.fbs";
 include "blazingdb/protocol/orchestrator/DDLCreateTableResponse.fbs";
 include "blazingdb/protocol/orchestrator/DMLResponse.fbs";
 include "blazingdb/protocol/orchestrator/DDLResponse.fbs";
+include "blazingdb/protocol/orchestrator/DMLDistributedResponse.fbs";
 include "blazingdb/protocol/interpreter/ExecutePlanResponse.fbs";
 include "blazingdb/protocol/interpreter/GetResultResponse.fbs";
 

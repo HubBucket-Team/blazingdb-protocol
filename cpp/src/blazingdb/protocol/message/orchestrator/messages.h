@@ -155,6 +155,7 @@ public:
     csvLineTerminator = std::string{pointer->csvLineTerminator()->c_str()};
 
     csvSkipRows = pointer->csvSkipRows();
+    resultToken = pointer->resultToken();
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
@@ -178,7 +179,8 @@ public:
                                                             files_offset,
                                                             csvDelimiterOffset,
                                                             csvLineTerminatorOffset,
-                                                            csvSkipRows));
+                                                            csvSkipRows,
+                                                            resultToken));
 
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
@@ -193,6 +195,7 @@ public:
   std::string csvDelimiter;
   std::string csvLineTerminator;
   uint32_t csvSkipRows;
+  uint64_t resultToken;
 };
 
 // authorization
@@ -229,6 +232,56 @@ public:
 
 private:
   int64_t access_token_;
+};
+
+class DMLDistributedResponseMessage : public IMessage {
+private:
+    using NodeConnectionDTO = blazingdb::protocol::interpreter::NodeConnectionDTO;
+
+public:
+    DMLDistributedResponseMessage()
+    : IMessage()
+    { }
+
+    DMLDistributedResponseMessage(const uint8_t* buffer)
+    : IMessage() {
+        auto pointer = flatbuffers::GetRoot<blazingdb::protocol::orchestrator::DMLDistributedResponse>(buffer);
+        auto array_responses = pointer->responses();
+        for (const auto& response : (*array_responses)) {
+            auto resultToken = response->resultToken();
+            auto nodeInfo  = NodeConnectionDTO {
+                .port = response->nodeConnection()->port(),
+                .path = std::string{response->nodeConnection()->path()->c_str()},
+                .type = response->nodeConnection()->type()
+            };
+            auto calciteTime = response->calciteTime();
+            responses.emplace_back(DMLResponseMessage(resultToken, nodeInfo, calciteTime));
+        }
+    }
+
+    std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const override {
+        std::vector<flatbuffers::Offset<DMLResponse>> dml_responses;
+        flatbuffers::FlatBufferBuilder builder;
+
+        for (const auto& response : responses) {
+            auto nodeInfo = CreateNodeConnectionDirect(builder,
+                                                       response.getNodeInfo().port,
+                                                       response.getNodeInfo().path.data(),
+                                                       response.getNodeInfo().type);
+
+            dml_responses.emplace_back(CreateDMLResponse(builder,
+                                                         response.getResultToken(),
+                                                         nodeInfo,
+                                                         response.getCalciteTime()));
+        }
+
+        builder.Finish(CreateDMLDistributedResponseDirect(builder, &dml_responses));
+
+        return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+    }
+
+public:
+    std::vector<DMLResponseMessage> responses;
 };
 
 } // orchestrator

@@ -12,7 +12,7 @@ namespace util {
     void read_all(int descriptor, void * buffer, size_t size){
         char * buffer_position = static_cast<char*>(buffer);
         size_t position = 0;
-        size_t read_size = 1024 * 1024;
+        size_t read_size = 1024 * 1024 * 1024;
         while(position < size){
             if(position + read_size > size){
                 read_size = size - position;
@@ -29,7 +29,7 @@ namespace util {
     void write_all(int descriptor, void * buffer, size_t size){
         char * buffer_position = static_cast<char*>(buffer);
         size_t position = 0;
-        size_t read_size = 1024 * 1024;
+        size_t read_size = 1024 * 1024 * 1024;
         while(position < size){
             if(position + read_size > size){
                 read_size = size - position;
@@ -45,10 +45,12 @@ namespace util {
 
     void read_buffer(int descriptor, Buffer & buffer){
         uint32_t response_buffer_length;
+        
         read_all(descriptor, (void*)&response_buffer_length, sizeof(uint32_t));
         
         buffer.resize(response_buffer_length);
         read_all(descriptor, (void*)buffer.data(), response_buffer_length);
+    
     }
     void write_buffer(int descriptor, const Buffer & buffer){
         int buffer_length = buffer.size();

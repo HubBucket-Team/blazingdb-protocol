@@ -14,7 +14,7 @@ namespace protocol {
  
 class Server {
 public:
-  explicit Server(const Connection &connection);
+  explicit Server(int tcp_port);
 
   template <class Callable>
   void handle(Callable &&callback) const {
@@ -22,7 +22,8 @@ public:
   }
 
 private:
-  const Connection &connection_;
+  int sockfd;
+  struct sockaddr_in serverAddress;
 
   struct _HandlerBase;
   using __HandlerBaseType = std::shared_ptr<_HandlerBase>;

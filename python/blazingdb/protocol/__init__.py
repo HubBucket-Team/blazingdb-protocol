@@ -5,7 +5,7 @@ import socket
 import struct
 import threading
 
-__all__ = ['UnixSocketConnection', 'Server', 'Client']
+__all__ = ['UnixSocketConnection', 'Server', 'Client', 'TcpSocketConnection']
 
 
 class Buffer(abc.ABC):
@@ -29,6 +29,27 @@ class UnixSocketConnection:
   def address(self):
     return self.address_
 
+class TcpSocketConnection:
+
+  # ip is the string for the host or regular ip
+  # port is an int number
+  def __init__(self, ip, port):
+    self.ip_ = ip
+    self.port_ = port
+    self.socket_ = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
+    server_address = (self.ip_, self.port_)
+
+  def __del__(self):
+    self.socket_.close()
+
+  def ip(self):
+    return self.ip_
+
+  def port(self):
+    return self.port_
+
+  def address(self):
+      return (self.ip(), self.port())
 
 class Client:
 

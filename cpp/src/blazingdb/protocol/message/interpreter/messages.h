@@ -28,7 +28,9 @@ class  GetResultRequestMessage :  public TypedMessage<uint64_t, interpreter::Get
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
-    return this->getBufferDataUsing(interpreter::CreateGetResultRequest);
+    flatbuffers::FlatBufferBuilder builder;
+    builder.Finish(interpreter::CreateGetResultRequest(builder, value_));
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
 
   uint64_t  getResultToken () {

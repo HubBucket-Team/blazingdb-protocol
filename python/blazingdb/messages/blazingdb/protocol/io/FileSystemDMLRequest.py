@@ -23,7 +23,7 @@ class FileSystemDMLRequest(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return ""
+        return None
 
     # FileSystemDMLRequest
     def TableGroup(self):
@@ -36,7 +36,27 @@ class FileSystemDMLRequest(object):
             return obj
         return None
 
-def FileSystemDMLRequestStart(builder): builder.StartObject(2)
+    # FileSystemDMLRequest
+    def CommunicationContext(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from .CommunicationContext import CommunicationContext
+            obj = CommunicationContext()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # FileSystemDMLRequest
+    def ResultToken(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
+        return 0
+
+def FileSystemDMLRequestStart(builder): builder.StartObject(4)
 def FileSystemDMLRequestAddStatement(builder, statement): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(statement), 0)
 def FileSystemDMLRequestAddTableGroup(builder, tableGroup): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(tableGroup), 0)
+def FileSystemDMLRequestAddCommunicationContext(builder, communicationContext): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(communicationContext), 0)
+def FileSystemDMLRequestAddResultToken(builder, resultToken): builder.PrependUint64Slot(3, resultToken, 0)
 def FileSystemDMLRequestEnd(builder): return builder.EndObject()

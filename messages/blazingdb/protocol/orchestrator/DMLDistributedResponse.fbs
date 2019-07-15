@@ -1,0 +1,9 @@
+include "blazingdb/protocol/orchestrator/DMLResponse.fbs";
+
+namespace blazingdb.protocol.orchestrator;
+
+table DMLDistributedResponse {
+    responses: [DMLResponse];
+}
+
+root_type DMLDistributedResponse;
