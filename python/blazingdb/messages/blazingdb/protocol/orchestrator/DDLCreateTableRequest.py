@@ -23,7 +23,7 @@ class DDLCreateTableRequest(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return ""
+        return None
 
     # DDLCreateTableRequest
     def ColumnNames(self, j):
@@ -60,7 +60,7 @@ class DDLCreateTableRequest(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return ""
+        return None
 
     # DDLCreateTableRequest
     def SchemaType(self):
@@ -100,14 +100,14 @@ class DDLCreateTableRequest(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return ""
+        return None
 
     # DDLCreateTableRequest
     def CsvLineTerminator(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return ""
+        return None
 
     # DDLCreateTableRequest
     def CsvSkipRows(self):
@@ -116,7 +116,14 @@ class DDLCreateTableRequest(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return 0
 
-def DDLCreateTableRequestStart(builder): builder.StartObject(10)
+    # DDLCreateTableRequest
+    def ResultToken(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(24))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
+        return 0
+
+def DDLCreateTableRequestStart(builder): builder.StartObject(11)
 def DDLCreateTableRequestAddName(builder, name): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 def DDLCreateTableRequestAddColumnNames(builder, columnNames): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(columnNames), 0)
 def DDLCreateTableRequestStartColumnNamesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
@@ -130,4 +137,5 @@ def DDLCreateTableRequestStartFilesVector(builder, numElems): return builder.Sta
 def DDLCreateTableRequestAddCsvDelimiter(builder, csvDelimiter): builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(csvDelimiter), 0)
 def DDLCreateTableRequestAddCsvLineTerminator(builder, csvLineTerminator): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(csvLineTerminator), 0)
 def DDLCreateTableRequestAddCsvSkipRows(builder, csvSkipRows): builder.PrependInt32Slot(9, csvSkipRows, 0)
+def DDLCreateTableRequestAddResultToken(builder, resultToken): builder.PrependUint64Slot(10, resultToken, 0)
 def DDLCreateTableRequestEnd(builder): return builder.EndObject()

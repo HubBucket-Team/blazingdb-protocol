@@ -164,6 +164,8 @@ struct CommunicationContextSchema {
   std::uint64_t token;
 };
 
+
+
 struct FileSystemBlazingTableSchema {
   std::string name; //ok
   blazingdb::protocol::FileSchemaType schemaType; //ok
@@ -183,7 +185,8 @@ class FileSystemDMLRequestMessage : public IMessage {
 public: 
   FileSystemDMLRequestMessage(const uint8_t *buffer);
   FileSystemDMLRequestMessage(std::string statement, FileSystemTableGroupSchema tableGroup,  	                              
-                                  const CommunicationContextSchema &communicationContext);
+                                  const CommunicationContextSchema &communicationContext,
+                                  uint64_t resultToken);
 
   flatbuffers::Offset<blazingdb::protocol::io::FileSystemTableGroup> _BuildTableGroup(flatbuffers::FlatBufferBuilder &builder,
                                                         FileSystemTableGroupSchema tableGroup) const ;
@@ -193,11 +196,13 @@ public:
   const std::string &statement() const noexcept;
   const FileSystemTableGroupSchema &tableGroup() const noexcept;
   const CommunicationContextSchema &communicationContext() const noexcept;
+  const uint64_t &resultToken() const noexcept;
 
 private:
   std::string statement_;
   FileSystemTableGroupSchema tableGroup_;
   CommunicationContextSchema communicationContext_;
+  uint64_t resultToken_;
 };
 
 

@@ -42,6 +42,13 @@ class TableSchema(object):
         return 0
 
     # TableSchema
+    def CalciteToFileIndicesAsNumpy(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Uint64Flags, o)
+        return 0
+
+    # TableSchema
     def CalciteToFileIndicesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
@@ -57,6 +64,13 @@ class TableSchema(object):
         return 0
 
     # TableSchema
+    def TypesAsNumpy(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Int32Flags, o)
+        return 0
+
+    # TableSchema
     def TypesLength(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
@@ -69,6 +83,13 @@ class TableSchema(object):
         if o != 0:
             a = self._tab.Vector(o)
             return self._tab.Get(flatbuffers.number_types.Uint64Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 8))
+        return 0
+
+    # TableSchema
+    def NumRowGroupsAsNumpy(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Uint64Flags, o)
         return 0
 
     # TableSchema
@@ -98,14 +119,14 @@ class TableSchema(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return ""
+        return None
 
     # TableSchema
     def CsvLineTerminator(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             return self._tab.String(o + self._tab.Pos)
-        return ""
+        return None
 
     # TableSchema
     def CsvSkipRows(self):

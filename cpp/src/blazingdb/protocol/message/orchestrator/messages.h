@@ -155,6 +155,7 @@ public:
     csvLineTerminator = std::string{pointer->csvLineTerminator()->c_str()};
 
     csvSkipRows = pointer->csvSkipRows();
+    resultToken = pointer->resultToken();
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
@@ -178,7 +179,8 @@ public:
                                                             files_offset,
                                                             csvDelimiterOffset,
                                                             csvLineTerminatorOffset,
-                                                            csvSkipRows));
+                                                            csvSkipRows,
+                                                            resultToken));
 
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
@@ -193,6 +195,7 @@ public:
   std::string csvDelimiter;
   std::string csvLineTerminator;
   uint32_t csvSkipRows;
+  uint64_t resultToken;
 };
 
 // authorization
