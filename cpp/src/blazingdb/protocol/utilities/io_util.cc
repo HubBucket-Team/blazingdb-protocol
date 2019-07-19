@@ -20,7 +20,7 @@ namespace util {
             int n = read(descriptor, buffer_position, read_size);
             position += n;
             buffer_position += n;
-            if(n == 0){
+            if(n < 0){
                 throw std::runtime_error{"ERROR: was not able to read the total amount of " + std::to_string(size)};                
             }
         }
@@ -37,7 +37,7 @@ namespace util {
             int n = write(descriptor, buffer_position, read_size);
             position += n;
             buffer_position += n;
-            if(n == 0){
+            if(n < 0){
                 throw std::runtime_error{"ERROR: was not able to write the total amount of " + std::to_string(size)};                
             }
         }

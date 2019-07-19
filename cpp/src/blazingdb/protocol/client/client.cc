@@ -50,10 +50,8 @@ Client::Client(const ConnectionAddress &connectionAddress) {
     
     if (connect(sock, (struct sockaddr *)&server, sizeof(server)) < 0) {
         close(sock);
-        perror("connect failed. Error");
-        //return false;
+        throw std::runtime_error("Connection to server failed.");
     }
-    //return true;
     
     //TODO dtor close the socket
 }
