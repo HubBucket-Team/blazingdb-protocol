@@ -2,22 +2,22 @@
 
 #include <gtest/gtest.h>
 
-using blazingdb::message::io::CommunicationContext;
-using blazingdb::message::io::CommunicationNode;
+using blazingdb::message::io::CommunicationContextSchema;
+using blazingdb::message::io::CommunicationNodeSchema;
 using blazingdb::message::io::CsvFileSchema;
 using blazingdb::message::io::FileSystemBlazingTableSchema;
 using blazingdb::message::io::FileSystemDMLRequestMessage;
 using blazingdb::message::io::FileSystemTableGroupSchema;
 using blazingdb::message::io::ParquetFileSchema;
-using blazingdb::protocol::io::FileSchemaType;
+using blazingdb::protocol::FileSchemaType;
 
-inline static std::vector<CommunicationNode> MakeCommunicationNodes() {
+inline static std::vector<CommunicationNodeSchema> MakeCommunicationNodes() {
   std::vector<std::int8_t> buffer{1, 2, 3};
   return {{buffer}};
 }
 
-inline static CommunicationContext MakeCommunicationContext() {
-  std::vector<CommunicationNode> nodes{MakeCommunicationNodes()};
+inline static CommunicationContextSchema MakeCommunicationContext() {
+  std::vector<CommunicationNodeSchema> nodes{MakeCommunicationNodes()};
   return {nodes, 0, 12345};
 }
 
@@ -28,16 +28,22 @@ inline static std::vector<FileSystemBlazingTableSchema> MakeTables() {
   const ParquetFileSchema parquetFileSchema{
       "parquet file 1", {1, 2, 3}, {4, 5, 6}};
 
-  return {
-      {"table 1",
+  const FileSystemBlazingTableSchema filesystemBlazingTableSchema{
+        "table 1",
        FileSchemaType::FileSchemaType_CSV,
        csvFilesSchema,
-       parquetFileSchema,
-       {"file 1", "file 2"},
-       {"column 1", "column 2"}},
-  };
-}
+       parquetFileSchema};
 
+  return {filesystemBlazingTableSchema};
+}
+	std::vector<std::string> names;
+	std::vector<uint64_t> calciteToFileIndices;
+	std::vector<int> types;
+	std::vector<uint64_t> numRowGroups;
+  std::vector<std::string> files;
+  std::string csvDelimiter;
+  std::string csvLineTerminator;
+  uint32_t csvSkipRows;
 inline static FileSystemTableGroupSchema MakeSchema() {
   return {MakeTables(), "testTableGroup"};
 }
@@ -45,9 +51,9 @@ inline static FileSystemTableGroupSchema MakeSchema() {
 TEST(DMLRequestMessage, CheckSerialization) {
   const std::string                statement      = "select statement;";
   const FileSystemTableGroupSchema schema         = MakeSchema();
-  const CommunicationContext communicationContext = MakeCommunicationContext();
+  const CommunicationContextSchema communicationContext = MakeCommunicationContext();
 
-  FileSystemDMLRequestMessage message{statement, schema, communicationContext};
+  FileSystemDMLRequestMessage message{statement, schema, communicationContext, 0};
 
   std::shared_ptr<flatbuffers::DetachedBuffer> detachedBuffer =
       message.getBufferData();
@@ -84,9 +90,9 @@ TEST(DMLRequestMessage, CheckSerialization) {
 TEST(DMLRequestMessage, CheckConversion) {
   const std::string                statement      = "select statement;";
   const FileSystemTableGroupSchema schema         = MakeSchema();
-  const CommunicationContext communicationContext = MakeCommunicationContext();
+  const CommunicationContextSchema communicationContext = MakeCommunicationContext();
 
-  FileSystemDMLRequestMessage message{statement, schema, communicationContext};
+  FileSystemDMLRequestMessage message{statement, schema, communicationContext, 0};
 
   std::shared_ptr<flatbuffers::DetachedBuffer> detachedBuffer =
       message.getBufferData();
@@ -99,12 +105,12 @@ TEST(DMLRequestMessage, CheckConversion) {
 
   EXPECT_EQ("testTableGroup", resultTableGroup.name);
 
-  CommunicationContext resultCommunicationContext =
+  CommunicationContextSchema resultCommunicationContext =
       resultMessage.communicationContext();
 
-  EXPECT_EQ(0, resultCommunicationContext.masterIndex());
-  EXPECT_EQ(12345, resultCommunicationContext.token());
+  EXPECT_EQ(0, resultCommunicationContext.masterIndex);
+  EXPECT_EQ(12345, resultCommunicationContext.token);
 
   std::vector<std::int8_t> expectedBuffer{1, 2, 3};
-  EXPECT_EQ(expectedBuffer, resultCommunicationContext.nodes()[0].buffer());
+  EXPECT_EQ(expectedBuffer, resultCommunicationContext.nodes[0].buffer);
 }
