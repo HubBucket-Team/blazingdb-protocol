@@ -226,7 +226,7 @@ public:
     builder.Finish(orchestrator::CreateSchemaListDirect(builder, &payload));
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
-  tables
+  
 private:
   std::vector<DDLCreateTableRequestMessage> tables; 
 };
