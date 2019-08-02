@@ -74,6 +74,7 @@ struct TableSchemaSTL {
   std::string csvDelimiter;
   std::string csvLineTerminator;
   uint32_t csvSkipRows;
+  int32_t csvHeader;
 
   static flatbuffers::Offset<blazingdb::protocol::TableSchema> Serialize(flatbuffers::FlatBufferBuilder &builder, const TableSchemaSTL &data);
   static void Deserialize (const blazingdb::protocol::TableSchema *pointer, TableSchemaSTL* schema);
