@@ -108,6 +108,7 @@ class CsvFileSchema(transport.schema(CsvFile)):
     skipRows = transport.NumberSegment()
     names = transport.VectorStringSegment(transport.StringSegment)
     dtypes = transport.VectorSegment(transport.NumberSegment)
+    header = transport.NumberSegment()
 
 
 class ParquetFileSchema(transport.schema(ParquetFile)):
@@ -154,10 +155,11 @@ def _GetCsvSchema(kwargs):
     delimiter =  kwargs.get('delimiter', '')
     lineTerminator =  kwargs.get('lineTerminator', '')
     skipRows =  kwargs.get('skipRows', 0)
+    header = kwargs.get('header', 0)
     names =  kwargs.get('names', [])
     dtypes =  kwargs.get('dtypes', [])
     return CsvFileSchema(path=path, delimiter=delimiter, lineTerminator=lineTerminator, skipRows=skipRows, names=names,
-                         dtypes=dtypes)
+                         dtypes=dtypes, header = header)
 
 
 def _GetGdfSchema(kwargs):

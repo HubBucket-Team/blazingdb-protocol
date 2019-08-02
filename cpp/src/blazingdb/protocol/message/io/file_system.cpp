@@ -146,7 +146,8 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
     std::vector<flatbuffers::Offset<flatbuffers::String>>  names = BuildeFlatStringList(builder, data.names);
     // std::vector<int32_t> &dtypes = data.dtypes; ??@todo
      
-    return blazingdb::protocol::io::CreateCsvFile(builder, builder.CreateString(data.path.c_str()), builder.CreateString(data.delimiter.c_str()), builder.CreateString(data.line_terminator.c_str()), data.skip_rows, builder.CreateVector(names), builder.CreateVector( data.dtypes.data(),  data.dtypes.size()) );
+    return blazingdb::protocol::io::CreateCsvFile(builder, builder.CreateString(data.path.c_str()), builder.CreateString(data.delimiter.c_str()), builder.CreateString(data.line_terminator.c_str()), 
+        data.skip_rows, builder.CreateVector(names), builder.CreateVector( data.dtypes.data(),  data.dtypes.size()) , data.header);
   }
 
    void CsvFileSchema::Deserialize(const blazingdb::protocol::io::CsvFile *pointer, CsvFileSchema* schema) {
@@ -156,6 +157,7 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
     if (std::string{pointer->lineTerminator()->c_str()}.length() > 0)
       schema->line_terminator =  std::string{pointer->lineTerminator()->c_str()};
     schema->skip_rows =  pointer->skipRows();
+    schema->header = pointer->header();
 
     auto ColumnNamesFrom = [](const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *rawNames) -> std::vector<std::string> {
       std::vector<std::string> columnNames;
@@ -181,6 +183,7 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
       const std::string & delimiter,
 			const std::string & line_terminator,
 			int skip_rows,
+      int header,
 			const std::vector<std::string> & names,
 			const std::vector<int> & dtypes)
       : IMessage()
@@ -189,6 +192,7 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
      this->delimiter = delimiter;
      this->line_terminator = line_terminator;
      this->skip_rows = skip_rows;
+     this->header = header;
      this->names = names;
      this->dtypes = dtypes;
   }

@@ -61,6 +61,7 @@ table CsvFile {
     skipRows:int;
     names:[string];
     dtypes:[int];
+    header: int;
 }
 root_type CsvFile;
 

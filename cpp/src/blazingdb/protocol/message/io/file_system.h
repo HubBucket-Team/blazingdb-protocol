@@ -109,6 +109,7 @@ struct CsvFileSchema {
   int skip_rows = 0;
   std::vector<std::string> names;
   std::vector<int> dtypes;
+  int header = 0;
 
 
   static flatbuffers::Offset<blazingdb::protocol::io::CsvFile> Serialize(flatbuffers::FlatBufferBuilder &builder, CsvFileSchema data);
@@ -122,6 +123,7 @@ public:
       const std::string & delimiter,
 			const std::string & line_terminator,
 			int skip_rows,
+      int header,
 			const std::vector<std::string> & names,
 			const std::vector<int> & dtypes);
 
