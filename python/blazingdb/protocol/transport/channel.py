@@ -11,7 +11,7 @@ class RequestSchema(transport.schema(Request)):
   header = transport.StructSegment(Header)
   payload = transport.BytesSegment()
 
-
+#DEPRECATED percy we use only MakeRequestBuffer now
 def MakeAuthRequestBuffer(messageType, schema = AuthRequestSchema(), builderInitialSize=0):
   return MakeRequestBuffer(messageType, 0, schema, builderInitialSize)
 
