@@ -48,6 +48,7 @@ class DDLCreateTableRequestSchema(transport.schema(DDLCreateTableRequest)):
   csvLineTerminator = transport.StringSegment()
   csvSkipRows = transport.NumberSegment()
   resultToken = transport.NumberSegment()
+  csvHeader = transport.NumberSegment()
 
 class DDLDropTableRequestSchema(transport.schema(DDLDropTableRequest)):
   name = transport.StringSegment()
@@ -112,7 +113,8 @@ def BuildDMLRequestSchema(query, tableGroupDto):
   tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=tables, name=tableGroupName)
   return blazingdb.protocol.orchestrator.DMLRequestSchema(query=query, tableGroup=tableGroup)
 
-def BuildDDLCreateTableRequestSchema(name, columnNames, columnTypes, dbName, schemaType, gdf, files, csvDelimiter, csvLineTerminator, csvSkipRows,resultToken):
+def BuildDDLCreateTableRequestSchema(name, columnNames, columnTypes, dbName, schemaType, gdf, files, csvDelimiter, csvLineTerminator, 
+    csvSkipRows,resultToken, csvHeader):
   if(resultToken == 0):
     resultToken = gdf['resultToken']	
   columnTokens = gdf['columnTokens']
@@ -151,4 +153,5 @@ def BuildDDLCreateTableRequestSchema(name, columnNames, columnTypes, dbName, sch
                                                                                        csvDelimiter=csvDelimiter,
                                                                                        csvLineTerminator=csvLineTerminator,
                                                                                        csvSkipRows=csvSkipRows,
-                                                                                       resultToken=resultToken,)
+                                                                                       resultToken=resultToken,
+                                                                                       csvHeader=csvHeader)

@@ -15,6 +15,7 @@ table DDLCreateTableRequest {
   	csvLineTerminator: string;
   	csvSkipRows: int;
   	resultToken: ulong;
+	csvHeader: int;
 }
 
 root_type DDLCreateTableRequest;
