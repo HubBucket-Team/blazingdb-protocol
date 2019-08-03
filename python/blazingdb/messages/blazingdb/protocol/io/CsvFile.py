@@ -83,7 +83,13 @@ class CsvFile(object):
             return self._tab.VectorLen(o)
         return 0
 
-def CsvFileStart(builder): builder.StartObject(6)
+    def Header(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
+        return 0
+
+def CsvFileStart(builder): builder.StartObject(7)
 def CsvFileAddPath(builder, path): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(path), 0)
 def CsvFileAddDelimiter(builder, delimiter): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(delimiter), 0)
 def CsvFileAddLineTerminator(builder, lineTerminator): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(lineTerminator), 0)
@@ -92,4 +98,5 @@ def CsvFileAddNames(builder, names): builder.PrependUOffsetTRelativeSlot(4, flat
 def CsvFileStartNamesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
 def CsvFileAddDtypes(builder, dtypes): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(dtypes), 0)
 def CsvFileStartDtypesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def CsvFileAddHeader(builder, header): builder.PrependInt32Slot(6, header, 0)
 def CsvFileEnd(builder): return builder.EndObject()
