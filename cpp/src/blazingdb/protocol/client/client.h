@@ -13,6 +13,8 @@ class Client {
 public:
   explicit Client(const ConnectionAddress &connectionAddress);
 
+  ~Client();
+  
   Buffer send(const Buffer &buffer);
 
   Buffer send(std::shared_ptr<flatbuffers::DetachedBuffer> &buffer);
