@@ -52,8 +52,6 @@ Client::Client(const ConnectionAddress &connectionAddress) {
         close(sock);
         throw std::runtime_error("Connection to server failed.");
     }
-    
-    //TODO dtor close the socket
 }
 
 Client::~Client(){
