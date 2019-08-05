@@ -56,6 +56,11 @@ Client::Client(const ConnectionAddress &connectionAddress) {
     //TODO dtor close the socket
 }
 
+Client::~Client(){
+    close(sock);
+}
+
+
 Buffer Client::send(const Buffer &buffer) {
   if(sock == -1) {
       std::cout << "ERROR: Invalid socket for buffer size:" << buffer.size() <<std::endl;
