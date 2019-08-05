@@ -2,6 +2,7 @@ package com.blazingdb.protocol.message;
 
 import blazingdb.protocol.Header;
 import blazingdb.protocol.Request;
+
 import com.google.flatbuffers.FlatBufferBuilder;
 
 import java.nio.ByteBuffer;
@@ -16,6 +17,13 @@ public class RequestMessage implements IMessage {
         this.header = header;
         this.payloadBuffer = requestPayload.getBufferData();
     }
+
+    // RequestMessage without payload
+    public RequestMessage(HeaderMessage header) {
+        this.header = header;
+        this.payloadBuffer = ByteBuffer.wrap(new byte[1]);
+    }
+
 
     public ByteBuffer getPayloadBuffer() {
         return payloadBuffer;
