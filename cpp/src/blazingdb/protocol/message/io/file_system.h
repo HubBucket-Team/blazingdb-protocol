@@ -175,6 +175,10 @@ struct FileSystemBlazingTableSchema {
   ParquetFileSchema parquet; //deprecated
   blazingdb::protocol::BlazingTableSchema gdf; //ok
   blazingdb::protocol::TableSchemaSTL tableSchema; //ok
+
+  std::vector<std::string> columnNames{};
+  std::vector<std::string> columnTypes{};
+  
 };
 
 struct FileSystemTableGroupSchema {

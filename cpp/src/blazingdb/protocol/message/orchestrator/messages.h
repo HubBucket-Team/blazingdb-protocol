@@ -202,6 +202,40 @@ public:
   int32_t csvHeader;
 };
 
+
+class SchemaListMessage : public IMessage { 
+public:
+  SchemaListMessage(const std::vector<DDLCreateTableRequestMessage> &tables)
+    : tables{tables}
+  {}
+ 
+  std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
+    std::vector<flatbuffers::Offset<DDLCreateTableRequest>> payload;
+    flatbuffers::FlatBufferBuilder builder;
+
+    for (const auto& table : tables) {
+      auto name_offset = builder.CreateString(table.name);
+      auto vectorOfColumnNames = builder.CreateVectorOfStrings(table.columnNames);
+      auto vectorOfColumnTypes = builder.CreateVectorOfStrings(table.columnTypes);
+      auto dbname_offset = builder.CreateString(table.dbName);
+
+      auto table_offset = orchestrator::CreateDDLCreateTableRequest(builder,
+                                                              name_offset,
+                                                              vectorOfColumnNames,
+                                                              vectorOfColumnTypes,
+                                                              dbname_offset);
+      payload.push_back(table_offset);
+    }
+
+    builder.Finish(orchestrator::CreateSchemaListDirect(builder, &payload));
+    return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
+  }
+  
+private:
+  std::vector<DDLCreateTableRequestMessage> tables; 
+};
+
+
 // authorization
 
 
