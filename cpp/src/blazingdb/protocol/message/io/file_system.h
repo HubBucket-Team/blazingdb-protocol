@@ -174,8 +174,8 @@ struct FileSystemBlazingTableSchema {
   blazingdb::protocol::BlazingTableSchema gdf; //ok
   blazingdb::protocol::TableSchemaSTL tableSchema; //ok
 
-  std::vector<std::string> columnNames;
-  std::vector<std::string> columnTypes;
+  std::vector<std::string> columnNames{};
+  std::vector<std::string> columnTypes{};
   
 };
 
