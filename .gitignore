@@ -58,7 +58,3 @@ python/resources/
 python/\.idea/
 
 integration/services/cpp/build/
-
-# Eclipse files
-.project
-.pydevproject
