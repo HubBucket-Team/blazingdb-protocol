@@ -4,5 +4,6 @@ enum FileSchemaType :byte {
     CSV,
     PARQUET,
     GDF,
-    DISTRIBUTED
+    DISTRIBUTED,
+    DASK
 }

@@ -1,0 +1,14 @@
+include "blazingdb/protocol/interpreter/MessageType.fbs";
+include "blazingdb/protocol/TableGroup.fbs";
+namespace blazingdb.protocol.interpreter;
+
+
+table RegisterDaskSliceRequest {
+	gdf: BlazingTable;
+	resultToken: ulong;
+	access_token: long;
+}
+
+root_type RegisterDaskSliceRequest;
+
+
