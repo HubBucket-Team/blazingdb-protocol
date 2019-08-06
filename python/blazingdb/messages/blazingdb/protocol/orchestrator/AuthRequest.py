@@ -18,5 +18,13 @@ class AuthRequest(object):
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
-def AuthRequestStart(builder): builder.StartObject(0)
+    # AuthRequest
+    def AccessToken(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
+        return 0
+
+def AuthRequestStart(builder): builder.StartObject(1)
+def AuthRequestAddAccessToken(builder, accessToken): builder.PrependUint64Slot(0, accessToken, 0)
 def AuthRequestEnd(builder): return builder.EndObject()

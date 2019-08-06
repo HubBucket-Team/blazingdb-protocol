@@ -3,7 +3,7 @@ include "blazingdb/protocol/orchestrator/MessageType.fbs";
 namespace blazingdb.protocol.orchestrator;
 
 table AuthRequest {
-
+    accessToken: ulong;
 }
 
 root_type AuthRequest;
