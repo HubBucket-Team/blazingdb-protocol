@@ -10,6 +10,7 @@ table TableSchema {
   csvLineTerminator: string;
   csvSkipRows: int;
 	csvHeader: int;
+	csvNrows: int;
 }
 
 root_type TableSchema;

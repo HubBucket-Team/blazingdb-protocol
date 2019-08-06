@@ -49,6 +49,7 @@ class DDLCreateTableRequestSchema(transport.schema(DDLCreateTableRequest)):
   csvSkipRows = transport.NumberSegment()
   resultToken = transport.NumberSegment()
   csvHeader = transport.NumberSegment()
+  csvNrows = transport.NumberSegment()
 
 class DDLDropTableRequestSchema(transport.schema(DDLDropTableRequest)):
   name = transport.StringSegment()
@@ -114,7 +115,7 @@ def BuildDMLRequestSchema(query, tableGroupDto):
   return blazingdb.protocol.orchestrator.DMLRequestSchema(query=query, tableGroup=tableGroup)
 
 def BuildDDLCreateTableRequestSchema(name, columnNames, columnTypes, dbName, schemaType, gdf, files, csvDelimiter, csvLineTerminator, 
-    csvSkipRows,resultToken, csvHeader):
+    csvSkipRows,resultToken, csvHeader, csvNrows):
   if(resultToken == 0):
     resultToken = gdf['resultToken']	
   columnTokens = gdf['columnTokens']
@@ -144,14 +145,15 @@ def BuildDDLCreateTableRequestSchema(name, columnNames, columnTypes, dbName, sch
   table = blazingdb.protocol.orchestrator.BlazingTableSchema(columns=columns, columnTokens=columnTokens, resultToken=resultToken)
 
   return blazingdb.protocol.orchestrator.DDLCreateTableRequestSchema(name=name,
-                                                                                       columnNames=columnNames,
-                                                                                       columnTypes=columnTypes,
-                                                                                       dbName=dbName,
-                                                                                       schemaType=schemaType,
-                                                                                       gdf=table,
-                                                                                       files=files,
-                                                                                       csvDelimiter=csvDelimiter,
-                                                                                       csvLineTerminator=csvLineTerminator,
-                                                                                       csvSkipRows=csvSkipRows,
-                                                                                       resultToken=resultToken,
-                                                                                       csvHeader=csvHeader)
+                                                                      columnNames=columnNames,
+                                                                      columnTypes=columnTypes,
+                                                                      dbName=dbName,
+                                                                      schemaType=schemaType,
+                                                                      gdf=table,
+                                                                      files=files,
+                                                                      csvDelimiter=csvDelimiter,
+                                                                      csvLineTerminator=csvLineTerminator,
+                                                                      csvSkipRows=csvSkipRows,
+                                                                      resultToken=resultToken,
+                                                                      csvHeader=csvHeader,
+                                                                      csvNrows=csvNrows)
