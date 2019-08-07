@@ -1,4 +1,4 @@
-namespace blazingdb.protocol;
+namespace blazingdb.protocol.io;
 
 enum FileSchemaType :byte {
     CSV,

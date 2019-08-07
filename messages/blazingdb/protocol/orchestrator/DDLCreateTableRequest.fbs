@@ -1,4 +1,4 @@
-include "blazingdb/protocol/FileSchema.fbs";
+include "blazingdb/protocol/io/FileSchema.fbs";
 include "blazingdb/protocol/BlazingTable.fbs";
 
 namespace blazingdb.protocol.orchestrator;
@@ -8,7 +8,7 @@ table DDLCreateTableRequest {
 	columnNames: [string];
 	columnTypes: [string];
 	dbName: string;
-	schemaType: FileSchemaType;
+	schemaType: io.FileSchemaType;
 	gdf: BlazingTable;
 	files: [string];
 	csvDelimiter: string;

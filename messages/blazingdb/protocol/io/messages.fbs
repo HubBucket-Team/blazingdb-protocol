@@ -1,4 +1,4 @@
-include "blazingdb/protocol/FileSchema.fbs";
+include "blazingdb/protocol/io/FileSchema.fbs";
 include "blazingdb/protocol/TableSchema.fbs";
 
 namespace blazingdb.protocol.io;

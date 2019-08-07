@@ -271,11 +271,11 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
       for (const auto& table : *rawTables) {
 
         std::string name = std::string{table->name()->c_str()};
-        blazingdb::protocol::FileSchemaType schemaType = table->schemaType();
+        blazingdb::protocol::io::FileSchemaType schemaType = table->schemaType();
         blazingdb::protocol::TableSchemaSTL tableSchema;
         blazingdb::protocol::TableSchemaSTL::Deserialize(table->tableSchema(), &tableSchema);
 
-        if (schemaType == blazingdb::protocol::FileSchemaType::FileSchemaType_CSV) {
+        if (schemaType == blazingdb::protocol::io::FileSchemaType::FileSchemaType_CSV) {
           CsvFileSchema csv;
           CsvFileSchema::Deserialize(table->csv(), &csv);
 
@@ -287,7 +287,7 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
               .gdf = blazingdb::protocol::BlazingTableSchema{},
               .tableSchema = tableSchema
           });
-        } else if (schemaType == blazingdb::protocol::FileSchemaType::FileSchemaType_PARQUET) {
+        } else if (schemaType == blazingdb::protocol::io::FileSchemaType::FileSchemaType_PARQUET) {
           ParquetFileSchema parquet;
           ParquetFileSchema::Deserialize(table->parquet(), &parquet);
 
@@ -357,7 +357,7 @@ std::vector<flatbuffers::Offset<flatbuffers::String>>  BuildeFlatStringList(flat
 
     for (FileSystemBlazingTableSchema& table : tableGroup.tables) {
       flatbuffers::Offset<flatbuffers::String> nameOffset = builder.CreateString(table.name);
-      blazingdb::protocol::FileSchemaType schemaType = table.schemaType;
+      blazingdb::protocol::io::FileSchemaType schemaType = table.schemaType;
       flatbuffers::Offset<blazingdb::protocol::io::CsvFile> csvOffset = CsvFileSchema::Serialize(builder, table.csv);
       flatbuffers::Offset<blazingdb::protocol::io::ParquetFile> parquetOffset = ParquetFileSchema::Serialize(builder, table.parquet);
       flatbuffers::Offset<blazingdb::protocol::BlazingTable> gdfOffset = BlazingTableSchema::Serialize(builder, table.gdf);

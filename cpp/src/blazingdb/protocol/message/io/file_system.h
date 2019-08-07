@@ -168,7 +168,7 @@ struct CommunicationContextSchema {
 
 struct FileSystemBlazingTableSchema {
   std::string name; //ok
-  blazingdb::protocol::FileSchemaType schemaType; //ok
+  blazingdb::protocol::io::FileSchemaType schemaType; //ok
   CsvFileSchema csv; //deprecated
   ParquetFileSchema parquet; //deprecated
   blazingdb::protocol::BlazingTableSchema gdf; //ok
