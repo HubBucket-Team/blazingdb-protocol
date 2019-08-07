@@ -105,6 +105,46 @@ private:
 };
 
 
+class RegisterDaskSliceRequestMessage : public IMessage {
+public:
+    using BlazingTableSchema = blazingdb::protocol::BlazingTableSchema;
+
+    RegisterDaskSliceRequestMessage(
+        const BlazingTableSchema & blazingTableSchema,
+        const std::uint64_t        resultToken) noexcept;
+
+    RegisterDaskSliceRequestMessage(const std::uint8_t * data) noexcept;
+
+    std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final;
+
+    const BlazingTableSchema & blazingTableSchema() const noexcept;
+    std::uint64_t              resultToken() const noexcept;
+
+private:
+    const std::unique_ptr<const class RegisterDaskSliceRequestMessageP>
+        registerDaskSliceRequestMessageP_;
+};
+
+
+class RegisterDaskSliceResponseMessage : public IMessage {
+public:
+    using BlazingTableSchema = blazingdb::protocol::BlazingTableSchema;
+
+    RegisterDaskSliceResponseMessage(
+        const BlazingTableSchema & blazingTableSchema) noexcept;
+
+    RegisterDaskSliceResponseMessage(const std::uint8_t * data) noexcept;
+
+    std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final;
+
+    const BlazingTableSchema & blazingTableSchema() const noexcept;
+
+private:
+    const std::unique_ptr<const class RegisterDaskSliceResponseMessageP>
+        registerDaskSliceResponseMessageP_;
+};
+
+
 } // interpreter
 } // protocol
 } // blazingdb

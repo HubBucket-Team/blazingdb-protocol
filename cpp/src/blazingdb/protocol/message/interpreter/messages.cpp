@@ -46,7 +46,7 @@ namespace interpreter {
     return nodeInfo;
   }
 
-  
+
 
 
   GetResultResponseMessage::GetResultResponseMessage (const BlazingMetadataDTO&  metadata, const std::vector<std::string>& columnNames, const std::vector<uint64_t>& columnTokens, const std::vector<::gdf_dto::gdf_column>& columns)
@@ -104,7 +104,7 @@ namespace interpreter {
     return columns;
   }
 
-  
+
 
 
   CreateTableResponseMessage::CreateTableResponseMessage (const blazingdb::protocol::TableSchemaSTL& tableSchema)
@@ -131,6 +131,222 @@ namespace interpreter {
     return tableSchema;
   }
 
+
+  // RegisterDaskSliceRequestMessage
+
+  class RegisterDaskSliceRequestMessageP {
+  public:
+      virtual std::shared_ptr<flatbuffers::DetachedBuffer>
+      getBufferData() const = 0;
+
+      virtual const BlazingTableSchema & blazingTableSchema() const
+          noexcept = 0;
+
+      virtual std::uint64_t resultToken() const noexcept = 0;
+  };
+
+  class RegisterDaskSliceRequestMessagePDeserialized
+      : public RegisterDaskSliceRequestMessageP {
+  public:
+      explicit RegisterDaskSliceRequestMessagePDeserialized(
+          const BlazingTableSchema & blazingTableSchema,
+          const std::uint64_t        resultToken)
+          : blazingTableSchema_{blazingTableSchema}, resultToken_{resultToken} {
+      }
+
+      std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
+          flatbuffers::FlatBufferBuilder flatBufferBuilder;
+
+          flatbuffers::Offset<BlazingTable> blazingTable =
+              BlazingTableSchema::Serialize(flatBufferBuilder,
+                                            blazingTableSchema_);
+
+          flatBufferBuilder.Finish(CreateRegisterDaskSliceRequest(
+              flatBufferBuilder, blazingTable, resultToken_));
+
+          return std::make_shared<flatbuffers::DetachedBuffer>(
+              flatBufferBuilder.Release());
+      }
+
+      const BlazingTableSchema & blazingTableSchema() const noexcept final {
+          return blazingTableSchema_;
+      }
+
+      std::uint64_t resultToken() const noexcept final { return resultToken_; }
+
+  private:
+      const BlazingTableSchema & blazingTableSchema_;
+      const std::uint64_t        resultToken_;
+  };
+
+  class RegisterDaskSliceRequestMessagePSerialized
+      : public RegisterDaskSliceRequestMessageP {
+  public:
+      explicit RegisterDaskSliceRequestMessagePSerialized(
+          const std::uint8_t * data)
+          : data_{data} {
+          using blazingdb::protocol::interpreter::RegisterDaskSliceRequest;
+          const RegisterDaskSliceRequest * registerDaskSliceRequestRoot =
+              flatbuffers::GetRoot<RegisterDaskSliceRequest>(data);
+
+          using blazingdb::protocol::interpreter::RegisterDaskSliceRequestT;
+          flatbuffers::unique_ptr<RegisterDaskSliceRequestT>
+              registerDaskSliceRequestT =
+                  flatbuffers::unique_ptr<RegisterDaskSliceRequestT>(
+                      registerDaskSliceRequestRoot->UnPack());
+
+          using blazingdb::protocol::BlazingTable;
+          const BlazingTable * blazingTable =
+              registerDaskSliceRequestRoot->table();
+
+          BlazingTableSchema::Deserialize(blazingTable, &blazingTableSchema_);
+          resultToken_ = registerDaskSliceRequestT->resultToken;
+      }
+
+      std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
+          return std::make_shared<flatbuffers::DetachedBuffer>(
+              nullptr, false, const_cast<std::uint8_t *>(data_), 0, nullptr, 0);
+      }
+
+      const BlazingTableSchema & blazingTableSchema() const noexcept final {
+          return blazingTableSchema_;
+      }
+
+      std::uint64_t resultToken() const noexcept final { return resultToken_; }
+
+  private:
+      BlazingTableSchema   blazingTableSchema_;
+      std::uint64_t        resultToken_;
+      const std::uint8_t * data_;
+  };
+
+  RegisterDaskSliceRequestMessage::RegisterDaskSliceRequestMessage(
+      const BlazingTableSchema & blazingTableSchema,
+      const std::uint64_t        resultToken) noexcept
+      : registerDaskSliceRequestMessageP_{
+            std::make_unique<RegisterDaskSliceRequestMessagePDeserialized>(
+                blazingTableSchema, resultToken)} {}
+
+  RegisterDaskSliceRequestMessage::RegisterDaskSliceRequestMessage(
+      const std::uint8_t * data) noexcept
+      : registerDaskSliceRequestMessageP_{
+            std::make_unique<RegisterDaskSliceRequestMessagePSerialized>(
+                data)} {}
+
+  std::shared_ptr<flatbuffers::DetachedBuffer>
+  RegisterDaskSliceRequestMessage::getBufferData() const {
+      return registerDaskSliceRequestMessageP_->getBufferData();
+  }
+
+  const BlazingTableSchema &
+  RegisterDaskSliceRequestMessage::blazingTableSchema() const noexcept {
+      return registerDaskSliceRequestMessageP_->blazingTableSchema();
+  }
+
+  std::uint64_t RegisterDaskSliceRequestMessage::resultToken() const noexcept {
+      return registerDaskSliceRequestMessageP_->resultToken();
+  }
+
+
+  // RegisterDaskSliceResponseMessage
+
+  class RegisterDaskSliceResponseMessageP {
+  public:
+      virtual std::shared_ptr<flatbuffers::DetachedBuffer>
+      getBufferData() const = 0;
+
+      virtual const BlazingTableSchema & blazingTableSchema() const
+          noexcept = 0;
+  };
+
+  class RegisterDaskSliceResponseMessagePDeserialized
+      : public RegisterDaskSliceResponseMessageP {
+  public:
+      explicit RegisterDaskSliceResponseMessagePDeserialized(
+          const BlazingTableSchema & blazingTableSchema)
+          : blazingTableSchema_{blazingTableSchema} {}
+
+      std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
+          flatbuffers::FlatBufferBuilder flatBufferBuilder;
+
+          flatbuffers::Offset<BlazingTable> blazingTable =
+              BlazingTableSchema::Serialize(flatBufferBuilder,
+                                            blazingTableSchema_);
+
+          flatBufferBuilder.Finish(
+              CreateRegisterDaskSliceResponse(flatBufferBuilder, blazingTable));
+
+          return std::make_shared<flatbuffers::DetachedBuffer>(
+              flatBufferBuilder.Release());
+      }
+
+      const BlazingTableSchema & blazingTableSchema() const noexcept final {
+          return blazingTableSchema_;
+      }
+
+  private:
+      const BlazingTableSchema & blazingTableSchema_;
+  };
+
+  class RegisterDaskSliceResponseMessagePSerialized
+      : public RegisterDaskSliceResponseMessageP {
+  public:
+      explicit RegisterDaskSliceResponseMessagePSerialized(
+          const std::uint8_t * data)
+          : data_{data} {
+          using blazingdb::protocol::interpreter::RegisterDaskSliceResponse;
+          const RegisterDaskSliceResponse * registerDaskSliceResponseRoot =
+              flatbuffers::GetRoot<RegisterDaskSliceResponse>(data);
+
+          using blazingdb::protocol::interpreter::RegisterDaskSliceResponseT;
+          flatbuffers::unique_ptr<RegisterDaskSliceResponseT>
+              registerDaskSliceResponseT =
+                  flatbuffers::unique_ptr<RegisterDaskSliceResponseT>(
+                      registerDaskSliceResponseRoot->UnPack());
+
+          using blazingdb::protocol::BlazingTable;
+          const BlazingTable * blazingTable =
+              registerDaskSliceResponseRoot->table();
+
+          BlazingTableSchema::Deserialize(blazingTable, &blazingTableSchema_);
+      }
+
+      std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData() const final {
+          return std::make_shared<flatbuffers::DetachedBuffer>(
+              nullptr, false, const_cast<std::uint8_t *>(data_), 0, nullptr, 0);
+          ;
+      }
+
+      const BlazingTableSchema & blazingTableSchema() const noexcept final {
+          return blazingTableSchema_;
+      }
+
+  private:
+      BlazingTableSchema   blazingTableSchema_;
+      const std::uint8_t * data_;
+  };
+
+  RegisterDaskSliceResponseMessage::RegisterDaskSliceResponseMessage(
+      const BlazingTableSchema & blazingTableSchema) noexcept
+      : registerDaskSliceResponseMessageP_{
+            std::make_unique<RegisterDaskSliceResponseMessagePDeserialized>(
+                blazingTableSchema)} {}
+
+  RegisterDaskSliceResponseMessage::RegisterDaskSliceResponseMessage(
+      const std::uint8_t * data) noexcept
+      : registerDaskSliceResponseMessageP_{
+            std::make_unique<RegisterDaskSliceResponseMessagePSerialized>(
+                data)} {}
+
+  std::shared_ptr<flatbuffers::DetachedBuffer>
+  RegisterDaskSliceResponseMessage::getBufferData() const {
+      return registerDaskSliceResponseMessageP_->getBufferData();
+  }
+
+  const BlazingTableSchema &
+  RegisterDaskSliceResponseMessage::blazingTableSchema() const noexcept {
+      return registerDaskSliceResponseMessageP_->blazingTableSchema();
+  }
 
 } // interpreter
 } // protocol

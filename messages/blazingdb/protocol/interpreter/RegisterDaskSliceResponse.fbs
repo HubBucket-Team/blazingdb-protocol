@@ -1,0 +1,7 @@
+namespace blazingdb.protocol.interpreter;
+
+table RegisterDaskSliceResponse {
+	table : BlazingTable;
+}
+
+root_type RegisterDaskSliceResponse;

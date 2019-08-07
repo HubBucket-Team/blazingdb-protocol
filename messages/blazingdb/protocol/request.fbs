@@ -7,6 +7,7 @@ include "blazingdb/protocol/orchestrator/AuthRequest.fbs";
 include "blazingdb/protocol/orchestrator/DMLRequest.fbs";
 include "blazingdb/protocol/interpreter/ExecutePlanRequest.fbs";
 include "blazingdb/protocol/interpreter/GetResultRequest.fbs";
+include "blazingdb/protocol/interpreter/RegisterDaskSliceRequest.fbs";
 
 namespace blazingdb.protocol;
 
