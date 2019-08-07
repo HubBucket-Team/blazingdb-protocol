@@ -189,7 +189,7 @@ public:
   std::vector<std::string> columnNames;
   std::vector<std::string> columnTypes;
   std::string dbName;
-  blazingdb::protocol::FileSchemaType schemaType;
+  blazingdb::protocol::io::FileSchemaType schemaType;
 	blazingdb::protocol::BlazingTableSchema gdf;
 	std::vector<std::string> files;
   std::string csvDelimiter;
