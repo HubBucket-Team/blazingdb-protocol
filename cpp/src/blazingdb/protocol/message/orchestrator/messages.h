@@ -117,6 +117,44 @@ public:
 };
 
 
+// DDLCreateTableRequestMessage
+
+class NodeTableSchema {
+public:
+    explicit NodeTableSchema(const BlazingTableSchema & blazingTableSchema);
+
+    explicit NodeTableSchema(const NodeTable * nodeTable);
+
+    const BlazingTableSchema & blazingTable() const noexcept;
+
+    flatbuffers::Offset<NodeTable> CreateFlatBufferItem(
+        flatbuffers::FlatBufferBuilder & flatBufferBuilder) const noexcept;
+
+private:
+    std::shared_ptr<class NodeTableSchemaP> nodeTableSchemaP_;
+};
+
+class NodeTablesSchema {
+public:
+    explicit NodeTablesSchema();
+
+    explicit NodeTablesSchema(
+        const flatbuffers::Vector<flatbuffers::Offset<NodeTable>> * nodeTables);
+
+    bool IsEmpty() const noexcept;
+
+    const NodeTableSchema operator[](const std::size_t index) const noexcept;
+
+    void Push(const NodeTableSchema & nodeTableSchema) noexcept;
+
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<NodeTable>>>
+    CreateFlatBufferVector(
+        flatbuffers::FlatBufferBuilder & flatBufferBuilder) const noexcept;
+
+private:
+    std::unique_ptr<class NodeTablesSchemaP> nodeTablesSchemaP_;
+};
+
 class DDLCreateTableRequestMessage : public IMessage {
 public:
 
@@ -156,6 +194,9 @@ public:
 
     csvSkipRows = pointer->csvSkipRows();
     resultToken = pointer->resultToken();
+
+    nodeTables =
+        std::make_unique<NodeTablesSchema>(pointer->nodeTables());
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
@@ -169,18 +210,20 @@ public:
     auto csvDelimiterOffset = builder.CreateString(csvDelimiter);
     auto csvLineTerminatorOffset = builder.CreateString(csvLineTerminator);
 
-    builder.Finish(orchestrator::CreateDDLCreateTableRequest(builder,
-                                                            name_offset,
-                                                            vectorOfColumnNames,
-                                                            vectorOfColumnTypes,
-                                                            dbname_offset,
-                                                            schemaType,
-                                                            gdf_offset,
-                                                            files_offset,
-                                                            csvDelimiterOffset,
-                                                            csvLineTerminatorOffset,
-                                                            csvSkipRows,
-                                                            resultToken));
+    builder.Finish(orchestrator::CreateDDLCreateTableRequest(
+        builder,
+        name_offset,
+        vectorOfColumnNames,
+        vectorOfColumnTypes,
+        dbname_offset,
+        schemaType,
+        gdf_offset,
+        files_offset,
+        csvDelimiterOffset,
+        csvLineTerminatorOffset,
+        csvSkipRows,
+        resultToken,
+        nodeTables->CreateFlatBufferVector(builder)));
 
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
@@ -196,6 +239,7 @@ public:
   std::string csvLineTerminator;
   uint32_t csvSkipRows;
   uint64_t resultToken;
+  std::unique_ptr<NodeTablesSchema> nodeTables;
 };
 
 // authorization

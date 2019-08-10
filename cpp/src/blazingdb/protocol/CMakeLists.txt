@@ -11,6 +11,7 @@ set(SRCS
   message/interpreter/messages.cpp
   message/messages.cpp
   message/io/file_system.cpp
+  message/orchestrator/messages.cpp
 )
 find_package(Threads)
 

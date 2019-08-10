@@ -3,6 +3,10 @@ include "blazingdb/protocol/BlazingTable.fbs";
 
 namespace blazingdb.protocol.orchestrator;
 
+table NodeTable {
+  gdf: BlazingTable;
+}
+
 table DDLCreateTableRequest {
 	name: string;
 	columnNames: [string];
@@ -12,9 +16,10 @@ table DDLCreateTableRequest {
 	gdf: BlazingTable;
 	files: [string];
 	csvDelimiter: string;
-  	csvLineTerminator: string;
-  	csvSkipRows: int;
-  	resultToken: ulong;
+	csvLineTerminator: string;
+	csvSkipRows: int;
+	resultToken: ulong;
+  nodeTables: [NodeTable];
 }
 
 root_type DDLCreateTableRequest;
