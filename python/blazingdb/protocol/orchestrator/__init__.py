@@ -9,7 +9,7 @@ from blazingdb.messages.blazingdb.protocol \
   import TableGroup, BlazingTable
 
 from blazingdb.messages.blazingdb.protocol.orchestrator \
-  import DMLRequest, DMLResponse, DDLResponse, DDLCreateTableRequest, DDLDropTableRequest, DMLDistributedResponse
+  import DMLRequest, DMLResponse, DDLResponse, DDLCreateTableRequest, DDLDropTableRequest, DMLDistributedResponse, NodeTable
 
 from blazingdb.messages.blazingdb.protocol.orchestrator.MessageType \
   import MessageType as OrchestratorMessageType
@@ -36,6 +36,10 @@ class DMLRequestSchema(transport.schema(DMLRequest)):
   query = transport.StringSegment()
   tableGroup = transport.SchemaSegment(TableGroupSchema)
 
+class NodeTableSchema(transport.schema(NodeTable)):
+  socket = transport.NumberSegment()
+  gdf = transport.SchemaSegment(BlazingTableSchema)
+
 class DDLCreateTableRequestSchema(transport.schema(DDLCreateTableRequest)):
   name = transport.StringSegment()
   columnNames = transport.VectorStringSegment(transport.StringSegment)
@@ -48,6 +52,7 @@ class DDLCreateTableRequestSchema(transport.schema(DDLCreateTableRequest)):
   csvLineTerminator = transport.StringSegment()
   csvSkipRows = transport.NumberSegment()
   resultToken = transport.NumberSegment()
+  nodeTables = transport.VectorSchemaSegment(NodeTableSchema)
 
 class DDLDropTableRequestSchema(transport.schema(DDLDropTableRequest)):
   name = transport.StringSegment()
@@ -112,9 +117,20 @@ def BuildDMLRequestSchema(query, tableGroupDto):
   tableGroup = blazingdb.protocol.orchestrator.TableGroupSchema(tables=tables, name=tableGroupName)
   return blazingdb.protocol.orchestrator.DMLRequestSchema(query=query, tableGroup=tableGroup)
 
-def BuildDDLCreateTableRequestSchema(name, columnNames, columnTypes, dbName, schemaType, gdf, files, csvDelimiter, csvLineTerminator, csvSkipRows,resultToken):
+def BuildDDLCreateTableRequestSchema(name,
+                                     columnNames,
+                                     columnTypes,
+                                     dbName,
+                                     schemaType,
+                                     gdf,
+                                     files,
+                                     csvDelimiter,
+                                     csvLineTerminator,
+                                     csvSkipRows,
+                                     resultToken,
+                                     daskTables):
   if(resultToken == 0):
-    resultToken = gdf['resultToken']	
+    resultToken = gdf['resultToken']
   columnTokens = gdf['columnTokens']
   columns = []
   for i, c in enumerate(gdf['columns']):
@@ -142,13 +158,14 @@ def BuildDDLCreateTableRequestSchema(name, columnNames, columnTypes, dbName, sch
   table = blazingdb.protocol.orchestrator.BlazingTableSchema(columns=columns, columnTokens=columnTokens, resultToken=resultToken)
 
   return blazingdb.protocol.orchestrator.DDLCreateTableRequestSchema(name=name,
-                                                                                       columnNames=columnNames,
-                                                                                       columnTypes=columnTypes,
-                                                                                       dbName=dbName,
-                                                                                       schemaType=schemaType,
-                                                                                       gdf=table,
-                                                                                       files=files,
-                                                                                       csvDelimiter=csvDelimiter,
-                                                                                       csvLineTerminator=csvLineTerminator,
-                                                                                       csvSkipRows=csvSkipRows,
-                                                                                       resultToken=resultToken,)
+                                                                     columnNames=columnNames,
+                                                                     columnTypes=columnTypes,
+                                                                     dbName=dbName,
+                                                                     schemaType=schemaType,
+                                                                     gdf=table,
+                                                                     files=files,
+                                                                     csvDelimiter=csvDelimiter,
+                                                                     csvLineTerminator=csvLineTerminator,
+                                                                     csvSkipRows=csvSkipRows,
+                                                                     resultToken=resultToken,
+                                                                     nodeTables=daskTables)
