@@ -1,11 +1,9 @@
 include "blazingdb/protocol/FileSchema.fbs";
 include "blazingdb/protocol/BlazingTable.fbs";
 
-namespace blazingdb.protocol.orchestrator;
+include "blazingdb/protocol/orchestrator/NodeTable.fbs";
 
-table NodeTable {
-  gdf: BlazingTable;
-}
+namespace blazingdb.protocol.orchestrator;
 
 table DDLCreateTableRequest {
 	name: string;

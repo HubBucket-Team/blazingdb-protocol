@@ -1,0 +1,9 @@
+include "blazingdb/protocol/BlazingTable.fbs";
+
+namespace blazingdb.protocol.orchestrator;
+
+table NodeTable {
+  gdf: BlazingTable;
+}
+
+root_type NodeTable;
