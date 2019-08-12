@@ -13,4 +13,5 @@ class MessageType(object):
     LoadParquetSchema = 7
     ExecutePlanFileSystem = 8
     FreeMemory = 9
+    RegisterDaskSlice = 10
 

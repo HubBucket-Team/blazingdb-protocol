@@ -7,4 +7,5 @@ class FileSchemaType(object):
     PARQUET = 1
     GDF = 2
     DISTRIBUTED = 3
+    DASK = 4
 

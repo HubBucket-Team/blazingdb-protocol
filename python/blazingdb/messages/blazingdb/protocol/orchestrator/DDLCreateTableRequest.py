@@ -74,7 +74,7 @@ class DDLCreateTableRequest(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
-            from .BlazingTable import BlazingTable
+            from blazingdb.messages.blazingdb.protocol.BlazingTable import BlazingTable
             obj = BlazingTable()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -123,7 +123,27 @@ class DDLCreateTableRequest(object):
             return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
         return 0
 
-def DDLCreateTableRequestStart(builder): builder.StartObject(11)
+    # DDLCreateTableRequest
+    def NodeTables(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
+            x = self._tab.Indirect(x)
+            from blazingdb.messages.blazingdb.protocol.orchestrator.NodeTable import NodeTable
+            obj = NodeTable()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # DDLCreateTableRequest
+    def NodeTablesLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+def DDLCreateTableRequestStart(builder): builder.StartObject(12)
 def DDLCreateTableRequestAddName(builder, name): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 def DDLCreateTableRequestAddColumnNames(builder, columnNames): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(columnNames), 0)
 def DDLCreateTableRequestStartColumnNamesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
@@ -138,4 +158,6 @@ def DDLCreateTableRequestAddCsvDelimiter(builder, csvDelimiter): builder.Prepend
 def DDLCreateTableRequestAddCsvLineTerminator(builder, csvLineTerminator): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(csvLineTerminator), 0)
 def DDLCreateTableRequestAddCsvSkipRows(builder, csvSkipRows): builder.PrependInt32Slot(9, csvSkipRows, 0)
 def DDLCreateTableRequestAddResultToken(builder, resultToken): builder.PrependUint64Slot(10, resultToken, 0)
+def DDLCreateTableRequestAddNodeTables(builder, nodeTables): builder.PrependUOffsetTRelativeSlot(11, flatbuffers.number_types.UOffsetTFlags.py_type(nodeTables), 0)
+def DDLCreateTableRequestStartNodeTablesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
 def DDLCreateTableRequestEnd(builder): return builder.EndObject()
