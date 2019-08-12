@@ -142,7 +142,8 @@ flatbuffers::Offset<TableGroup> BuildTableGroup(flatbuffers::FlatBufferBuilder &
     auto csvDelimiterOffset = builder.CreateString(data.csvDelimiter);
     auto csvLineTerminatorOffset = builder.CreateString(data.csvLineTerminator);
 
-    return blazingdb::protocol::CreateTableSchema(builder, namesOffset, calciteToFileIndicesOffset, typesOffset, numRowGroupsOffset, filesOffset, csvDelimiterOffset, csvLineTerminatorOffset, data.csvSkipRows);
+    return blazingdb::protocol::CreateTableSchema(builder, namesOffset, calciteToFileIndicesOffset, typesOffset, numRowGroupsOffset, filesOffset, 
+      csvDelimiterOffset, csvLineTerminatorOffset, data.csvSkipRows, data.csvHeader);
   }
   void TableSchemaSTL::Deserialize (const blazingdb::protocol::TableSchema *pointer, TableSchemaSTL* schema){
       schema->names.clear();
@@ -180,6 +181,8 @@ flatbuffers::Offset<TableGroup> BuildTableGroup(flatbuffers::FlatBufferBuilder &
       schema->csvLineTerminator = std::string{pointer->csvLineTerminator()->c_str()};
 
       schema->csvSkipRows = pointer->csvSkipRows();
+
+      schema->csvHeader = pointer->csvHeader();
   }
 
 

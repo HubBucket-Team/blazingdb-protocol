@@ -156,6 +156,8 @@ public:
 
     csvSkipRows = pointer->csvSkipRows();
     resultToken = pointer->resultToken();
+
+    csvHeader = pointer->csvHeader();
   }
 
   std::shared_ptr<flatbuffers::DetachedBuffer> getBufferData( ) const override  {
@@ -180,7 +182,8 @@ public:
                                                             csvDelimiterOffset,
                                                             csvLineTerminatorOffset,
                                                             csvSkipRows,
-                                                            resultToken));
+                                                            resultToken,
+                                                            csvHeader));
 
     return std::make_shared<flatbuffers::DetachedBuffer>(builder.Release());
   }
@@ -196,6 +199,7 @@ public:
   std::string csvLineTerminator;
   uint32_t csvSkipRows;
   uint64_t resultToken;
+  int32_t csvHeader;
 };
 
 

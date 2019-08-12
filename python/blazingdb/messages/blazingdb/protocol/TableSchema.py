@@ -135,7 +135,14 @@ class TableSchema(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return 0
 
-def TableSchemaStart(builder): builder.StartObject(8)
+    # TableSchema
+    def CsvHeader(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
+        return 0
+
+def TableSchemaStart(builder): builder.StartObject(9)
 def TableSchemaAddNames(builder, names): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(names), 0)
 def TableSchemaStartNamesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
 def TableSchemaAddCalciteToFileIndices(builder, calciteToFileIndices): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(calciteToFileIndices), 0)
@@ -149,4 +156,5 @@ def TableSchemaStartFilesVector(builder, numElems): return builder.StartVector(4
 def TableSchemaAddCsvDelimiter(builder, csvDelimiter): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(csvDelimiter), 0)
 def TableSchemaAddCsvLineTerminator(builder, csvLineTerminator): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(csvLineTerminator), 0)
 def TableSchemaAddCsvSkipRows(builder, csvSkipRows): builder.PrependInt32Slot(7, csvSkipRows, 0)
+def TableSchemaAddCsvHeader(builder, csvHeader): builder.PrependInt32Slot(8, csvHeader, 0)
 def TableSchemaEnd(builder): return builder.EndObject()

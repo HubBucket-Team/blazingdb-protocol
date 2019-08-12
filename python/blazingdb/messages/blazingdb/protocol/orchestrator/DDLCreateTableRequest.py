@@ -123,7 +123,14 @@ class DDLCreateTableRequest(object):
             return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
         return 0
 
-def DDLCreateTableRequestStart(builder): builder.StartObject(11)
+    # DDLCreateTableRequest
+    def CsvHeader(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(26))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
+        return 0
+
+def DDLCreateTableRequestStart(builder): builder.StartObject(12)
 def DDLCreateTableRequestAddName(builder, name): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
 def DDLCreateTableRequestAddColumnNames(builder, columnNames): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(columnNames), 0)
 def DDLCreateTableRequestStartColumnNamesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
@@ -138,4 +145,5 @@ def DDLCreateTableRequestAddCsvDelimiter(builder, csvDelimiter): builder.Prepend
 def DDLCreateTableRequestAddCsvLineTerminator(builder, csvLineTerminator): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(csvLineTerminator), 0)
 def DDLCreateTableRequestAddCsvSkipRows(builder, csvSkipRows): builder.PrependInt32Slot(9, csvSkipRows, 0)
 def DDLCreateTableRequestAddResultToken(builder, resultToken): builder.PrependUint64Slot(10, resultToken, 0)
+def DDLCreateTableRequestAddCsvHeader(builder, csvHeader): builder.PrependInt32Slot(11, csvHeader, 0)
 def DDLCreateTableRequestEnd(builder): return builder.EndObject()
