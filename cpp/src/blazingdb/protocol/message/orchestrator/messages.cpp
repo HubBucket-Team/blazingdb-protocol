@@ -68,7 +68,7 @@ public:
         flatbuffers::Offset<BlazingTable> blazingTable =
             BlazingTableSchema::Serialize(flatBufferBuilder,
                                           blazingTableSchema_);
-        return CreateNodeTable(flatBufferBuilder, blazingTable);
+        return CreateNodeTable(flatBufferBuilder, 0, blazingTable);
     }
 
 private:
@@ -96,7 +96,7 @@ public:
         flatbuffers::Offset<BlazingTable> blazingTable =
             BlazingTableSchema::Serialize(flatBufferBuilder,
                                           blazingTableSchema_);
-        return CreateNodeTable(flatBufferBuilder, blazingTable);
+        return CreateNodeTable(flatBufferBuilder, 0, blazingTable);
     }
 
 private:
